@@ -29,7 +29,7 @@
 	T1 .req R1  // temporary
 	T2 .req R2  // temporary
 	UP .req R3   // system variables pointer 
-	IP .req R4   // scratch 
+	IPP .req R4   // scratch 
 	TOS .req R5  // top of data stack 
 	DSP .req R6   // scratch 
 	RSP .req R7   // scratch 
@@ -50,38 +50,56 @@
 	.equ DEND , VID_BUFF-4  /*usable RAM end */
     .equ MAPOFFSET, RAM_ADR-0x8000200
 
+	.equ COMPO ,	0x040	/*lexicon compile only */ 
+	.equ IMEDD ,	0x080	/*lexicon immediate bit */
+	.equ MASKK ,	0x0FFFFFF1F	/*lexicon bit mask, allowed for Chineze character */
+
+	.equ CELLL ,	4	/*size of a cell */
+	.equ BASEE ,	10	/*default radix */
+	.equ VOCSS ,	8	/*depth of vocabulary stack */
+
+	.equ BKSPP ,	8	/*backspace */
+	.equ LF ,	10	  /*line feed */
+	.equ CRR ,	13	/*carriage return */
+	.equ ERR ,	27	/*error escape */
+	.equ TIC ,	39	/*tick */
+
 /*************************************
    system variables offset from UPP
 *************************************/
-  .equ SEED_OFS, 4    // prng seed 
-  .equ TICKS_OFS, SEED_OFS+4  // millseconds counter
-  .equ TIMER_OFS, TICKS_OFS+4  // count down timer
-  .equ BOOT_OFS, TIMER_OFS+4  // boot program address
-  .equ BASE_OFS, BOOT_OFS+4  // numeric conversion base 
-  .equ TMP_OFS, BASE_OFS+4   // temporary variable
-  .equ SPAN_OFS, TMP_OFS+4  // character count received by expect  
-  .equ TOIN_OFS, SPAN_OFS+4  // >IN  parse pointer in TIB
-  .equ NTIB_OFS, TOIN_OFS+4  // #TIB  characters in TIB 
-  .equ TIB_OFS, NTIB_OFS+4   // TIB buffer address 
-  .equ EVAL_OFS, TIB_OFS+4  // eval|compile vector 
-  .equ HLD_OFS, EVAL_OFS+4   // hold pointer 
-  .equ CTXT_OFS, HLD_OFS+4  // context pointer 
-  .equ FORTH_CTOP_OFS, CTXT_OFS+4  // flash free dictionary address 
-  .equ USER_CTOP_OFS, FORTH_CTOP_OFS+4  // ram free dictionary address
-  .equ LASTN_OFS, USER_CTOP_OFS+4     // last word in dictionary link nfa 
+  .equ SEED, 4    // prng seed 
+  .equ TICKS, SEED+4  // millseconds counter
+  .equ TIMER, TICKS+4  // count down timer
+  .equ BOOT, TIMER+4  // boot program address
+  .equ BASE, BOOT+4  // numeric conversion base 
+  .equ TMP, BASE+4   // temporary variable
+  .equ SPAN, TMP+4  // character count received by expect  
+  .equ TOIN, SPAN+4  // >IN  parse pointer in TIB
+  .equ NTIB, TOIN+4  // #TIB  characters in TIB 
+  .equ TIB, NTIB+4   // TIB buffer address 
+  .equ EVAL, TIB+4  // eval|compile vector 
+  .equ HLD, EVAL+4   // hold pointer 
+  .equ CTXT, HLD+4  // context pointer 
+  .equ FORTH_CTOP, CTXT+4  // flash free dictionary address 
+  .equ USER_CTOP, FORTH_CTOP+4  // ram free dictionary address
+  .equ LASTN, USER_CTOP+4     // last word in dictionary link nfa 
   .equ RX_QUEUE_SIZE, 16 // uart_rx queue size 16 characters 
-  .equ RX_QUEUE_OFS, LASTN_OFS+4 // rx queue 
-  .equ RX_HEAD_OFS, RX_QUEUE_OFS+RX_QUEUE_SIZE // queue head indice 
-  .equ RX_TAIL_OFS, RX_HEAD_OFS+4 // queue tail indice 
-  .equ VID_CNTR_OFS, RX_TAIL_OFS+4 // video line counter 
-  .equ VID_STATE_OFS, VID_CNTR_OFS+4 // video field,ODD=0,EVEN=1 
-  .equ VID_FIELD_OFS, VID_STATE_OFS+4 // VSYNC,PRE_VID,VID,POST_VID 
-  .equ VID_BUFFER_OFS, VID_FIELD_OFS+4 // video buffer address 
-  .equ KBD_STRUCT_OFS, VID_BUFFER_OFS+4 // keyboard structure 
+  .equ RX_QUEUE, LASTN+4 // rx queue 
+  .equ RX_HEAD, RX_QUEUE+RX_QUEUE_SIZE // queue head indice 
+  .equ RX_TAIL, RX_HEAD+4 // queue tail indice 
+  .equ VID_CNTR, RX_TAIL+4 // video line counter 
+  .equ VID_STATE, VID_CNTR+4 // video field,ODD=0,EVEN=1 
+  .equ VID_FIELD, VID_STATE+4 // VSYNC,PRE_VID,VID,POST_VID 
+  .equ VID_BUFFER, VID_FIELD+4 // video buffer address 
+  .equ KBD_STRUCT, VID_BUFFER+4 // keyboard structure 
   .equ KBD_QUEUE_SIZE, 16 
-  .equ KBD_QUEUE_OFS, KBD_STRUCT_OFS+4 
-  .equ KBD_QHEAD_OFS,KBD_QUEUE_OFS+KBD_QUEUE_SIZE 
-  .equ KBD_QTAIL_OFS,KBD_QHEAD_OFS+4
+  .equ KBD_QUEUE, KBD_STRUCT+4 
+  .equ KBD_QHEAD,KBD_QUEUE+KBD_QUEUE_SIZE 
+  .equ KBD_QTAIL,KBD_QHEAD+4
+  .equ ROW,KBD_QTAIL+4 
+  .equ COL,ROW+4 
+  .equ BK_COLOR,COL+4 
+  .equ FT_COLOR,BK_COLOR+4
 
 /***********************************************
 * MACROS
@@ -133,10 +151,8 @@
 		.ascii "\name"
 		.p2align 2 
 	CA_\label:   // code field address 
-		.word \label + MAPOFFSET 
-		.section .text, "ax", %progbits 
-		.p2align 2 
-	\label:  // code address in .section .text 
+		.word \label
+	\label:  // code
 	.endm 
 	
 

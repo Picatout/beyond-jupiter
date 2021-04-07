@@ -128,25 +128,25 @@ NOTES:
 /*************************************
   TIMER3 interrupt for tv_out
   T1 line # 
-  T2 TIM3_BASE_ADR 
+  T0 TIM3_BASE_ADR 
 *************************************/
   _GBL_FUNC tv_out_isr
-  push {T2,XP,YP}
-  _MOV32 T2,TIM3_BASE_ADR
+  push {T0,T1,T2,T3}
+  _MOV32 T0,TIM3_BASE_ADR
   eor T1,T1
-  str T1,[T2,#TIM_SR]
-  ldr T1,[UP,#VID_CNTR_OFS]
+  str T1,[T0,#TIM_SR]
+  ldr T1,[UP,#VID_CNTR]
   add T1,#1 
-  str T1,[UP,#VID_CNTR_OFS]
+  str T1,[UP,#VID_CNTR]
 /** machine state cases **/
-  ldr XP,[UP,#VID_STATE_OFS]
-  cmp XP,#ST_VSYNC 
+  ldr T2,[UP,#VID_STATE]
+  cmp T2,#ST_VSYNC 
   beq state_vsync
-  cmp XP,#ST_PREVID 
+  cmp T2,#ST_PREVID 
   beq state_pre_video 
-  cmp XP,#ST_VIDEO 
+  cmp T2,#ST_VIDEO 
   beq state_video_out 
-  cmp XP,#ST_POSTVID 
+  cmp T2,#ST_POSTVID 
   beq state_post_video
   b default_handler // invalid state 
 /*** vertical sync state **/
@@ -154,50 +154,50 @@ state_vsync:
   cmp T1,#1
   bne 1f 
 /****** set vertical pre-sync  *****/
-  mov XP,#SERRATION
-  str XP,[T2,#TIM_CCR4]
-  mov XP,#SYNC_LINE 
-  str XP,[T2,#TIM_ARR]
+  mov T1,#SERRATION
+  str T1,[T0,#TIM_CCR4]
+  mov T1,#SYNC_LINE 
+  str T1,[T0,#TIM_ARR]
   b tv_isr_exit 
 1: cmp T1,#7
   bne 2f 
 // vertical sync pulse   
-  mov XP,#VSYNC_PULSE
-  str XP,[T2,#TIM_CCR4]
+  mov T1,#VSYNC_PULSE
+  str T1,[T0,#TIM_CCR4]
   b tv_isr_exit
 2: cmp T1,#13
    bne 3f  
 // set vertical post-sync    
-   mov XP,#SERRATION 
-   str XP,[T2,#TIM_CCR4]
+   mov T1,#SERRATION 
+   str T1,[T0,#TIM_CCR4]
    b tv_isr_exit   
 3: cmp T1,#18
    bne 4f 
 // if even field full line  
-   ldr XP,[UP,#VID_FIELD_OFS]
-   cmp XP,#ODD_FIELD  
+   ldr T1,[UP,#VID_FIELD]
+   cmp T1,#ODD_FIELD  
    beq tv_isr_exit 
    b sync_end 
 4: cmp T1,#19 
    bne tv_isr_exit
 sync_end: 
    mov T1,#9
-   str T1,[UP,#VID_CNTR_OFS]
-   mov XP,#HPULSE 
-   str XP,[T2,#TIM_CCR4] 
-   mov XP,#HPER 
-   str XP,[T2,#TIM_ARR] 
-   mov XP,#ST_PREVID 
-   str XP,[UP,#VID_STATE_OFS]
+   str T1,[UP,#VID_CNTR]
+   mov T1,#HPULSE 
+   str T1,[T0,#TIM_CCR4] 
+   mov T1,#HPER 
+   str T1,[T0,#TIM_ARR] 
+   mov T1,#ST_PREVID 
+   str T1,[UP,#VID_STATE]
    b tv_isr_exit 
 /*****************************/
 state_pre_video:
    cmp T1,#VIDEO_FIRST_LINE
    bmi tv_isr_exit 
-   mov XP,#ST_VIDEO 
-   str XP,[UP,#VID_STATE_OFS]
-   mov XP,#(1<<3) // CC3IE 
-   str XP,[T2,#TIM_DIER]
+   mov T1,#ST_VIDEO 
+   str T1,[UP,#VID_STATE]
+   mov T1,#(1<<3) // CC3IE 
+   str T1,[T0,#TIM_DIER]
    b tv_isr_exit 
 /**************************
     VIDEO OUTPUT 
@@ -205,53 +205,52 @@ state_pre_video:
 state_video_out:
    cmp T1,#VIDEO_LAST_LINE 
    bmi 1f 
-   mov XP,#ST_POSTVID 
-   str XP,[UP,#VID_STATE_OFS]
-   mov XP,#1 
-   str XP,[T2,#TIM_DIER]
+   mov T1,#ST_POSTVID 
+   str T1,[UP,#VID_STATE]
+   mov T1,#1 
+   str T1,[T0,#TIM_DIER]
    b tv_isr_exit 
 1: // video output
-   ldr T2,[UP,#VID_BUFFER_OFS]
-   sub T1,#VIDEO_FIRST_LINE 
-   mov XP,#160
-   mul T1,XP 
-   add T2,T1  
-   mov YP,#160
-   _MOV32 XP,GPIOA_BASE_ADR 
-2: ldrb T1,[T2]
-   lsr T1,#4 
-   str T1,[XP,#GPIO_ODR]
+   ldr T0,[UP,#VID_BUFFER]
+   sub T1,#(VIDEO_FIRST_LINE+1) 
+   mov T3,#160
+   mul T1,T3 
+   add T0,T1  
+   _MOV32 T1,GPIOA_BASE_ADR 
+2: ldrb T2,[T0]
+   lsr T2,#4 
+   str T2,[T1,#GPIO_ODR]
    nop.w
    nop.w 
-   ldrb T1,[T2],#1
-   and T1,#15 
-   str T1,[XP,#GPIO_ODR]
+   ldrb T2,[T0],#1
+   and T2,#15 
+   str T2,[T1,#GPIO_ODR]
    nop.w
    nop.w  
-   subs YP,#1
+   subs T3,#1
    bne 2b  
-   mov T1,#(15<<16) 
-   str T1,[XP,#GPIO_BSRR]
+   mov T2,#(15<<16) 
+   str T2,[T1,#GPIO_BSRR]
    b tv_isr_exit 
 state_post_video:
-   mov XP,#262
-   cmp T1,XP
+   mov T2,#262
+   cmp T1,T2
    bmi tv_isr_exit     
 // odd field line 262 half line 
-   ldr XP,[UP,VID_FIELD_OFS]
-   cbnz XP, frame_end 
+   ldr T1,[UP,VID_FIELD]
+   cbnz T1, frame_end 
    mov T1,#SYNC_LINE
-   str T1,[T2,#TIM_ARR]      
+   str T1,[T0,#TIM_ARR]      
 frame_end: 
    mov T1,#ST_VSYNC 
-   str T1,[UP,#VID_STATE_OFS]
+   str T1,[UP,#VID_STATE]
    eor T1,T1 
-   str T1,[UP,#VID_CNTR_OFS]
-   ldr XP,[UP,#VID_FIELD_OFS]
-   mvn XP,XP  
-   str XP,[UP,#VID_FIELD_OFS]
+   str T1,[UP,#VID_CNTR]
+   ldr T1,[UP,#VID_FIELD]
+   mvn T1,T1  
+   str T1,[UP,#VID_FIELD]
 tv_isr_exit: 
-   pop {T2,XP,YP}
+   pop {T0,T1,T2,T3}
    _RET   
 
 /**********************************
@@ -271,6 +270,9 @@ tv_isr_exit:
 /********************************************
     TV font  ASCII 6 pixels x 8 pixels 
 ********************************************/
+  .equ CHAR_WIDTH, 6 
+  .equ CHAR_HEIGHT, 8
+  
 font_6x8:
 .byte 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 // espace
 .byte 0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00 // !

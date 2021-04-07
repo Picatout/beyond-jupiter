@@ -28,7 +28,7 @@
 *	T1	 	R1  working register 
 *	T2	 	R2  working register  
 *	UP	 	R3  variables pointer 
-*	IP	 	R4	instruction pointer  
+*	IPP	 	R4	instruction pointer  
 *	TOS	 	R5  top of data stack 
 *	DSP	 	R6 	data stack pointer 
 *	RSP	 	R7	return stack pointer 
@@ -49,7 +49,7 @@
     inner interpreter 
 **************************/
 NEXT:
-    ldr T2,[IP],#4
-    bx [T2]
+    ldr T2,[IPP],#4
+    blx T2
 
 

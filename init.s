@@ -173,13 +173,13 @@ exception_msg:
   .global systick_handler
 systick_handler:
   _MOV32 r3,UPP
-  ldr r0,[r3,#TICKS_OFS]  
+  ldr r0,[r3,#TICKS]  
   add r0,#1
-  str r0,[r3,#TICKS_OFS]
-  ldr r0,[r3,#TIMER_OFS]
+  str r0,[r3,#TICKS]
+  ldr r0,[r3,#TIMER]
   cbz r0, systick_exit
   sub r0,#1
-  str r0,[r3,#TIMER_OFS]
+  str r0,[r3,#TIMER]
 systick_exit:
   bx lr
 
@@ -197,13 +197,13 @@ uart_rx_handler:
 	beq 2f // no char received 
 	cmp r9,#3
 	beq user_reboot // received CTRL-C then reboot MCU 
-	add r7,r3,#RX_QUEUE_OFS
-	ldr r4,[r3,#RX_TAIL_OFS]
+	add r7,r3,#RX_QUEUE
+	ldr r4,[r3,#RX_TAIL]
 	add r7,r7,r4 
 	strb r9,[r7]
 	add r4,#1 
 	and r4,#(RX_QUEUE_SIZE-1)
-	str r4,[r3,#RX_TAIL_OFS]
+	str r4,[r3,#RX_TAIL]
 2:	
 	pop {r4,r6,r7,r9}
 	bx lr 
@@ -263,44 +263,42 @@ reset_handler:
 	bl	tv_init 
 	bl forth_init 
    // test code 
-	_MOV32 r2,VID_BUFF 
-	mov r2,#32000
-	eor r0,r0 
-1:  mov r1,#10
-2:	strb r0,[T2],#1
-	subs YP,#1 
+	_MOV32 T3,VID_BUFF 
+	mov T2,#32000
+	eor T0,T0 
+1:  mov T1,#10
+2:	strb T0,[T3],#1
+	subs T1,#1 
 	bne 2b  
-	add T1,#0x11
-	tst T1,#15
+	add T0,#0x11
+	tst T0,#15
 	bne 3f
-	eor T1,T1
-3:  subs XP,#10 
+	eor T0,T0
+3:  subs T2,#10 
 	bne 1b 
-//	b . 
+	b . 
 // end test code */
-	ldr r0,forth_entry
+//	ldr r0,forth_entry
 	orr r0,#1
 	bx r0
   
 	.p2align 2 
 forth_entry:
-	.word COLD  
+//	.word COLD  
 
 	.type forth_init, %function 
 forth_init:
-	_MOV32 r3,UPP 
-	_MOV32 R1,SPP
-	_MOV32 R2,RPP
-	EOR R5,R5  
+	_MOV32 UP,UPP 
+	_MOV32 DSP,SPP
+	_MOV32 RSP,RPP
+	EOR TOS,TOS  
 	BX LR 
 
-/*
+/************
 // test code 
 	.type echo, %function 
-echo:
-	BL KEY 
-	BL EMIT 
-	B  echo 	
+ECHO:
+	.word KEY,EMIT,BRANCH,echo  
 
 	.type blink, %function 
 blink:
@@ -308,23 +306,22 @@ blink:
 0:	mov r4,#1<<LED_PIN 
 	str r4,[r0,GPIO_BSRR]
 	mov	r4,#500
-	str r4,[R3,#TIMER_OFS] 
+	str r4,[R3,#TIMER] 
 	_CALL timeout
 	mov r4,#1<<(LED_PIN+16)
 	str r4,[r0,#GPIO_BSRR]
 	mov	r4,#500
-	str r4,[R3,#TIMER_OFS] 
+	str r4,[R3,#TIMER] 
 	_CALL timeout 
 	b 0b 
 
 	.type timeout, %function 
 timeout:
-	ldr r4,[r3,#TIMER_OFS]
+	ldr r4,[r3,#TIMER]
 	orrs r4,r4
 	bne timeout 
 	bx lr 
-*/
-
+**********/
 
   .type init_devices, %function
   .p2align 2 
@@ -413,7 +410,7 @@ wait_sws:
   str r1,[r0,#STK_LOAD]
   mov r1,#7
   str r1,[r0,STK_CTL]
-  _NEXT  
+  _RET  
 
 /*******************************
   initialize UART peripheral 
@@ -445,14 +442,14 @@ uart_init:
   str r1,[r0,#NVIC_ISER1]
   bx lr 
 
-/* copy system to RAM */ 
+/* copy system variables to RAM */ 
 	.type remap, %function 
-
+    .global remap 
 remap:
 // copy system to RAM 	
 	_MOV32 r0,RAM_ADR 
-	ldr r1,init_vars_src 
-	mov r2,#CTOP-UZERO 
+	ldr r1,=UZERO 
+	mov r2,#ULAST-UZERO 
 	add r2,r2,#3
 	and r2,r2,#~3 
 1:	ldr r3,[r1],#4 
@@ -466,7 +463,53 @@ remap:
 	cmp r0,r2 
 	blt 2b 
 	_MOV32 UP,RAM_ADR  
-	_NEXT 
-init_vars_src:
-	.word UZERO 
+	_RET 
 
+/******************************************************
+*  COLD start moves the following to USER variables.
+*  MUST BE IN SAME ORDER AS USER VARIABLES.
+******************************************************/
+	.p2align 2
+UZERO:
+	.word 0  			/*Reserved */
+	.word 0xaa55aa55 /* SEED  */ 
+	.word 0      /* TICKS */
+    .word 0     /* TIMER */
+	.word HI  /*'BOOT */
+	.word BASEE 	/*BASE */
+	.word 0			/*tmp */
+	.word 0			/*SPAN */
+	.word 0			/*>IN */
+	.word 0			/*#TIB */
+	.word TIBB	/*TIB */
+	.word INTER	/*'EVAL */
+	.word 0			/*HLD */
+	.word _LASTN	/*CONTEXT */
+	.word CTOP  	/* FCP end of system dictionnary */
+	.word RAM_ADR+(CTOP-UZERO)	/* CP end of RAM dictionary RAM */
+	.word _LASTN	/*LAST word in dictionary */
+	.space  RX_QUEUE_SIZE /* space reserved for rx_queue,head and tail pointer. */
+	.word 0  /* RX_HEAD */
+	.word 0  /* RX_TAIL */ 
+	.word 0  /* VID_CNTR, video_line counter */ 
+	.word 0  /* VID_STATE, video state */  
+    .word 0  /* VID_FIELD, field */
+	.word VID_BUFF /* video_buffer address */ 
+    .word 0 /* kbd struct */
+	.space KBD_QUEUE_SIZE,0  
+	.word 0  /* kbd queue head */
+	.word 0 /* kbd queue tail */ 
+    .word 0 /* tv cursor row */
+    .word 0 /* tv cursor column */ 
+    .word 0 /* tv back color */
+    .word 7 /* tv font color */
+    .word 0,0 
+ULAST:
+
+INTER:
+
+_LASTN:
+
+CTOP:
+
+HI:

@@ -47,10 +47,10 @@ flags
    :0 -> parity error flags 
 **********************************/
     .equ KBD_F_PAR_ERR,1
-    .equ KBD_FLAGS,KBD_STRUCT_OFS+2 
-    .equ KBD_RXSHIFT,KBD_STRUCT_OFS+1
-    .equ KBD_BITCNTR,KBD_STRUCT_OFS 
-    .equ KBD_ONES,KBD_STRUCT_OFS+3 
+    .equ KBD_FLAGS,KBD_STRUCT+2 
+    .equ KBD_RXSHIFT,KBD_STRUCT+1
+    .equ KBD_BITCNTR,KBD_STRUCT 
+    .equ KBD_ONES,KBD_STRUCT+3 
 
 /**********************************
     kbd_isr
@@ -108,13 +108,13 @@ stop_bit:
     tst r1,#KBD_F_PAR_ERR 
     bne 9f // drop this code 
 // store code in queue 
-    ldr r1,[UP,#KBD_QTAIL_OFS]
-    add r2,UP,#KBD_QUEUE_OFS
+    ldr r1,[UP,#KBD_QTAIL]
+    add r2,UP,#KBD_QUEUE
     ldrb r0,[UP,#KBD_RXSHIFT]
     strb r0,[r2,r1]
     add r1,#1
     and r1,#KBD_QUEUE_SIZE-1
-    strb r1,[UP,#KBD_QTAIL_OFS]
+    strb r1,[UP,#KBD_QTAIL]
     eor r0,r0 
     strh r0,[UP,#KBD_BITCNTR]
 9:  _RET 
