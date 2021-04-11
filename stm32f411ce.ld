@@ -41,13 +41,6 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
-  . = ALIGN(4);  
-  .inflash :
-  {
-    . = ALIGN(4) ;
-    KEEP(*(.inflash))
-    KEEP(*(.inflash.*))
-  } >FLASH 
 
   .  = ALIGN(4);        
 

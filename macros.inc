@@ -24,17 +24,19 @@
 .equ EXT ,	0x00	/*minor extension */
 
 
-/* registers alias */
-	T0 .req R0  // temporary
-	T1 .req R1  // temporary
-	T2 .req R2  // temporary
-	UP .req R3   // system variables pointer 
-	IPP .req R4   // scratch 
-	TOS .req R5  // top of data stack 
-	DSP .req R6   // scratch 
-	RSP .req R7   // scratch 
-	T3  .req R8   // temporary
-	T4  .req R9   // temporary 
+	/* registers alias */
+    T0		.req	r0 	// temporary register 
+    T1		.req	r1  // temporary register 
+    T2		.req	r2  // temporary register  
+    T3		.req    r3  // temporary register 
+    UP		.req	r4  // user variables pointer 
+    WP		.req    r5  // working register 
+	TOS		.req	r6  // top of data stack 
+    DSP		.req	r7 	// data stack pointer 
+    RSP		.req	r8	// return stack pointer 
+	INX 	.req    r10 // INEXT  address 
+//	IP		.req	r12	// VM instruction pointer  
+
 
 /* beyond Jupiter specific constants */ 
   .equ LED_GPIO, GPIOC_BASE_ADR
@@ -47,6 +49,7 @@
 	.equ SPP ,	RPP-128	/*top of data stack (SP0) */
 	.equ VID_BUFF, SPP-256-32000 /* video buffer */
 	.equ UPP ,	RAM_ADR	 /* start of user area (UP0) */
+	.equ DTOP,  RAM_ADR+0x512 
 	.equ DEND , VID_BUFF-4  /*usable RAM end */
     .equ MAPOFFSET, RAM_ADR-0x8000200
 
@@ -76,8 +79,8 @@
   .equ SPAN, TMP+4  // character count received by expect  
   .equ TOIN, SPAN+4  // >IN  parse pointer in TIB
   .equ NTIB, TOIN+4  // #TIB  characters in TIB 
-  .equ TIB, NTIB+4   // TIB buffer address 
-  .equ EVAL, TIB+4  // eval|compile vector 
+  .equ TIBUF, NTIB+4   // TIB buffer address 
+  .equ EVAL, TIBUF+4  // eval|compile vector 
   .equ HLD, EVAL+4   // hold pointer 
   .equ CTXT, HLD+4  // context pointer 
   .equ FORTH_CTOP, CTXT+4  // flash free dictionary address 
@@ -115,35 +118,9 @@
 	BX LR 
 	.endm 
 
- 	.macro	_NEST /*start high level word */
-	STMFD	RSP!,{LR}
-	.endm
-
- 	.macro	_UNNEST	/*end high level word */
-	LDMFD	RSP!,{PC}
-	.endm
-
-	.macro _MOV32 R V 
-	MOV \R, #\V&0xffff
-	MOVT \R, #\V>>16
-	.endm
-
- 	.macro	_DOLIT  value /*long literals */
-	BL	DOLIT
-	.word \value 
-	.endm
-
- 	.macro	_DPUSH	/*push R5 on data stack*/
-	STR	R5,[R1,#-4]!
-	.endm
-
- 	.macro	_DPOP /*pop data stack to R5 */
-	LDR	R5,[R1],#4
-	.endm
-
 	/* dictionary header  */
 	.macro _HEADER  label, nlen, name
-		.section .inflash.dictinary 
+		.section .text, "ax", %progbits 
 	LF_\label:   // link field
 		.word link 
 		.equ link , . 
@@ -171,3 +148,72 @@
 	.endm 
 
 
+// load large constant to register 
+	.macro _MOV32 r, value 
+	mov \r,#(\value&0xffff)
+	movt \r,#(\value>>16)
+	.endm 
+
+	.macro _NEXT /* direct jump INEXT */ 
+	B INEXT   
+	.endm 
+
+ 	.macro	_NEST /*start high level word */
+	BX INX  
+	NOP.N 
+	.endm
+
+	.macro _ADR label 
+	.word 1+\label  
+	.endm 
+
+ 	.macro	_UNNEST	/*end high level word */
+	_ADR UNNEST 
+	.endm
+
+ 	.macro	_DOLIT u /*long literals */
+	_ADR	DOLIT
+	.word	\u 
+	.endm
+
+	.macro _DOTQP len, text 
+	_ADR DOTQP 
+	.byte \len 
+	.ascii "\text" 
+	.p2align 2 
+	.endm
+
+	.macro _COMPI name 
+	_DOLIT \name 
+	_ADR CALLC 
+	.endm 
+
+	.macro _ABORQ len,name 
+	_ADR ABORQ 
+	.byte \len 
+	.ascii "\name"
+	.p2align 2 
+	.endm
+
+	.macro _BRAN label 
+	_ADR BRAN 
+	.word \label 
+	.endm 
+
+	.macro _QBRAN label 
+	_ADR QBRAN 
+	.word \label
+	.endm 
+
+	.macro _DONXT label 
+	_ADR DONXT
+	.word \label 
+	.endm 
+
+ 	.macro	_PUSH	/*push TOS on data stack*/
+	STR	TOS,[DSP,#-4]!
+	.endm
+
+ 	.macro	_POP /*pop data stack to TOS */
+	LDR	TOS,[DSP],#4
+	.endm

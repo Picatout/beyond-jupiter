@@ -20,7 +20,7 @@
 
   .syntax unified
   .cpu cortex-m4
-  .fpu softvfp
+  .fpu softvfp 
   .thumb
 
   .include "stm32f411ce.inc"
@@ -131,7 +131,6 @@ NOTES:
   T0 TIM3_BASE_ADR 
 *************************************/
   _GBL_FUNC tv_out_isr
-  push {T0,T1,T2,T3}
   _MOV32 T0,TIM3_BASE_ADR
   eor T1,T1
   str T1,[T0,#TIM_SR]
@@ -250,7 +249,6 @@ frame_end:
    mvn T1,T1  
    str T1,[UP,#VID_FIELD]
 tv_isr_exit: 
-   pop {T0,T1,T2,T3}
    _RET   
 
 /**********************************

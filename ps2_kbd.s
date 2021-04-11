@@ -27,7 +27,7 @@
 
   .syntax unified
   .cpu cortex-m4
-  .fpu softvfp
+  .fpu softvfp 
   .thumb
 
   .include "stm32f411ce.inc"

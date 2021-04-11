@@ -149,7 +149,7 @@ isr_end:
 /*****************************************************
 * default isr handler called on unexpected interrupt
 *****************************************************/
-   .section  .inflash, "ax", %progbits 
+   .section  .text, "ax", %progbits 
    
   .type default_handler, %function
   .p2align 2 
@@ -189,23 +189,20 @@ systick_exit:
 	.p2align 2
 	.type uart_rx_handler, %function
 uart_rx_handler:
-	push {r4,r6,r7,r9}
-	_MOV32 r4,UART 
-	ldr r6,[r4,#USART_SR]
-	ldr r9,[r4,#USART_DR]
-	tst r6,#(1<<5) // RXNE 
+	_MOV32 r3,UART 
+	ldr r0,[r3,#USART_SR]
+	ldr r1,[r3,#USART_DR]
+	tst r0,#(1<<5) // RXNE 
 	beq 2f // no char received 
-	cmp r9,#3
+	cmp r1,#3
 	beq user_reboot // received CTRL-C then reboot MCU 
-	add r7,r3,#RX_QUEUE
-	ldr r4,[r3,#RX_TAIL]
-	add r7,r7,r4 
-	strb r9,[r7]
-	add r4,#1 
-	and r4,#(RX_QUEUE_SIZE-1)
-	str r4,[r3,#RX_TAIL]
+	add r0,UP,#RX_QUEUE
+	ldr r2,[UP,#RX_TAIL]
+	strb r1,[r0,r2]
+	add r2,#1 
+	and r2,#(RX_QUEUE_SIZE-1)
+	str r2,[UP,#RX_TAIL]
 2:	
-	pop {r4,r6,r7,r9}
 	bx lr 
 
 user_reboot:
@@ -227,6 +224,7 @@ user_reboot_msg:
 	.ascii "\ruser reboot!"
 	.p2align 2 
 
+   
 // send counted string to uart 
 // input: r5 string* 
 	.type uart_puts,%function 
@@ -262,7 +260,7 @@ reset_handler:
 	bl  uart_init
 	bl	tv_init 
 	bl forth_init 
-   // test code 
+/****** test code ******/
 	_MOV32 T3,VID_BUFF 
 	mov T2,#32000
 	eor T0,T0 
@@ -276,23 +274,20 @@ reset_handler:
 	eor T0,T0
 3:  subs T2,#10 
 	bne 1b 
-	b . 
-// end test code */
-//	ldr r0,forth_entry
-	orr r0,#1
-	bx r0
-  
-	.p2align 2 
-forth_entry:
-//	.word COLD  
+/***** end test code ****/
+	b COLD 
+
+
 
 	.type forth_init, %function 
 forth_init:
 	_MOV32 UP,UPP 
 	_MOV32 DSP,SPP
 	_MOV32 RSP,RPP
+  ldr INX,=NEST
+  orr INX,#1 
 	EOR TOS,TOS  
-	BX LR 
+	_RET 
 
 /************
 // test code 
@@ -321,7 +316,7 @@ timeout:
 	orrs r4,r4
 	bne timeout 
 	bx lr 
-**********/
+***** end test code *****/
 
   .type init_devices, %function
   .p2align 2 
@@ -481,7 +476,7 @@ UZERO:
 	.word 0			/*SPAN */
 	.word 0			/*>IN */
 	.word 0			/*#TIB */
-	.word TIBB	/*TIB */
+	.word TIBB	/*TIBU */
 	.word INTER	/*'EVAL */
 	.word 0			/*HLD */
 	.word _LASTN	/*CONTEXT */
@@ -506,10 +501,3 @@ UZERO:
     .word 0,0 
 ULAST:
 
-INTER:
-
-_LASTN:
-
-CTOP:
-
-HI:
