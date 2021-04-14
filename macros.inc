@@ -70,12 +70,12 @@
 /*************************************
    system variables offset from UPP
 *************************************/
-  .equ SEED, 4    // prng seed 
-  .equ TICKS, SEED+4  // millseconds counter
-  .equ TIMER, TICKS+4  // count down timer
-  .equ BOOT, TIMER+4  // boot program address
-  .equ BASE, BOOT+4  // numeric conversion base 
-  .equ TMP, BASE+4   // temporary variable
+  .equ RNDSEED, 4    // prng seed 
+  .equ TICKS, RNDSEED+4  // millseconds counter
+  .equ CD_TIMER, TICKS+4  // count down timer
+  .equ BOOT, CD_TIMER+4  // boot program address
+  .equ NBASE, BOOT+4  // numeric conversion base 
+  .equ TMP, NBASE+4   // temporary variable
   .equ SPAN, TMP+4  // character count received by expect  
   .equ TOIN, SPAN+4  // >IN  parse pointer in TIB
   .equ NTIB, TOIN+4  // #TIB  characters in TIB 
@@ -102,7 +102,7 @@
   .equ ROW,KBD_QTAIL+4 
   .equ COL,ROW+4 
   .equ BK_COLOR,COL+4 
-  .equ FT_COLOR,BK_COLOR+4
+  .equ PEN_COLOR,BK_COLOR+4
 
 /***********************************************
 * MACROS
@@ -120,16 +120,12 @@
 
 	/* dictionary header  */
 	.macro _HEADER  label, nlen, name
-		.section .text, "ax", %progbits 
-	LF_\label:   // link field
-		.word link 
-		.equ link , . 
+		.word LINK 
+		.equ LINK , . 
 	_\label: .byte \nlen    // name field
 		.ascii "\name"
 		.p2align 2 
-	CA_\label:   // code field address 
-		.word \label
-	\label:  // code
+	\label:   // code field 
 	.endm 
 	
 

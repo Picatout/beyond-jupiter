@@ -176,10 +176,10 @@ systick_handler:
   ldr r0,[r3,#TICKS]  
   add r0,#1
   str r0,[r3,#TICKS]
-  ldr r0,[r3,#TIMER]
+  ldr r0,[r3,#CD_TIMER]
   cbz r0, systick_exit
   sub r0,#1
-  str r0,[r3,#TIMER]
+  str r0,[r3,#CD_TIMER]
 systick_exit:
   bx lr
 
@@ -469,7 +469,7 @@ UZERO:
 	.word 0  			/*Reserved */
 	.word 0xaa55aa55 /* SEED  */ 
 	.word 0      /* TICKS */
-    .word 0     /* TIMER */
+    .word 0     /* CD_TIMER */
 	.word HI  /*'BOOT */
 	.word BASEE 	/*BASE */
 	.word 0			/*tmp */

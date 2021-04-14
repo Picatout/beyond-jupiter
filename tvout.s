@@ -24,7 +24,7 @@
   .thumb
 
   .include "stm32f411ce.inc"
-//  .include "macros.inc"
+  .include "tvout.inc"
 
   .equ FCLK, 96000000
   .equ FHORZ, 15734 
@@ -33,11 +33,6 @@
   .equ HPULSE, (FCLK/1000000*47/10 -1) // 4.7µS
   .equ SERRATION,(FCLK/1000000*23/10-1) // 2.3µS
   .equ VSYNC_PULSE,(FCLK/1000000*271/10-1)  // 27.1µs
-  .equ HRES, 320  // horizontal resolution
-  .equ VRES, 200   // vertical resolution
-  .equ BPP, 4     // bits per pixel
-  .equ BPR, (HRES*BPP/8)  // bytes per row
-  .equ VIDEO_BUFFER_SIZE, (VRES*BPR) // bytes 
   .equ LEFT_MARGIN, (750) 
   .equ VIDEO_FIRST_LINE, 40
   .equ VIDEO_LAST_LINE, (VIDEO_FIRST_LINE+VRES)
@@ -251,16 +246,122 @@ frame_end:
 tv_isr_exit: 
    _RET   
 
+/***************************
+    FORTH WORDS 
+***************************/
+    .equ LINK, 0 
+
+// PLOT ( x y op -- )
+// draw a pixel 
+//    0 back color 
+//    1 pen color 
+//    2 invert (pen -> back | back -> pen )
+//    3 xor pen color  
+    _HEADER PLOT,4,"PLOT"
+    mov T0,TOS // op 
+    ldmfd DSP!,{T1,T2} // T1=y,T2=x 
+    mov T3,#BPR // bytes per row  
+    mul T1,T3 
+    lsr WP,T2,#1 
+    add T1,WP 
+    ldr T3,[UP,#VID_BUFFER] 
+    ldrb WP,[T3,T1] // byte in buffer 2 pixels 
+    mov TOS,#15 // AND mask 
+    tst T2,#1 
+    beq 1f 
+    lsl TOS,#4 // mask out low nibble for odd pixel  
+1:	cbz T0,op_back 
+    cmp T0,#1 
+    beq op_pen 
+    cmp T0,#2 
+    beq op_invert 
+    cmp T0,#3 
+    beq op_xor
+    b 9f   
+op_back:
+    and WP,TOS // mask out nibble 
+    ldrb T0,[UP,#BK_COLOR]
+    tst T2,#1 
+    bne 1f 
+    lsl T0,#4 // high nibble  
+1:  orr WP,T0  
+    strb WP,[T3,T1]
+    b 9f 
+op_pen: 
+    and WP,TOS 
+    ldrb T0,[UP,#PEN_COLOR]
+    tst T2,#1
+    bne 1f 
+    lsl T0,#4 // even pixel high nibble 
+1:	orr WP,T0 
+    strb WP,[T3,T1]
+    b 9f 
+op_invert:
+    and WP,TOS 
+    ldrb T0,[UP,#BK_COLOR]
+    tst T2,#1 
+    bne 1f 
+    lsl T0,#4 
+1:  cmp WP,T0
+    bne 2f 
+    ldrb T0,[UP,#PEN_COLOR]
+    tst T2,#1 
+    bne 2f 
+    lsl T0,#4
+2:  ldrb WP,[T3,T1]
+    and WP,TOS 
+    orr WP,T0 
+    strb WP,[T3,T1]
+    b 9f 
+op_xor:
+    ldr T0,[UP,#PEN_COLOR]
+    tst T2,#1 
+    bne 1f 
+    lsl T0,#4 
+1:  eor WP,T0 
+    strb WP,[T3,T1]
+9:  _POP 
+    _NEXT 
+
+
+// CLS ( -- )
+// clear TV screen 
+    _HEADER CLS,3,"CLS"
+    eor T0,T0 
+    ldrb T1,[UP,#BK_COLOR]
+    orr T0,T1 
+    lsl T1,#4 
+    orr T0,T1 
+    lsl T1,T0,#8 
+    orr T0,T1 
+    lsl T1,T0,#16
+    orr T0,T1 
+    mov T1,#VIDEO_BUFFER_SIZE-4   
+    ldr T2,[UP,#VID_BUFFER]
+1:	str T0,[T2,T1]
+    subs T1,#4
+    bne 1b
+    str T0,[T2]
+    _NEXT 
+
+
+
+
 /**********************************
-   put_char 
+   TV-PUTC ( c -- )
    draw character in video buffer
-   input:
-      r0 character 
 
 **********************************/
-      _FUNC put_char 
-
-      _RET 
+    _HEADER TVPUTC,7,"TV-PUTC"
+    _NEST 
+    sub TOS,#32
+    mov T0,#8 
+    mul TOS,T0 
+    ldr T3,=font_6x8
+    add TOS,T3 // character font address
+    
+    
+    _UNNEST  
 
 
 	.section .rodata 

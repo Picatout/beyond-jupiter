@@ -62,7 +62,7 @@
 	.thumb
 
 	.include "stm32f411ce.inc"
- 
+	
 	.section .text, "ax", %progbits
 
 /***********************************
@@ -105,7 +105,7 @@ UNNEST:
 COMPI_NEST:
 	add T1,UP,#USER_CTOP 
 	ldr T1,[T1]
-	mov T2,#0x4700+(8<<3)
+	mov T2,#0x4700+(10<<3)
 	strh T2,[T1],#2
 	mov T2,#0xbf00 // NOP.N   
 	strh T2,[T1],#2 
@@ -113,11 +113,12 @@ COMPI_NEST:
 	str T1,[T2]
 	_NEXT  
 
+
 // RANDOM ( n+ -- {0..n+ - 1} )
 // return pseudo random number 
 // REF: https://en.wikipedia.org/wiki/Xorshift
 
-	.word 0
+	.word LINK 
 _RAND: .byte 6
 	.ascii "RANDOM"
 	.p2align 2 
@@ -1085,7 +1086,7 @@ _SEED: .byte 4
 	.p2align 2
 SEED:
 	_PUSH 
-	ADD TOS,UP,#SEED
+	ADD TOS,UP,#RNDSEED
 	_NEXT 	
 
 //  MSEC ( -- a)
@@ -1107,7 +1108,7 @@ _TIMER:  .byte 5
   .p2align 2 
 TIMER:
   _PUSH 
-  ADD TOS,UP,#TIMER
+  ADD TOS,UP,#CD_TIMER
   _NEXT
 
 //    'BOOT	 ( -- a )
@@ -1131,7 +1132,7 @@ _BASE:	.byte   4
 	.p2align 2 	
 BASE:
 	_PUSH
-	ADD	TOS,UP,#BASE
+	ADD	TOS,UP,#NBASE
 	_NEXT
 
 //    tmp	 ( -- a )
@@ -1254,9 +1255,31 @@ LAST:
 	ADD	TOS,UP,#LASTN
 	_NEXT
 
+// BACK-COLOR ( -- a )
+//   back color variable 
+   .word _LAST 
+_BACKCOLOR: .byte 10 
+	.ascii "BACK-COLOR"
+	.p2align 2 
+BACKCOLOR:   
+	_PUSH 
+	ADD TOS,UP,#BK_COLOR
+	_NEXT
+
+// PEN-COLOR ( -- a )
+// pen color variable 
+    .word _BACKCOLOR 
+_PENCOLOR: .byte 9
+	.ascii "PEN-COLOR"
+	.p2align 2 
+PENCOLOR: 
+	_PUSH 
+	ADD TOS,UP,#PEN_COLOR
+	_NEXT 
+
 //	FTRACE ( -- a )
 // return trace flag address 
-	.word _LAST  
+	.word _PENCOLOR   
 _FTRACE: .byte 6
 	.ascii "FTRACE"
 	.p2align 2 
