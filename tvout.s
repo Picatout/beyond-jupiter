@@ -36,7 +36,7 @@
   .equ LEFT_MARGIN, (750) 
   .equ VIDEO_FIRST_LINE, 40
   .equ VIDEO_LAST_LINE, (VIDEO_FIRST_LINE+VRES)
-  .equ VIDEO_DELAY,(FCLK/1000000*10-1) // 10µSec
+  .equ VIDEO_DELAY,(FCLK/1000000*15-1) // 15µSec
   .equ VIDEO_END, (FCLK/1000000*62-1) // 62µSec
 
 // video state 
@@ -198,7 +198,7 @@ state_pre_video:
 **************************/   
 state_video_out:
    cmp T1,#VIDEO_LAST_LINE 
-   bmi 1f 
+   bls 1f 
    mov T1,#ST_POSTVID 
    str T1,[UP,#VID_STATE]
    mov T1,#1 
@@ -250,6 +250,63 @@ tv_isr_exit:
     FORTH WORDS 
 ***************************/
     .equ LINK, 0 
+
+// BACK-COLOR ( -- a )
+//   back color variable 
+   _HEADER BACKCOLOR,10,"BACK-COLOR" 
+	_PUSH 
+	ADD TOS,UP,#BK_COLOR
+	_NEXT
+
+// PEN-COLOR ( -- a )
+// pen color variable 
+  _HEADER PENCOLOR,9,"PEN-COLOR"
+	_PUSH 
+	ADD TOS,UP,#PEN_COLOR
+	_NEXT 
+
+// COLUMN ( -- a )
+// cursor column variable 
+  _HEADER COLUMN,6,"COLUMN"
+  _PUSH 
+  ADD TOS,UP,#COL 
+  _NEXT 
+
+// ROW ( -- a )
+// cursor row 
+  _HEADER CURSOR_ROW,3,"ROW"
+  _PUSH 
+  ADD TOS,UP,#ROW 
+  _NEXT 
+
+// ROW>Y ( n1 - n2 )
+// convert cursor row to y coord 
+  _HEADER ROWY,5,"ROW>Y"
+  mov T0,#CHAR_HEIGHT
+  mul TOS,T0 
+  _NEXT 
+
+// COL>X ( n1 -- n2 )
+// convert cursor column to x coord 
+  _HEADER COLX,5,"COL>X" 
+  mov T0,#CHAR_WIDTH 
+  mul TOS,T0 
+  _NEXT 
+
+// FONT ( -- a )
+// return address of font table
+  _HEADER FONT,4,"FONT" 
+  _PUSH 
+  ldr TOS,=font_6x8 
+  _NEXT 
+
+// VIDBUFF ( -- a )
+// address of video buffer 
+  _HEADER VIDBUFF,7,"VIDBUFF"
+  _PUSH 
+  LDR TOS,[UP,#VID_BUFFER]
+  _NEXT 
+
 
 // PLOT ( x y op -- )
 // draw a pixel 
@@ -323,6 +380,13 @@ op_xor:
 9:  _POP 
     _NEXT 
 
+// VSYNC ( -- )
+// wait vertical sync phase 
+    _HEADER VSYNC,5,"VSYNC"
+1:  ldr T0,[UP,#VID_CNTR]
+    cmp T0,#0
+    bne 1b
+    _NEXT 
 
 // CLS ( -- )
 // clear TV screen 
@@ -342,25 +406,137 @@ op_xor:
     subs T1,#4
     bne 1b
     str T0,[T2]
+    eor T0,T0 
+    str T0,[UP,#ROW]
+    str T0,[UP,#COL]
     _NEXT 
 
 
+// CLRLINE ( n -- )
+// clear text line 
+  _HEADER CLRLINE,7,"CLRLINE"
+  _NEST
+  _DOLIT (BPR*CHAR_HEIGHT)
+  _ADR DUPP  
+  _ADR TOR 
+  _ADR STAR
+  _ADR VIDBUFF
+  _ADR PLUS
+  _ADR RFROM   
+  _DOLIT 0 
+  _ADR FILL 
+  _UNNEST 
+
+// SCROLLUP ( -- )
+// scroll up tv screen 1 char height 
+  _HEADER SCROLLUP,8,"SCROLLUP"
+  _NEST 
+  _ADR VIDBUFF 
+  _ADR DUPP 
+  _DOLIT BPR*CHAR_HEIGHT 
+  _ADR DUPP 
+  _ADR TOR 
+  _ADR PLUS 
+  _ADR SWAP 
+  _DOLIT VIDEO_BUFFER_SIZE 
+  _ADR RFROM  
+  _ADR SUBB 
+  _ADR MOVE
+  _DOLIT 24 
+  _ADR CLRLINE 
+  _UNNEST 
+
+//  RIGHT ( -- )
+// move cursor 1 char. right 
+  _HEADER RIGHT,5,"RIGHT"
+  ldr T0,[UP,#COL]
+  add T0,#1
+  cmp T0,#53
+  bpl 1f 
+  str T0,[UP,#COL]
+  _NEXT 
+1: eor T0,T0 
+  str T0,[UP,#COL]
+  ldr T0,[UP,#ROW]
+  cmp T0,#24
+  beq 2f 
+  add T0,#1 
+  str T0,[UP,#ROW]
+  _NEXT 
+// calling a colon word 
+// from a code word   
+2: STMFD	RSP!,{IP}
+   ldr IP,=3f 
+   b INEXT 
+3: 
+  _ADR SCROLLUP 
+  _UNNEST  
+
+
+// CHAR_ROW 
+// plot character row 
+// {x y r -- }
+  _HEADER CHAR_ROW,7,"CHARROW"
+    _NEST 
+    _DOLIT 5 
+    _ADR TOR 
+1:  _ADR DUPP
+    _DOLIT 128 
+    _ADR ANDD
+    _DOLIT 7 
+    _ADR RSHIFT // {x y r 0|1 -- }
+    _ADR TOR 
+    _ADR ROT 
+    _ADR ROT 
+    _ADR DDUP
+    _ADR RFROM 
+    _ADR PLOT // { -- x y r } 
+    _ADR SWAP  
+    _ADR ONEP 
+    _ADR SWAP 
+    _ADR ROT // { x' y r }
+    _DOLIT 1 
+    _ADR LSHIFT 
+    _DONXT 1b
+    _ADR DDROP 
+    _ADR DROP 
+    _UNNEST 
 
 
 /**********************************
    TV-PUTC ( c -- )
    draw character in video buffer
-
 **********************************/
     _HEADER TVPUTC,7,"TV-PUTC"
     _NEST 
-    sub TOS,#32
-    mov T0,#8 
-    mul TOS,T0 
-    ldr T3,=font_6x8
-    add TOS,T3 // character font address
-    
-    
+    _DOLIT 32 
+    _ADR SUBB
+    _DOLIT 8 
+    _ADR STAR 
+    _ADR FONT 
+    _ADR PLUS // character font address
+    _ADR COLUMN 
+    _ADR AT
+    _ADR COLX  // x coord 
+    _ADR CURSOR_ROW 
+    _ADR AT    
+    _ADR ROWY  // {c-adr x y -- } 
+    _DOLIT 7   
+    _ADR TOR  
+1:  _ADR DDUP // {c-adr x y x y -- }
+    _DOLIT 4 
+    _ADR PICK 
+    _ADR CAT 
+    _ADR CHAR_ROW  //{c-adr x y x y r -- }
+    _ADR ONEP // {c-adr x y' -- }
+    _ADR ROT   
+    _ADR ONEP 
+    _ADR ROT 
+    _ADR ROT
+    _DONXT 1b
+    _ADR DDROP 
+    _ADR DROP 
+    _ADR RIGHT
     _UNNEST  
 
 
@@ -369,9 +545,6 @@ op_xor:
 /********************************************
     TV font  ASCII 6 pixels x 8 pixels 
 ********************************************/
-  .equ CHAR_WIDTH, 6 
-  .equ CHAR_HEIGHT, 8
-  
 font_6x8:
 .byte 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 // espace
 .byte 0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00 // !

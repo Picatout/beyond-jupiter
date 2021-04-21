@@ -76,13 +76,13 @@
   .equ BOOT, CD_TIMER+4  // boot program address
   .equ NBASE, BOOT+4  // numeric conversion base 
   .equ TMP, NBASE+4   // temporary variable
-  .equ SPAN, TMP+4  // character count received by expect  
-  .equ TOIN, SPAN+4  // >IN  parse pointer in TIB
-  .equ NTIB, TOIN+4  // #TIB  characters in TIB 
-  .equ TIBUF, NTIB+4   // TIB buffer address 
+  .equ CSPAN, TMP+4  // character count received by expect  
+  .equ TOIN, CSPAN+4  // >IN  parse pointer in TIB
+  .equ NTIBB, TOIN+4  // #TIB  characters in TIB 
+  .equ TIBUF, NTIBB+4   // TIB buffer address 
   .equ EVAL, TIBUF+4  // eval|compile vector 
-  .equ HLD, EVAL+4   // hold pointer 
-  .equ CTXT, HLD+4  // context pointer 
+  .equ HOLD, EVAL+4   // hold pointer 
+  .equ CTXT, HOLD+4  // context pointer 
   .equ FORTH_CTOP, CTXT+4  // flash free dictionary address 
   .equ USER_CTOP, FORTH_CTOP+4  // ram free dictionary address
   .equ LASTN, USER_CTOP+4     // last word in dictionary link nfa 

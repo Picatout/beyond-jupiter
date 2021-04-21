@@ -1156,7 +1156,7 @@ _SPAN:	.byte   4
 	.p2align 2 	
 SPAN:
 	_PUSH
-	ADD	TOS,UP,#SPAN
+	ADD	TOS,UP,#CSPAN
 	_NEXT
 
 //    >IN	 ( -- a )
@@ -1180,7 +1180,7 @@ _NTIB:	.byte   4
 	.p2align 2 	
 NTIB:
 	_PUSH
-	ADD	TOS,UP,#NTIB
+	ADD	TOS,UP,#NTIBB
 	_NEXT
 
 //    'EVAL	( -- a )
@@ -1204,7 +1204,7 @@ _HLD:	.byte   3
 	.p2align 2 	
 HLD:
 	_PUSH
-	ADD	TOS,UP,#HLD
+	ADD	TOS,UP,#HOLD
 	_NEXT
 
 //    CONTEXT	( -- a )
@@ -1255,38 +1255,6 @@ LAST:
 	ADD	TOS,UP,#LASTN
 	_NEXT
 
-// BACK-COLOR ( -- a )
-//   back color variable 
-   .word _LAST 
-_BACKCOLOR: .byte 10 
-	.ascii "BACK-COLOR"
-	.p2align 2 
-BACKCOLOR:   
-	_PUSH 
-	ADD TOS,UP,#BK_COLOR
-	_NEXT
-
-// PEN-COLOR ( -- a )
-// pen color variable 
-    .word _BACKCOLOR 
-_PENCOLOR: .byte 9
-	.ascii "PEN-COLOR"
-	.p2align 2 
-PENCOLOR: 
-	_PUSH 
-	ADD TOS,UP,#PEN_COLOR
-	_NEXT 
-
-//	FTRACE ( -- a )
-// return trace flag address 
-	.word _PENCOLOR   
-_FTRACE: .byte 6
-	.ascii "FTRACE"
-	.p2align 2 
-FTRACE:	
-	_PUSH 
-	ADD TOS,UP,#FTRACE 
-	_NEXT 
 
 /***********************
 	system constants 
@@ -1294,7 +1262,7 @@ FTRACE:
 
 //	USER_BEGIN ( -- a )
 //  where user area begin in RAM
-	.word _FTRACE
+	.word _LAST
 _USER_BGN: .byte 10
 	.ascii "USER_BEGIN"
 	.p2align 2
@@ -1661,17 +1629,13 @@ _FILL:	.byte   4
 	.ascii "FILL"
 	.p2align 2 	
 FILL:
-	LDR	T2,[DSP],#4
-	LDR	T3,[DSP],#4
-FILL0:
-	B FILL1
-	MOV	TOS,TOS
+	LDMFD DSP!,{T0,T1} 
+	MOVS T0,T0 
+	BEQ FILL2
 FILL1:
-	STRB	TOS,[T3],#1
-	MOVS	T2,T2
-	BEQ	FILL2
-	SUB	T2,T2,#1
-	B FILL0
+	STRB	TOS,[T1],#1
+	SUBS	T0,T0,#1
+	BNE FILL1
 FILL2:
 	_POP
 	_NEXT
@@ -3546,38 +3510,10 @@ VARIA:
 // **************************************************************************
 //  Tools
 
-//  TRACE ( f -- )
-// enable or disable tracing 
-	.word _VARIA 
-_TRACE: .byte 5
-	.ascii "TRACE"
-	.p2align 2
-TRACE: 
-	_NEST 
-	_ADR FTRACE 
-	_ADR STORE 
-	_UNNEST 
-
-// TR_PRINT ( ca -- )
-// print name from ca  
-	.word _TRACE 
-_DBG_PRT: .byte 7 
-	.ascii "DBG_PRT"
-DBG_PRT:
-	_NEST 
-	_ADR TNAME 
-	_ADR QDUP 
-	_QBRAN 1f 
-	_ADR COUNT 
-	_ADR TYPEE 
-	_ADR CR
-1:  	
-	_UNNEST 
-
 //    dm+	 ( a u -- a )
 // 	Dump u bytes from , leaving a+u on the stack.
 
-// 	.word	_TRACE
+// 	.word	_VARIA 
 // _DMP	.byte  3
 // 	.ascii "dm+"
 // 	.p2align 2 	
