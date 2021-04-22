@@ -36,7 +36,7 @@
   .equ LEFT_MARGIN, (750) 
   .equ VIDEO_FIRST_LINE, 40
   .equ VIDEO_LAST_LINE, (VIDEO_FIRST_LINE+VRES)
-  .equ VIDEO_DELAY,(FCLK/1000000*15-1) // 15µSec
+  .equ VIDEO_DELAY,(FCLK/1000000*14-1) // 14µSec
   .equ VIDEO_END, (FCLK/1000000*62-1) // 62µSec
 
 // video state 
@@ -245,6 +245,7 @@ frame_end:
    str T1,[UP,#VID_FIELD]
 tv_isr_exit: 
    _RET   
+
 
 /***************************
     FORTH WORDS 
@@ -480,21 +481,18 @@ op_xor:
     _NEST 
     _DOLIT 5 
     _ADR TOR 
-1:  _ADR DUPP
+1:  _ADR TOR 
+    _ADR DDUP 
+    _ADR RAT 
     _DOLIT 128 
-    _ADR ANDD
+    _ADR ANDD 
     _DOLIT 7 
-    _ADR RSHIFT // {x y r 0|1 -- }
-    _ADR TOR 
-    _ADR ROT 
-    _ADR ROT 
-    _ADR DDUP
-    _ADR RFROM 
-    _ADR PLOT // { -- x y r } 
-    _ADR SWAP  
+    _ADR RSHIFT // {x y x y 0|1 }
+    _ADR PLOT 
+    _ADR SWAP 
     _ADR ONEP 
     _ADR SWAP 
-    _ADR ROT // { x' y r }
+    _ADR RFROM 
     _DOLIT 1 
     _ADR LSHIFT 
     _DONXT 1b
@@ -521,19 +519,18 @@ op_xor:
     _ADR CURSOR_ROW 
     _ADR AT    
     _ADR ROWY  // {c-adr x y -- } 
+    _ADR ROT  // TEST 
     _DOLIT 7   
     _ADR TOR  
-1:  _ADR DDUP // {c-adr x y x y -- }
-    _DOLIT 4 
-    _ADR PICK 
-    _ADR CAT 
-    _ADR CHAR_ROW  //{c-adr x y x y r -- }
-    _ADR ONEP // {c-adr x y' -- }
-    _ADR ROT   
-    _ADR ONEP 
-    _ADR ROT 
-    _ADR ROT
-    _DONXT 1b
+1:  _ADR TOR  // { x y }
+    _ADR DDUP  // { x y x y }
+    _ADR RAT 
+    _ADR CAT   // { x y x y r }
+    _ADR CHAR_ROW 
+    _ADR ONEP // {x y' }
+    _ADR RFROM 
+    _ADR ONEP // {x y' c-adr' }
+    _DONXT 1b 
     _ADR DDROP 
     _ADR DROP 
     _ADR RIGHT

@@ -796,10 +796,23 @@ ROT:
 	STR	T0,[DSP,#4] // w2 rpelace w1 
 	_NEXT
 
+// -ROT ( w1 w2 w3 -- w3 w1 w2 )
+// left rotate top 3 elements 
+	.word _ROT 
+_NROT: .byte 4 
+	.ascii "-ROT"
+	.p2align 2 
+NROT:
+	LDR T0,[DSP,#4]
+	STR TOS,[DSP,#4]	
+	LDR TOS,[DSP]
+	STR T0,[DSP]
+	_NEXT 
+
 //    2DROP	( w1 w2 -- )
 // 	Drop top 2 items.
 
-	.word	_ROT
+	.word	_NROT
 _DDROP:	.byte   5
 	.ascii "2DROP"
 	.p2align 2 	
