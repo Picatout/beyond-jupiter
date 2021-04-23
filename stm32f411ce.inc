@@ -199,8 +199,7 @@
    .equ NVIC_IABR6, 0x318
    .equ NVIC_IABR7, 0x31c
 /*  NVIC_IPR0 - NVIC_IPR59 */
-   .equ NVIC_IPR_BASE, 0x400 
-   .equ NVIC_STIR, 0xE00 
+   .equ NVIC_IPR_BASE, 0xE000E400 
 
 /* TIMERS registers */
 .equ TIM1_BASE_ADR,0x40010000

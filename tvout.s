@@ -313,73 +313,58 @@ tv_isr_exit:
 // draw a pixel 
 //    0 back color 
 //    1 pen color 
-//    2 invert (pen -> back | back -> pen )
+//    2 invert (invert color pixels )
 //    3 xor pen color  
     _HEADER PLOT,4,"PLOT"
-    mov T0,TOS // op 
-    ldmfd DSP!,{T1,T2} // T1=y,T2=x 
-    mov T3,#BPR // bytes per row  
-    mul T1,T3 
-    lsr WP,T2,#1 
-    add T1,WP 
+// compute video buffer byte address from coords
+    ldmfd DSP!,{T0,T1} // T0=y,T1=x 
+    mov T2,#BPR // bytes per row  
+    mul T0,T2 
+    lsr T2,T1,#1 // 2 pixels per byte  
+    add T0,T2 
     ldr T3,[UP,#VID_BUFFER] 
-    ldrb WP,[T3,T1] // byte in buffer 2 pixels 
-    mov TOS,#15 // AND mask 
-    tst T2,#1 
+    add T3,T0 // T3 -> byte address 
+    ldrb WP,[T3] // byte in buffer, 2 pixels 
+    mov T2,#15 // AND mask 
+    tst T1,#1 
     beq 1f 
-    lsl TOS,#4 // mask out low nibble for odd pixel  
-1:	cbz T0,op_back 
-    cmp T0,#1 
-    beq op_pen 
-    cmp T0,#2 
-    beq op_invert 
-    cmp T0,#3 
-    beq op_xor
-    b 9f   
+    lsl T2,#4 // mask out low nibble for odd pixel  
+1:  ldr T0,=plot_op 
+    tbb [T0,TOS]
 op_back:
-    and WP,TOS // mask out nibble 
+    and WP,T2 // mask out nibble 
     ldrb T0,[UP,#BK_COLOR]
-    tst T2,#1 
+    tst T1,#1 
     bne 1f 
     lsl T0,#4 // high nibble  
 1:  orr WP,T0  
-    strb WP,[T3,T1]
+    strb WP,[T3]
     b 9f 
 op_pen: 
-    and WP,TOS 
+    and WP,T2 
     ldrb T0,[UP,#PEN_COLOR]
-    tst T2,#1
+    tst T1,#1
     bne 1f 
     lsl T0,#4 // even pixel high nibble 
 1:	orr WP,T0 
-    strb WP,[T3,T1]
+    strb WP,[T3]
     b 9f 
 op_invert:
-    and WP,TOS 
-    ldrb T0,[UP,#BK_COLOR]
-    tst T2,#1 
-    bne 1f 
-    lsl T0,#4 
-1:  cmp WP,T0
-    bne 2f 
-    ldrb T0,[UP,#PEN_COLOR]
-    tst T2,#1 
-    bne 2f 
-    lsl T0,#4
-2:  ldrb WP,[T3,T1]
-    and WP,TOS 
-    orr WP,T0 
-    strb WP,[T3,T1]
+    eor WP,T2 
+    strb WP,[T3]
     b 9f 
 op_xor:
     ldr T0,[UP,#PEN_COLOR]
-    tst T2,#1 
+    tst T1,#1 
     bne 1f 
     lsl T0,#4 
 1:  eor WP,T0 
-    strb WP,[T3,T1]
+    strb WP,[T3]
 9:  _POP 
     _NEXT 
+
+plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
+
 
 // VSYNC ( -- )
 // wait vertical sync phase 
@@ -473,33 +458,56 @@ op_xor:
   _ADR SCROLLUP 
   _UNNEST  
 
+// extract font pixel 
+FONT_PIXEL: // ( r -- 0|1 )
+    mov T0,#128 
+    and TOS,T0 
+    lsr TOS,#7
+    _NEXT 
+
+// increment x coord 
+INCR_X: // ( x y -- x' y )
+  ldr T0,[DSP]
+  add T0,#1 
+  str T0,[DSP]
+  _NEXT 
+
+// shift font row data
+NEXT_PIXEL:
+    lsl TOS,#1
+    _NEXT 
+
 
 // CHAR_ROW 
 // plot character row 
 // {x y r -- }
-  _HEADER CHAR_ROW,7,"CHARROW"
+//  _HEADER CHAR_ROW,7,"CHARROW"
+CHAR_ROW:  
     _NEST 
     _DOLIT 5 
     _ADR TOR 
 1:  _ADR TOR 
     _ADR DDUP 
-    _ADR RAT 
-    _DOLIT 128 
-    _ADR ANDD 
-    _DOLIT 7 
-    _ADR RSHIFT // {x y x y 0|1 }
+    _ADR RAT
+    _ADR FONT_PIXEL  // {x y x y 0|1 }
     _ADR PLOT 
-    _ADR SWAP 
-    _ADR ONEP 
-    _ADR SWAP 
+    _ADR INCR_X 
     _ADR RFROM 
-    _DOLIT 1 
-    _ADR LSHIFT 
+    _ADR NEXT_PIXEL
+    //_DOLIT 1 
+    //_ADR LSHIFT 
     _DONXT 1b
-    _ADR DDROP 
-    _ADR DROP 
+    _ADR TDROP 
     _UNNEST 
 
+
+CHAR_FONT: // ( c -- c-adr )
+   sub TOS,#32
+   mov T0,#8 
+   mul TOS,T0 
+   ldr T0,=font_6x8
+   add TOS,T0 
+   _NEXT 
 
 /**********************************
    TV-PUTC ( c -- )
@@ -507,12 +515,7 @@ op_xor:
 **********************************/
     _HEADER TVPUTC,7,"TV-PUTC"
     _NEST 
-    _DOLIT 32 
-    _ADR SUBB
-    _DOLIT 8 
-    _ADR STAR 
-    _ADR FONT 
-    _ADR PLUS // character font address
+    _ADR CHAR_FONT 
     _ADR COLUMN 
     _ADR AT
     _ADR COLX  // x coord 
@@ -530,9 +533,8 @@ op_xor:
     _ADR ONEP // {x y' }
     _ADR RFROM 
     _ADR ONEP // {x y' c-adr' }
-    _DONXT 1b 
-    _ADR DDROP 
-    _ADR DROP 
+    _DONXT 1b
+    _ADR TDROP  
     _ADR RIGHT
     _UNNEST  
 

@@ -1,3 +1,9 @@
+2021-04-23
+
+* Réécriture de **PLOT** 
+* Ajout du mot **3DROP** 
+* Travail sur **TV-PUTC** pour améliorer performance. 
+
 2021-04-21
 
 * Améliorer performance **TV-PUTC** et **CHARROW** 

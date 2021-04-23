@@ -821,10 +821,19 @@ DDROP:
 	_POP
 	_NEXT 
 
+	.word _DDROP 
+_TDROP: .byte 5 
+	.ascii "3DROP"
+	.p2align 2
+TDROP:
+    add DSP,#8 
+    _POP 
+    _NEXT 
+
 //    2DUP	( w1 w2 -- w1 w2 w1 w2 )
 // 	Duplicate top 2 items.
 
-	.word	_DDROP
+	.word	_TDROP
 _DDUP:	.byte   4
 	.ascii "2DUP"
 	.p2align 2 	

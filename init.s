@@ -400,6 +400,10 @@ wait_sws:
 
 
 /* configure systicks for 1msec ticks */
+// set priority to 15 (lowest)
+  _MOV32 r0,NVIC_IPR_BASE
+  mov r1,#15<<4
+  strb r1,[r0,#24]
   _MOV32 r0,STK_BASE_ADR 
   _MOV32 r1,95999 
   str r1,[r0,#STK_LOAD]
