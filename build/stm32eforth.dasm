@@ -985,7 +985,7 @@ Disassembly of section .text:
  8000ba0:	2909      	cmp	r1, #9
  8000ba2:	d025      	beq.n	8000bf0 <parity_bit>
  8000ba4:	290a      	cmp	r1, #10
- 8000ba6:	d034      	beq.n	8000c12 <stop_bit>
+ 8000ba6:	d033      	beq.n	8000c10 <stop_bit>
  8000ba8:	f894 206d 	ldrb.w	r2, [r4, #109]	; 0x6d
  8000bac:	ea4f 0252 	mov.w	r2, r2, lsr #1
  8000bb0:	f410 5f80 	tst.w	r0, #4096	; 0x1000
@@ -997,47 +997,47 @@ Disassembly of section .text:
  8000bc6:	f884 206d 	strb.w	r2, [r4, #109]	; 0x6d
  8000bca:	f101 0101 	add.w	r1, r1, #1
  8000bce:	f884 106c 	strb.w	r1, [r4, #108]	; 0x6c
- 8000bd2:	e03e      	b.n	8000c52 <stop_bit+0x40>
+ 8000bd2:	e03e      	b.n	8000c52 <stop_bit+0x42>
 
 08000bd4 <start_bit>:
  8000bd4:	f410 5f80 	tst.w	r0, #4096	; 0x1000
- 8000bd8:	d13b      	bne.n	8000c52 <stop_bit+0x40>
+ 8000bd8:	d13b      	bne.n	8000c52 <stop_bit+0x42>
  8000bda:	f101 0101 	add.w	r1, r1, #1
  8000bde:	f884 106c 	strb.w	r1, [r4, #108]	; 0x6c
  8000be2:	ea81 0101 	eor.w	r1, r1, r1
  8000be6:	f884 106d 	strb.w	r1, [r4, #109]	; 0x6d
  8000bea:	f884 106f 	strb.w	r1, [r4, #111]	; 0x6f
- 8000bee:	e030      	b.n	8000c52 <stop_bit+0x40>
+ 8000bee:	e030      	b.n	8000c52 <stop_bit+0x42>
 
 08000bf0 <parity_bit>:
- 8000bf0:	f8d4 106f 	ldr.w	r1, [r4, #111]	; 0x6f
+ 8000bf0:	f894 106f 	ldrb.w	r1, [r4, #111]	; 0x6f
  8000bf4:	f410 5f80 	tst.w	r0, #4096	; 0x1000
- 8000bf8:	d001      	beq.n	8000bfe <parity_bit+0xe>
+ 8000bf8:	d003      	beq.n	8000c02 <parity_bit+0x12>
  8000bfa:	f101 0101 	add.w	r1, r1, #1
- 8000bfe:	f011 0f01 	tst.w	r1, #1
- 8000c02:	d126      	bne.n	8000c52 <stop_bit+0x40>
- 8000c04:	f894 106e 	ldrb.w	r1, [r4, #110]	; 0x6e
- 8000c08:	f041 0101 	orr.w	r1, r1, #1
- 8000c0c:	f884 106e 	strb.w	r1, [r4, #110]	; 0x6e
- 8000c10:	e01b      	b.n	8000c4a <stop_bit+0x38>
+ 8000bfe:	f884 106f 	strb.w	r1, [r4, #111]	; 0x6f
+ 8000c02:	f894 106c 	ldrb.w	r1, [r4, #108]	; 0x6c
+ 8000c06:	f101 0101 	add.w	r1, r1, #1
+ 8000c0a:	f884 106c 	strb.w	r1, [r4, #108]	; 0x6c
+ 8000c0e:	e020      	b.n	8000c52 <stop_bit+0x42>
 
-08000c12 <stop_bit>:
- 8000c12:	f410 5f80 	tst.w	r0, #4096	; 0x1000
- 8000c16:	d106      	bne.n	8000c26 <stop_bit+0x14>
- 8000c18:	f894 106e 	ldrb.w	r1, [r4, #110]	; 0x6e
- 8000c1c:	f041 0102 	orr.w	r1, r1, #2
- 8000c20:	f884 106e 	strb.w	r1, [r4, #110]	; 0x6e
- 8000c24:	e011      	b.n	8000c4a <stop_bit+0x38>
- 8000c26:	f894 106e 	ldrb.w	r1, [r4, #110]	; 0x6e
- 8000c2a:	f011 0f01 	tst.w	r1, #1
- 8000c2e:	d10c      	bne.n	8000c4a <stop_bit+0x38>
- 8000c30:	f8d4 1084 	ldr.w	r1, [r4, #132]	; 0x84
- 8000c34:	f104 0270 	add.w	r2, r4, #112	; 0x70
- 8000c38:	f894 006d 	ldrb.w	r0, [r4, #109]	; 0x6d
- 8000c3c:	5450      	strb	r0, [r2, r1]
- 8000c3e:	f101 0101 	add.w	r1, r1, #1
- 8000c42:	f001 010f 	and.w	r1, r1, #15
- 8000c46:	f884 1084 	strb.w	r1, [r4, #132]	; 0x84
+08000c10 <stop_bit>:
+ 8000c10:	f894 106e 	ldrb.w	r1, [r4, #110]	; 0x6e
+ 8000c14:	f410 5f80 	tst.w	r0, #4096	; 0x1000
+ 8000c18:	d012      	beq.n	8000c40 <stop_bit+0x30>
+ 8000c1a:	f894 106f 	ldrb.w	r1, [r4, #111]	; 0x6f
+ 8000c1e:	f011 0f01 	tst.w	r1, #1
+ 8000c22:	d012      	beq.n	8000c4a <stop_bit+0x3a>
+ 8000c24:	f8d4 1084 	ldr.w	r1, [r4, #132]	; 0x84
+ 8000c28:	f104 0270 	add.w	r2, r4, #112	; 0x70
+ 8000c2c:	f894 006d 	ldrb.w	r0, [r4, #109]	; 0x6d
+ 8000c30:	5450      	strb	r0, [r2, r1]
+ 8000c32:	f101 0101 	add.w	r1, r1, #1
+ 8000c36:	f001 010f 	and.w	r1, r1, #15
+ 8000c3a:	f884 1084 	strb.w	r1, [r4, #132]	; 0x84
+ 8000c3e:	e004      	b.n	8000c4a <stop_bit+0x3a>
+ 8000c40:	f041 0102 	orr.w	r1, r1, #2
+ 8000c44:	f884 106e 	strb.w	r1, [r4, #110]	; 0x6e
+ 8000c48:	e7ff      	b.n	8000c4a <stop_bit+0x3a>
  8000c4a:	ea80 0000 	eor.w	r0, r0, r0
  8000c4e:	f8a4 006c 	strh.w	r0, [r4, #108]	; 0x6c
  8000c52:	4770      	bx	lr
@@ -4888,19 +4888,19 @@ Disassembly of section .debug_line:
  274:	2e7cf403 	cdpcs	4, 7, cr15, cr12, cr3, {0}
  278:	4b212f4b 	blmi	84bfac <FLASH_SIZE+0x7cbfac>
  27c:	21212f21 			; <UNDEFINED> instruction: 0x21212f21
- 280:	21212121 			; <UNDEFINED> instruction: 0x21212121
+ 280:	22212121 	eorcs	r2, r1, #1073741832	; 0x40000008
  284:	212f2f2f 			; <UNDEFINED> instruction: 0x212f2f2f
  288:	2f2f2f2f 	svccs	0x002f2f2f
  28c:	222f2f2f 	eorcs	r2, pc, #47, 30	; 0xbc
  290:	2f2f212f 	svccs	0x002f212f
  294:	222f2f2f 	eorcs	r2, pc, #47, 30	; 0xbc
  298:	2f212f2f 	svccs	0x00212f2f
- 29c:	2f2f222f 	svccs	0x002f222f
- 2a0:	212f222f 			; <UNDEFINED> instruction: 0x212f222f
- 2a4:	212f2f2f 			; <UNDEFINED> instruction: 0x212f2f2f
- 2a8:	2f222f2f 	svccs	0x00222f2f
- 2ac:	2f212f2f 	svccs	0x00212f2f
- 2b0:	2f2f2f2f 	svccs	0x002f2f2f
+ 29c:	2f2f2f2f 	svccs	0x002f2f2f
+ 2a0:	212f2f22 			; <UNDEFINED> instruction: 0x212f2f22
+ 2a4:	2f222f2f 	svccs	0x00222f2f
+ 2a8:	2f212f2f 	svccs	0x00212f2f
+ 2ac:	2f222f2f 	svccs	0x00222f2f
+ 2b0:	2f2f212f 	svccs	0x002f212f
  2b4:	4b200a03 	blmi	802ac8 <FLASH_SIZE+0x782ac8>
  2b8:	2f22212f 	svccs	0x0022212f
  2bc:	2f2f9659 	svccs	0x002f9659
@@ -4909,7 +4909,7 @@ Disassembly of section .debug_line:
  2c8:	212f2f2f 			; <UNDEFINED> instruction: 0x212f2f2f
  2cc:	2f2f2121 	svccs	0x002f2121
  2d0:	0304042f 	movweq	r0, #17455	; 0x442f
- 2d4:	2f207f99 	svccs	0x00207f99
+ 2d4:	2f207f98 	svccs	0x00207f98
  2d8:	2f242f24 	svccs	0x00242f24
  2dc:	2f222f31 	svccs	0x00222f31
  2e0:	200b032f 	andcs	r0, fp, pc, lsr #6

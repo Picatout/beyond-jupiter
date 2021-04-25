@@ -2141,7 +2141,7 @@ ARM GAS  forth.s 			page 1
   40              	    byte bitcntr; received bit counter 
   41              	    byte rxshift; shiftin keycode 
   42              	    byte flags; flags 
-  43              	    byte ones; count bits to 1 
+  43              	    byte parity; count parity bits 
   44              	    }
   45              	
   46              	flags 
@@ -2152,7 +2152,7 @@ ARM GAS  forth.s 			page 1
   51              	    .equ KBD_FLAGS,KBD_STRUCT+2 
   52              	    .equ KBD_RXSHIFT,KBD_STRUCT+1
   53              	    .equ KBD_BITCNTR,KBD_STRUCT 
-  54              	    .equ KBD_ONES,KBD_STRUCT+3 
+  54              	    .equ KBD_PARITY,KBD_STRUCT+3 
   55              	
   56              	/**********************************
   57              	    kbd_isr
@@ -2178,131 +2178,132 @@ ARM GAS  forth.s 			page 1
   72 09a0 0929     	    cmp r1,#9 
   73 09a2 25D0     	    beq parity_bit 
   74 09a4 0A29     	    cmp r1,#10 
-  75 09a6 34D0     	    beq stop_bit 
-  76 09a8 94F86D20 	    ldrb r2,[UP,#KBD_RXSHIFT]
-  77 09ac 4FEA5202 	    lsr r2,#1 
-  78 09b0 10F4805F 	    tst r0,#(1<<12) // data bit 
-  79 09b4 07D0     	    beq 1f 
-  80 09b6 42F08002 	    orr r2,#(1<<7)
-  81 09ba 94F86F00 	    ldrb r0,[UP,#KBD_ONES]
-  82 09be 00F10100 	    add r0,#1 
-  83 09c2 84F86F00 	    strb r0,[UP,#KBD_ONES]
-  84 09c6 84F86D20 	1:  strb r2,[UP,#KBD_RXSHIFT]
-  85 09ca 01F10101 	    add r1,#1 
-  86 09ce 84F86C10 	    strb r1,[UP,#KBD_BITCNTR]
-  87 09d2 3EE0     	    b 9f         
-  88              	start_bit:
-  89 09d4 10F4805F 	    tst r0,#(1<<12) 
-  90 09d8 3BD1     	    bne 9f // not a start bit 
-  91 09da 01F10101 	    add r1,#1 
-  92 09de 84F86C10 	    strb r1,[UP,#KBD_BITCNTR]
-  93 09e2 81EA0101 	    eor r1,r1 
-  94 09e6 84F86D10 	    strb r1,[UP,#KBD_RXSHIFT]
-  95 09ea 84F86F10 	    strb r1,[UP,#KBD_ONES]
-  96 09ee 30E0     	    b 9f 
-  97              	parity_bit:
-  98 09f0 D4F86F10 	    ldr r1,[UP,#KBD_ONES]
-  99 09f4 10F4805F 	    tst r0,#(1<<12)
- 100 09f8 01D0     	    beq 1f 
- 101 09fa 01F10101 	    add r1,#1 
- 102 09fe 11F0010F 	1:  tst r1,#1 
- 103 0a02 26D1     	    bne 9f      
- 104              	2: // parity error
- 105 0a04 94F86E10 	    ldrb r1,[UP,#KBD_FLAGS]
- 106 0a08 41F00101 	    orr r1,#KBD_PAR_ERR // parity error flags 
- 107 0a0c 84F86E10 	    strb r1,[UP,#KBD_FLAGS]
- 108 0a10 1BE0     	    b 8f      
- 109              	stop_bit:
- 110 0a12 10F4805F 	    tst r0,#(1<<12)
- 111 0a16 06D1     	    bne 3f
- 112 0a18 94F86E10 	    ldrb r1,[UP,#KBD_FLAGS]
- 113 0a1c 41F00201 	    orr r1,#KBD_FRAME_ERR 
- 114 0a20 84F86E10 	    strb r1,[UP,#KBD_FLAGS]
+  75 09a6 33D0     	    beq stop_bit 
+  76              	    // data bit 
+  77 09a8 94F86D20 	    ldrb r2,[UP,#KBD_RXSHIFT]
+  78 09ac 4FEA5202 	    lsr r2,#1 
+  79 09b0 10F4805F 	    tst r0,#(1<<12) // data bit 
+  80 09b4 07D0     	    beq 1f 
+  81 09b6 42F08002 	    orr r2,#(1<<7)
+  82 09ba 94F86F00 	    ldrb r0,[UP,#KBD_PARITY]
+  83 09be 00F10100 	    add r0,#1 
+  84 09c2 84F86F00 	    strb r0,[UP,#KBD_PARITY]
+  85 09c6 84F86D20 	1:  strb r2,[UP,#KBD_RXSHIFT]
+  86 09ca 01F10101 	    add r1,#1 
+  87 09ce 84F86C10 	    strb r1,[UP,#KBD_BITCNTR]
+  88 09d2 3EE0     	    b 9f         
+  89              	start_bit:
+  90 09d4 10F4805F 	    tst r0,#(1<<12) 
+  91 09d8 3BD1     	    bne 9f // not a start bit 
+  92 09da 01F10101 	    add r1,#1 
+  93 09de 84F86C10 	    strb r1,[UP,#KBD_BITCNTR]
+  94 09e2 81EA0101 	    eor r1,r1 
+  95 09e6 84F86D10 	    strb r1,[UP,#KBD_RXSHIFT]
+  96 09ea 84F86F10 	    strb r1,[UP,#KBD_PARITY]
+  97 09ee 30E0     	    b 9f 
+  98              	parity_bit:
+  99 09f0 94F86F10 	    ldrb r1,[UP,#KBD_PARITY]
+ 100 09f4 10F4805F 	    tst r0,#(1<<12)
+ 101 09f8 03D0     	    beq 1f  
+ 102 09fa 01F10101 	    add r1,#1 
+ 103 09fe 84F86F10 	    strb r1,[UP,#KBD_PARITY]  
+ 104 0a02 94F86C10 	1:  ldrb r1,[UP,#KBD_BITCNTR]
+ 105 0a06 01F10101 	    add r1,#1
+ 106 0a0a 84F86C10 	    strb r1,[UP,#KBD_BITCNTR]    
+ 107 0a0e 20E0     	    b 9f      
+ 108              	stop_bit:
+ 109 0a10 94F86E10 	    ldrb r1,[UP,#KBD_FLAGS]
+ 110 0a14 10F4805F 	    tst r0,#(1<<12)
+ 111 0a18 12D0     	    beq 2f
+ 112 0a1a 94F86F10 	    ldrb r1,[UP,#KBD_PARITY]
+ 113 0a1e 11F0010F 	    tst r1,#1 
+ 114 0a22 12D0     	    beq 8f // parity error 
 ARM GAS  forth.s 			page 38
 
 
- 115 0a24 11E0     	    b 8f  
- 116 0a26 94F86E10 	3:  ldrb r1,[UP,#KBD_FLAGS]
- 117 0a2a 11F0010F 	    tst r1,#KBD_PAR_ERR 
- 118 0a2e 0CD1     	    bne 8f // drop this code 
- 119              	// store code in queue 
- 120 0a30 D4F88410 	    ldr r1,[UP,#KBD_QTAIL]
- 121 0a34 04F17002 	    add r2,UP,#KBD_QUEUE
- 122 0a38 94F86D00 	    ldrb r0,[UP,#KBD_RXSHIFT]
- 123 0a3c 5054     	    strb r0,[r2,r1]
- 124 0a3e 01F10101 	    add r1,#1
- 125 0a42 01F00F01 	    and r1,#KBD_QUEUE_SIZE-1
- 126 0a46 84F88410 	    strb r1,[UP,#KBD_QTAIL]
- 127 0a4a 80EA0000 	8:  eor r0,r0 
- 128 0a4e A4F86C00 	    strh r0,[UP,#KBD_BITCNTR]
- 129 0a52 7047     	9:  _RET 
- 130              	    
- 131              	/**********************************
- 132              	    kbd_init 
- 133              	    initialize keyboard 
- 134              	    PS2 clock on PA11 
- 135              	    PS2 data on PA12 
- 136              	**********************************/
- 137              	    _GBL_FUNC kbd_init 
- 138              	// interrupt triggered on falling edge 
- 139 0a54 4FF47052 	   _MOV32 r2,EXTI_BASE_ADR
- 139      C4F20102 
- 140 0a5c 4FF40060 	   mov r0,#(1<<11)
- 141 0a60 1060     	   str r0,[r2,#EXTI_IMR] // enable EXTI11 
- 142 0a62 D060     	   str r0,[r2,#EXTI_FTSR] // on falling edge 
- 143              	// enable interrupt EXTI15_10_IRQ in NVIC 
- 144 0a64 4FF02800 	   mov r0,#EXTI15_10_IRQ
- 145 0a68 00B5FFF7 	   _CALL nvic_enable_irq 
- 145      23FC5DF8 
- 145      04EB
- 146 0a72 7047     	   _RET 
- 147              	
+ 115              	// store code in queue 
+ 116 0a24 D4F88410 	    ldr r1,[UP,#KBD_QTAIL]
+ 117 0a28 04F17002 	    add r2,UP,#KBD_QUEUE
+ 118 0a2c 94F86D00 	    ldrb r0,[UP,#KBD_RXSHIFT]
+ 119 0a30 5054     	    strb r0,[r2,r1]
+ 120 0a32 01F10101 	    add r1,#1
+ 121 0a36 01F00F01 	    and r1,#KBD_QUEUE_SIZE-1
+ 122 0a3a 84F88410 	    strb r1,[UP,#KBD_QTAIL]
+ 123 0a3e 04E0     	    b 8f 
+ 124              	2:  // framing error 
+ 125 0a40 41F00201 	    orr r1,#KBD_FRAME_ERR   
+ 126 0a44 84F86E10 	    strb r1,[UP,#KBD_FLAGS]
+ 127 0a48 FFE7     	    b 8f 
+ 128 0a4a 80EA0000 	8:  eor r0,r0 
+ 129 0a4e A4F86C00 	    strh r0,[UP,#KBD_BITCNTR]
+ 130 0a52 7047     	9:  _RET 
+ 131              	    
+ 132              	/**********************************
+ 133              	    kbd_init 
+ 134              	    initialize keyboard 
+ 135              	    PS2 clock on PA11 
+ 136              	    PS2 data on PA12 
+ 137              	**********************************/
+ 138              	    _GBL_FUNC kbd_init 
+ 139              	// interrupt triggered on falling edge 
+ 140 0a54 4FF47052 	   _MOV32 r2,EXTI_BASE_ADR
+ 140      C4F20102 
+ 141 0a5c 4FF40060 	   mov r0,#(1<<11)
+ 142 0a60 1060     	   str r0,[r2,#EXTI_IMR] // enable EXTI11 
+ 143 0a62 D060     	   str r0,[r2,#EXTI_FTSR] // on falling edge 
+ 144              	// enable interrupt EXTI15_10_IRQ in NVIC 
+ 145 0a64 4FF02800 	   mov r0,#EXTI15_10_IRQ
+ 146 0a68 00B5FFF7 	   _CALL nvic_enable_irq 
+ 146      23FC5DF8 
+ 146      04EB
+ 147 0a72 7047     	   _RET 
  148              	
- 149              	// KEY-ERR? ( -- 0|1|2)
- 150              	// report keyboard error 
- 151 0a74 3E090000 	    _HEADER KEYERRQ,8,"KEY-ERR?"
- 151      084B4559 
- 151      2D455252 
- 151      3F0000BF 
- 152 0a84 47F8046D 	    _PUSH 
- 153 0a88 94F86E60 	    ldrb TOS,[UP,#KBD_FLAGS]
- 154 0a8c 06F00306 	    and TOS,#3 
- 155 0a90 34E0     	    _NEXT     
- 156              	
- 157              	// KEY-RST-ERR ( -- )
- 158              	// reset keyboard error flags 
- 159 0a92 780A0000 	    _HEADER KEY_RST_ERR,11,"KEY-RST-ERR"
- 159      0B4B4559 
- 159      2D525354 
- 159      2D455252 
- 159      00BF
- 160 0aa4 94F86E00 	    ldrb T0,[UP,#KBD_FLAGS]
- 161 0aa8 00F0FC00 	    and T0,#0xFC 
+ 149              	
+ 150              	// KEY-ERR? ( -- 0|1|2)
+ 151              	// report keyboard error 
+ 152 0a74 3E090000 	    _HEADER KEYERRQ,8,"KEY-ERR?"
+ 152      084B4559 
+ 152      2D455252 
+ 152      3F0000BF 
+ 153 0a84 47F8046D 	    _PUSH 
+ 154 0a88 94F86E60 	    ldrb TOS,[UP,#KBD_FLAGS]
+ 155 0a8c 06F00306 	    and TOS,#3 
+ 156 0a90 34E0     	    _NEXT     
+ 157              	
+ 158              	// KEY-RST-ERR ( -- )
+ 159              	// reset keyboard error flags 
+ 160 0a92 780A0000 	    _HEADER KEY_RST_ERR,11,"KEY-RST-ERR"
+ 160      0B4B4559 
+ 160      2D525354 
+ 160      2D455252 
+ 160      00BF
+ 161 0aa4 94F86E00 	    ldrb T0,[UP,#KBD_FLAGS]
 ARM GAS  forth.s 			page 39
 
 
- 162 0aac 84F86E00 	    strb T0,[UP,#KBD_FLAGS]
- 163 0ab0 24E0     	    _NEXT 
- 164              	
- 165              	// KEYCODE ( -- c )
- 166              	// extract keyboard scancode from queue.
- 167 0ab2 960A0000 	    _HEADER KEYCODE,7,"KEYCODE"
- 167      074B4559 
- 167      434F4445 
- 167      00BF
- 168 0ac0 47F8046D 	    _PUSH
- 169 0ac4 86EA0606 	    eor TOS,TOS  
- 170 0ac8 04F17003 	    add T3,UP,#KBD_QUEUE
- 171 0acc D4F88000 	    ldr T0,[UP,#KBD_QHEAD]
- 172 0ad0 D4F88410 	    ldr T1,[UP,#KBD_QTAIL]
- 173 0ad4 8842     	    cmp T0,T1 
- 174 0ad6 06D0     	    beq 2f  
- 175 0ad8 1E5C     	    ldrb TOS,[T3,T0]
- 176 0ada 00F10100 	    add T0,#1 
- 177 0ade 00F00F00 	    and T0,#KBD_QUEUE_SIZE-1
- 178 0ae2 C4F88000 	    str T0,[UP,#KBD_QHEAD]
- 179 0ae6 09E0     	2:  _NEXT 
- 180              	
+ 162 0aa8 00F0FC00 	    and T0,#0xFC 
+ 163 0aac 84F86E00 	    strb T0,[UP,#KBD_FLAGS]
+ 164 0ab0 24E0     	    _NEXT 
+ 165              	
+ 166              	// KEYCODE ( -- c )
+ 167              	// extract keyboard scancode from queue.
+ 168 0ab2 960A0000 	    _HEADER KEYCODE,7,"KEYCODE"
+ 168      074B4559 
+ 168      434F4445 
+ 168      00BF
+ 169 0ac0 47F8046D 	    _PUSH
+ 170 0ac4 86EA0606 	    eor TOS,TOS  
+ 171 0ac8 04F17003 	    add T3,UP,#KBD_QUEUE
+ 172 0acc D4F88000 	    ldr T0,[UP,#KBD_QHEAD]
+ 173 0ad0 D4F88410 	    ldr T1,[UP,#KBD_QTAIL]
+ 174 0ad4 8842     	    cmp T0,T1 
+ 175 0ad6 06D0     	    beq 2f  
+ 176 0ad8 1E5C     	    ldrb TOS,[T3,T0]
+ 177 0ada 00F10100 	    add T0,#1 
+ 178 0ade 00F00F00 	    and T0,#KBD_QUEUE_SIZE-1
+ 179 0ae2 C4F88000 	    str T0,[UP,#KBD_QHEAD]
+ 180 0ae6 09E0     	2:  _NEXT 
+ 181              	
    1              	/* 
    2              	****************************************************
    3              	*  STM32eForth version 7.20
@@ -2337,10 +2338,10 @@ ARM GAS  forth.s 			page 1
   32              	*	Subroutine Threaded Forth Model
   33              	*	Adapted to STM32F407-Discovery Board
   34              	*	Assembled by Keil uVision 5.10
-  35              	
 ARM GAS  forth.s 			page 40
 
 
+  35              	
   36              	*	Version 4.03
   37              	*	Direct Threaded Forth Model
   38              	*	Derived from 80386 eForth versin 4.02
@@ -2397,10 +2398,10 @@ ARM GAS  forth.s 			page 1
   89              	INEXT: 
   90 0afc 5CF8045B 		LDR WP,[IP],#4 
   91 0b00 2847     		BX WP  
-  92              	UNNEST:
 ARM GAS  forth.s 			page 41
 
 
+  92              	UNNEST:
   93 0b02 58F804CB 		LDMFD RSP!,{IP}
   94 0b06 5CF8045B 		LDR WP,[IP],#4 
   95 0b0a 2847     		BX WP  
@@ -2457,10 +2458,10 @@ ARM GAS  forth.s 			page 1
  142 0b84 A10D0000 		_ADR DUPP 
  143 0b88 6D110000 		_ADR SEED 
  144 0b8c E10C0000 		_ADR STORE 
- 145 0b90 6D0C0000 		_DOLIT 0x7FFFFFFF
 ARM GAS  forth.s 			page 42
 
 
+ 145 0b90 6D0C0000 		_DOLIT 0x7FFFFFFF
  145      FFFFFF7F 
  146 0b98 E50D0000 		_ADR ANDD 
  147 0b9c B10D0000 		_ADR SWAP 
@@ -2517,10 +2518,10 @@ ARM GAS  forth.s 			page 1
  194 0c0d 3F4B4559 		.ascii "?KEY"
  195 0c11 0000BF   		.p2align 2 
  196              	QKEY:
- 197              	QRX: 
 ARM GAS  forth.s 			page 43
 
 
+ 197              	QRX: 
  198 0c14 47F8046D 		_PUSH
  199 0c18 A06D     		ldr T0,[UP,#RX_TAIL] 
  200 0c1a 616D     		ldr T1,[UP,#RX_HEAD]
@@ -2577,10 +2578,10 @@ ARM GAS  forth.s 			page 1
  250              	// _LIT	.byte   COMPO+5
  251              	// 	.ascii "doLIT"
  252 0c6a 00BF     	 	.p2align 2 	
- 253              	DOLIT:
 ARM GAS  forth.s 			page 44
 
 
+ 253              	DOLIT:
  254 0c6c 47F8046D 		_PUSH				//  store TOS on data stack
  255 0c70 5CF8046B 		LDR	TOS,[IP],#4		//  get literal at word boundary
  256 0c74 42E7     		_NEXT 
@@ -2637,10 +2638,10 @@ ARM GAS  forth.s 			page 1
  306 0cba 1FE7     		_NEXT
  307              	QBRAN1:
  308 0cbc 0CF1040C 	 	ADD	IP,IP,#4
- 309 0cc0 1CE7     		_NEXT
 ARM GAS  forth.s 			page 45
 
 
+ 309 0cc0 1CE7     		_NEXT
  310              	
  311              	//    branch	( -- )
  312              	// 	Branch to an inline address.
@@ -2697,10 +2698,10 @@ ARM GAS  forth.s 			page 1
  363              	CSTOR:
  364 0d00 57F8045B 		LDR	WP,[DSP],#4
  365 0d04 3570     		STRB WP,[TOS]
- 366 0d06 57F8046B 		_POP
 ARM GAS  forth.s 			page 46
 
 
+ 366 0d06 57F8046B 		_POP
  367 0d0a F7E6     		_NEXT
  368              	
  369              	//    C@	  ( b -- c )
@@ -2757,10 +2758,10 @@ ARM GAS  forth.s 			page 1
  420 0d57 525021   		.ascii "RP!" 
  421 0d5a 00BF     		.p2align 2 
  422              	RPSTOR:
- 423 0d5c B046     		MOV RSP,TOS 
 ARM GAS  forth.s 			page 47
 
 
+ 423 0d5c B046     		MOV RSP,TOS 
  424 0d5e 57F8046B 		_POP  
  425 0d62 CBE6     		_NEXT 
  426              	
@@ -2817,10 +2818,10 @@ ARM GAS  forth.s 			page 1
  477 0daa 04       	_SWAP:	.byte   4
  478 0dab 53574150 		.ascii "SWAP"
  479 0daf 00       		.p2align 2 	
- 480              	SWAP:
 ARM GAS  forth.s 			page 48
 
 
+ 480              	SWAP:
  481 0db0 3D68     		LDR	WP,[DSP]
  482 0db2 3E60     		STR	TOS,[DSP]
  483 0db4 2E46     		MOV	TOS,WP
@@ -2877,10 +2878,10 @@ ARM GAS  forth.s 			page 1
  534              	
  535              	//    XOR	 ( w w -- w )
  536              	// 	Bitwise exclusive OR.
- 537              	
 ARM GAS  forth.s 			page 49
 
 
+ 537              	
  538 0e02 F20D0000 		.word	_ORR
  539 0e06 03       	_XORR:	.byte   3
  540 0e07 584F52   		.ascii "XOR"
@@ -2937,10 +2938,10 @@ ARM GAS  forth.s 			page 1
  589 0e5e 4A0E0000 		.word	_LSHIFT
  590 0e62 01       	_PLUS:	.byte   1
  591 0e63 2B       		.ascii "+"
- 592              		.p2align 2 	
 ARM GAS  forth.s 			page 50
 
 
+ 592              		.p2align 2 	
  593              	PLUS:
  594 0e64 57F8045B 		LDR	WP,[DSP],#4
  595 0e68 2E44     		ADD	TOS,TOS,WP
@@ -2997,10 +2998,10 @@ ARM GAS  forth.s 			page 1
  646 0eb2 3A60     		STR	T2,[DSP]
  647 0eb4 1E46     		MOV	TOS,T3
  648 0eb6 21E6     		_NEXT 
- 649              	
 ARM GAS  forth.s 			page 51
 
 
+ 649              	
  650              	//    1+	 ( w -- w+1 )
  651              	// 	Add 1.
  652              	
@@ -3057,10 +3058,10 @@ ARM GAS  forth.s 			page 1
  702 0f00 06F10406 		ADD	TOS,TOS,#CELLL
  703 0f04 FAE5     		_NEXT
  704              	
- 705              	//    CELL-	( w -- w-4 )
 ARM GAS  forth.s 			page 52
 
 
+ 705              	//    CELL-	( w -- w-4 )
  706              	// 	Subtract CELLL.
  707              	
  708 0f06 FA0E0000 		.word	_CELLP
@@ -3117,10 +3118,10 @@ ARM GAS  forth.s 			page 1
  756 0f51 0000BF   		.p2align 2 	
  757              	TWOST:
  758 0f54 4FEA4606 		MOV	TOS,TOS,LSL#1
- 759 0f58 D0E5     		_NEXT
 ARM GAS  forth.s 			page 53
 
 
+ 759 0f58 D0E5     		_NEXT
  760              	
  761              	//    2/	( w -- w/2 )
  762              	// 	Divide by 2.
@@ -3177,10 +3178,10 @@ ARM GAS  forth.s 			page 1
  813              	// 	Drop top 2 items.
  814              	
  815 0fa6 960F0000 		.word	_NROT
- 816 0faa 05       	_DDROP:	.byte   5
 ARM GAS  forth.s 			page 54
 
 
+ 816 0faa 05       	_DDROP:	.byte   5
  817 0fab 3244524F 		.ascii "2DROP"
  817      50
  818              		.p2align 2 	
@@ -3237,10 +3238,10 @@ ARM GAS  forth.s 			page 1
  868              		.p2align 2 	
  869              	INVER:
  870 1008 6FEA0606 		MVN	TOS,TOS
- 871 100c 76E5     		_NEXT
 ARM GAS  forth.s 			page 55
 
 
+ 871 100c 76E5     		_NEXT
  872              	
  873              	//    NEGATE	( w -- -w )
  874              	// 	2's complement.
@@ -3297,10 +3298,10 @@ ARM GAS  forth.s 			page 1
  924 1062 4BE5     		_NEXT
  925              	
  926              	//    U<	 ( w w -- t )
- 927              	// 	Unsigned less?
 ARM GAS  forth.s 			page 56
 
 
+ 927              	// 	Unsigned less?
  928              	
  929 1064 52100000 		.word	_EQUAL
  930 1068 02       	_ULESS:	.byte   2
@@ -3357,10 +3358,10 @@ ARM GAS  forth.s 			page 1
  981 10ba C8BF     		IT GT 
  982 10bc 2E46     		MOVGT	TOS,WP
  983 10be 1DE5     		_NEXT 
- 984              	
 ARM GAS  forth.s 			page 57
 
 
+ 984              	
  985              	//    MIN	 ( w w -- min )
  986              	// 	Leave minimum.
  987              	
@@ -3417,10 +3418,10 @@ ARM GAS  forth.s 			page 1
  1038 1112 47F8045D 		STR	WP,[DSP,#-4]!
  1039 1116 3668     		LDR	TOS,[TOS]
  1040 1118 F0E4     		_NEXT
- 1041              	
 ARM GAS  forth.s 			page 58
 
 
+ 1041              	
  1042              	//    COUNT	( b -- b+1 c )
  1043              	// 	Fetch length of string.
  1044              	
@@ -3477,10 +3478,10 @@ ARM GAS  forth.s 			page 1
  1093              	DOCON:
  1094 1158 47F8046D 		_PUSH
  1095 115c 5CF8046B 		LDR.W TOS,[IP],#4 
- 1096 1160 CFE4     		B UNNEST 
 ARM GAS  forth.s 			page 59
 
 
+ 1096 1160 CFE4     		B UNNEST 
  1097              	
  1098              	/***********************
  1099              	  system variables 
@@ -3537,10 +3538,10 @@ ARM GAS  forth.s 			page 1
  1148              	//    BASE	( -- a )
  1149              	// 	Storage of the radix base for numeric I/O.
  1150              	
- 1151 11b2 A2110000 		.word	_TBOOT
 ARM GAS  forth.s 			page 60
 
 
+ 1151 11b2 A2110000 		.word	_TBOOT
  1152 11b6 04       	_BASE:	.byte   4
  1153 11b7 42415345 		.ascii "BASE"
  1154 11bb 00       		.p2align 2 	
@@ -3597,10 +3598,10 @@ ARM GAS  forth.s 			page 1
  1205 1208 04F12406 		ADD	TOS,UP,#NTIBB
  1206 120c 76E4     		_NEXT
  1207              	
- 1208              	//    'EVAL	( -- a )
 ARM GAS  forth.s 			page 61
 
 
+ 1208              	//    'EVAL	( -- a )
  1209              	// 	Execution vector of EVAL.
  1210              	
  1211 120e FE110000 		.word	_NTIB
@@ -3657,10 +3658,10 @@ ARM GAS  forth.s 			page 1
  1260 1266 03       	_FCP: .byte 3            
  1261 1267 464350   		.ascii "FCP"
  1262 126a 00BF     		.p2align 2 
- 1263              	FCP: 
 ARM GAS  forth.s 			page 62
 
 
+ 1263              	FCP: 
  1264 126c 47F8046D 		_PUSH 
  1265 1270 04F13806 		ADD TOS,UP,#FORTH_CTOP 
  1266 1274 42E4     		_NEXT 
@@ -3717,10 +3718,10 @@ ARM GAS  forth.s 			page 1
  1314              	***********************/
  1315              	
  1316              	//    WITHIN	( u ul uh -- t )
- 1317              	// 	Return true if u is within the range of ul and uh.
 ARM GAS  forth.s 			page 63
 
 
+ 1317              	// 	Return true if u is within the range of ul and uh.
  1318              	
  1319 12c4 AC120000 		.word	_USER_END 
  1320 12c8 06       	_WITHI:	.byte   6
@@ -3777,10 +3778,10 @@ ARM GAS  forth.s 			page 1
  1369 132c F4120000 		.word	_UMMOD
  1370 1330 05       	_MSMOD:	.byte  5
  1371 1331 4D2F4D4F 		.ascii "M/MOD"
- 1371      44
 ARM GAS  forth.s 			page 64
 
 
+ 1371      44
  1372 1336 00BF     		.p2align 2 	
  1373              	MSMOD:	
  1374 1338 504700BF 		_NEST
@@ -3837,10 +3838,10 @@ ARM GAS  forth.s 			page 1
  1422 13cd 4D4F44   		.ascii "MOD"
  1423              		.p2align 2 	
  1424              	MODD:
- 1425 13d0 504700BF 		_NEST
 ARM GAS  forth.s 			page 65
 
 
+ 1425 13d0 504700BF 		_NEST
  1426 13d4 B1130000 		_ADR	SLMOD
  1427 13d8 910D0000 		_ADR	DROP
  1428 13dc 030B0000 		_UNNEST
@@ -3897,10 +3898,10 @@ ARM GAS  forth.s 			page 1
  1478              	
  1479 143c 24140000 		.word	_STASL
  1480 1440 07       	_ALGND:	.byte   7
- 1481 1441 414C4947 		.ascii "ALIGNED"
 ARM GAS  forth.s 			page 66
 
 
+ 1481 1441 414C4947 		.ascii "ALIGNED"
  1481      4E4544
  1482              		.p2align 2 	
  1483              	ALGND:
@@ -3957,10 +3958,10 @@ ARM GAS  forth.s 			page 1
  1527              	
  1528 14c8 A8140000 		.word	_DEPTH
  1529 14cc 04       	_PICK:	.byte  4
- 1530 14cd 5049434B 		.ascii "PICK"
 ARM GAS  forth.s 			page 67
 
 
+ 1530 14cd 5049434B 		.ascii "PICK"
  1531 14d1 0000BF   		.p2align 2 	
  1532              	PICK:
  1533 14d4 504700BF 		_NEST
@@ -4017,10 +4018,10 @@ ARM GAS  forth.s 			page 1
  1583              	//    @EXECUTE	( a -- )
  1584              	// 	Execute vector stored in address a.
  1585              	
- 1586 153e 30150000 		.word	_TIB
 ARM GAS  forth.s 			page 68
 
 
+ 1586 153e 30150000 		.word	_TIB
  1587 1542 08       	_ATEXE:	.byte   8
  1588 1543 40455845 		.ascii "@EXECUTE"
  1588      43555445 
@@ -4077,10 +4078,10 @@ ARM GAS  forth.s 			page 1
  1638 15b2 3600     		MOVS	TOS,TOS
  1639 15b4 02D0     		BEQ	MOVE2
  1640 15b6 A6F10406 		SUB	TOS,TOS,#4
- 1641 15ba F6E7     		B MOVE0
 ARM GAS  forth.s 			page 69
 
 
+ 1641 15ba F6E7     		B MOVE0
  1642              	MOVE2:
  1643 15bc 57F8046B 		_POP
  1644 15c0 FFF79CBA 		_NEXT
@@ -4137,10 +4138,10 @@ ARM GAS  forth.s 			page 1
  1692 1648 030B0000 		_UNNEST   			// move string
  1693              	
  1694              	// **************************************************************************
- 1695              	//  Numeric output, single precision
 ARM GAS  forth.s 			page 70
 
 
+ 1695              	//  Numeric output, single precision
  1696              	
  1697              	//    DIGIT	( u -- c )
  1698              	// 	Convert digit u to a character.
@@ -4197,10 +4198,10 @@ ARM GAS  forth.s 			page 1
  1743 16cc E10C0000 		_ADR	STORE
  1744 16d0 030B0000 		_UNNEST
  1745              	
- 1746              	//    HOLD	( c -- )
 ARM GAS  forth.s 			page 71
 
 
+ 1746              	//    HOLD	( c -- )
  1747              	// 	Insert a character into the numeric output string.
  1748              	
  1749 16d4 BC160000 		.word	_BDIGS
@@ -4257,10 +4258,10 @@ ARM GAS  forth.s 			page 1
  1798              	
  1799 174c 28170000 		.word	_DIGS
  1800 1750 04       	_SIGN:	.byte  4
- 1801 1751 5349474E 		.ascii "SIGN"
 ARM GAS  forth.s 			page 72
 
 
+ 1801 1751 5349474E 		.ascii "SIGN"
  1802 1755 0000BF   		.p2align 2 	
  1803              	SIGN:
  1804 1758 504700BF 		_NEST
@@ -4317,10 +4318,10 @@ ARM GAS  forth.s 			page 1
  1853 17cd 484558   		.ascii "HEX"
  1854              		.p2align 2 	
  1855              	HEX:
- 1856 17d0 504700BF 		_NEST
 ARM GAS  forth.s 			page 73
 
 
+ 1856 17d0 504700BF 		_NEST
  1857 17d4 6D0C0000 		_DOLIT 16
  1857      10000000 
  1858 17dc BD110000 		_ADR	BASE
@@ -4377,10 +4378,10 @@ ARM GAS  forth.s 			page 1
  1901              	DGTQ1:
  1902 1864 A10D0000 		_ADR	DUPP
  1903 1868 210D0000 		_ADR	RFROM
- 1904 186c 6D100000 		_ADR	ULESS
 ARM GAS  forth.s 			page 74
 
 
+ 1904 186c 6D100000 		_ADR	ULESS
  1905 1870 030B0000 		_UNNEST
  1906              	
  1907              	//    NUMBER?	( a -- n T | a F )
@@ -4437,10 +4438,10 @@ ARM GAS  forth.s 			page 1
  1952 1920 BD110000 		_ADR	BASE
  1953 1924 F50C0000 		_ADR	AT
  1954 1928 19180000 		_ADR	DIGTQ
- 1955 192c AF0C0000 		_QBRAN	NUMQ4
 ARM GAS  forth.s 			page 75
 
 
+ 1955 192c AF0C0000 		_QBRAN	NUMQ4
  1955      7C190000 
  1956 1934 B10D0000 		_ADR	SWAP
  1957 1938 BD110000 		_ADR	BASE
@@ -4497,10 +4498,10 @@ ARM GAS  forth.s 			page 1
  2003 19c8 030B0000 		_UNNEST
  2004              	
  2005              	//    SPACE	( -- )
- 2006              	// 	Send the blank character to the output device.
 ARM GAS  forth.s 			page 76
 
 
+ 2006              	// 	Send the blank character to the output device.
  2007              	
  2008 19cc B4190000 		.word	_KEY
  2009 19d0 05       	_SPACE:	.byte  5
@@ -4557,10 +4558,10 @@ ARM GAS  forth.s 			page 1
  2053      3C1A0000 
  2054 1a50 910D0000 		_ADR	DROP
  2055 1a54 030B0000 		_UNNEST
- 2056              	
 ARM GAS  forth.s 			page 77
 
 
+ 2056              	
  2057              	//    CR	  ( -- )
  2058              	// 	Output a carriage return and a line feed.
  2059              	
@@ -4617,10 +4618,10 @@ ARM GAS  forth.s 			page 1
  2108              	// 	Run time routine of ." . Output a compiled string.
  2109              	
  2110              	// 	.word	_STRQP
- 2111              	// _DOTST	.byte  COMPO+2
 ARM GAS  forth.s 			page 78
 
 
+ 2111              	// _DOTST	.byte  COMPO+2
  2112              	// 	.ascii ".$$"
  2113              	// 	.p2align 2 	
  2114              	DOTST:
@@ -4677,10 +4678,10 @@ ARM GAS  forth.s 			page 1
  2165 1b24 C50D0000 		_ADR	OVER
  2166 1b28 750E0000 		_ADR	SUBB
  2167 1b2c F5190000 		_ADR	SPACS
- 2168 1b30 2D1A0000 		_ADR	TYPEE
 ARM GAS  forth.s 			page 79
 
 
+ 2168 1b30 2D1A0000 		_ADR	TYPEE
  2169 1b34 030B0000 		_UNNEST
  2170              	
  2171              	//    U.	  ( u -- )
@@ -4737,10 +4738,10 @@ ARM GAS  forth.s 			page 1
  2220 1bb0 030B0000 		_UNNEST
  2221              	
  2222              	// **************************************************************************
- 2223              	//  Parsing
 ARM GAS  forth.s 			page 80
 
 
+ 2223              	//  Parsing
  2224              	
  2225              	//    parse	( b u c -- b u delta //  string> )
  2226              	// 	Scan word delimited by c. Return found string and its offset.
@@ -4797,10 +4798,10 @@ ARM GAS  forth.s 			page 1
  2272 1c54 150D0000 		_ADR	CAT
  2273 1c58 750E0000 		_ADR	SUBB			// scan for delimiter
  2274 1c5c C7110000 		_ADR	TEMP
- 2275 1c60 F50C0000 		_ADR	AT
 ARM GAS  forth.s 			page 81
 
 
+ 2275 1c60 F50C0000 		_ADR	AT
  2276 1c64 210F0000 		_ADR	BLANK
  2277 1c68 55100000 		_ADR	EQUAL
  2278 1c6c AF0C0000 		_QBRAN	PARS5
@@ -4857,10 +4858,10 @@ ARM GAS  forth.s 			page 1
  2324 1d0c 750E0000 		_ADR	SUBB			// remaining count
  2325 1d10 210D0000 		_ADR	RFROM
  2326 1d14 B51B0000 		_ADR	PARS
- 2327 1d18 F1110000 		_ADR	INN
 ARM GAS  forth.s 			page 82
 
 
+ 2327 1d18 F1110000 		_ADR	INN
  2328 1d1c DD100000 		_ADR	PSTOR
  2329 1d20 030B0000 		_UNNEST
  2330              	
@@ -4917,10 +4918,10 @@ ARM GAS  forth.s 			page 1
  2379 1d89 43484152 		.ascii "CHAR"
  2380 1d8d 0000BF   		.p2align 2 	
  2381              	CHAR:
- 2382 1d90 504700BF 		_NEST
 ARM GAS  forth.s 			page 83
 
 
+ 2382 1d90 504700BF 		_NEST
  2383 1d94 210F0000 		_ADR	BLANK
  2384 1d98 E51C0000 		_ADR	PARSE
  2385 1d9c 910D0000 		_ADR	DROP
@@ -4977,10 +4978,10 @@ ARM GAS  forth.s 			page 1
  2433 1e0c 49140000 		_ADR	ALGND
  2434 1e10 030B0000 		_UNNEST
  2435              	
- 2436              	//    SAME?	( a1 a2 u -- a1 a2 f | -0+ )
 ARM GAS  forth.s 			page 84
 
 
+ 2436              	//    SAME?	( a1 a2 u -- a1 a2 f | -0+ )
  2437              	// 	Compare u bytes in two strings. Return 0 if identical.
  2438              	//
  2439              	//  Picatout 2020-12-01, 
@@ -5037,10 +5038,10 @@ ARM GAS  forth.s 			page 1
  2485 1e88 25110000 		_ADR	COUNT			// na a+1 count
  2486 1e8c A10D0000 		_ADR	DUPP 
  2487 1e90 C7110000 		_ADR	TEMP
- 2488 1e94 E10C0000 		_ADR	STORE			// na a+1 count 
 ARM GAS  forth.s 			page 85
 
 
+ 2488 1e94 E10C0000 		_ADR	STORE			// na a+1 count 
  2489 1e98 490D0000 		_ADR  TOR		// na a+1  R: count  
  2490 1e9c B10D0000 		_ADR	SWAP			// a+1 na
  2491              	FIND1:
@@ -5097,10 +5098,10 @@ ARM GAS  forth.s 			page 1
  2535              	//    NAME?	( a -- ca na | a F )
  2536              	// 	Search all context vocabularies for a string.
  2537              	
- 2538 1f50 181E0000 		.word	_SAMEQ
 ARM GAS  forth.s 			page 86
 
 
+ 2538 1f50 181E0000 		.word	_SAMEQ
  2539 1f54 05       	_NAMEQ:	.byte  5
  2540 1f55 4E414D45 		.ascii "NAME?"
  2540      3F
@@ -5157,10 +5158,10 @@ ARM GAS  forth.s 			page 1
  2588 1fc4 490C0000 		_ADR	TECHO
  2589 1fc8 C50D0000 		_ADR	OVER
  2590 1fcc 010D0000 		_ADR	CSTOR
- 2591 1fd0 C10E0000 		_ADR	ONEP
 ARM GAS  forth.s 			page 87
 
 
+ 2591 1fd0 C10E0000 		_ADR	ONEP
  2592 1fd4 030B0000 		_UNNEST
  2593              	
  2594              	//    kTAP	( bot eot cur c -- bot eot cur )
@@ -5217,10 +5218,10 @@ ARM GAS  forth.s 			page 1
  2640 2054 AF0C0000 		_QBRAN	ACCP4
  2640      94200000 
  2641 205c B9190000 		_ADR	KEY
- 2642 2060 A10D0000 		_ADR	DUPP
 ARM GAS  forth.s 			page 88
 
 
+ 2642 2060 A10D0000 		_ADR	DUPP
  2643 2064 210F0000 		_ADR	BLANK
  2644 2068 6D0C0000 		_DOLIT 127
  2644      7F000000 
@@ -5277,10 +5278,10 @@ ARM GAS  forth.s 			page 1
  2688 20ee 00BF     		.p2align 2 	
  2689              	ABORT:
  2690 20f0 504700BF 		_NEST
- 2691              	ABORT1:
 ARM GAS  forth.s 			page 89
 
 
+ 2691              	ABORT1:
  2692 20f4 D9190000 		_ADR	SPACE
  2693 20f8 25110000 		_ADR	COUNT
  2694 20fc 2D1A0000 		_ADR	TYPEE
@@ -5337,10 +5338,10 @@ ARM GAS  forth.s 			page 1
  2736      0D20636F 
  2736      6D70696C 
  2736      65206F6E 
- 2736      6C7900BF 
 ARM GAS  forth.s 			page 90
 
 
+ 2736      6C7900BF 
  2737 2188 850C0000 		_ADR	EXECU
  2738 218c 030B0000 		_UNNEST			// execute defined word
  2739              	INTE1:
@@ -5397,10 +5398,10 @@ ARM GAS  forth.s 			page 1
  2784      434B
  2785 2207 00       		.p2align 2 	
  2786              	QSTAC:
- 2787 2208 504700BF 		_NEST
 ARM GAS  forth.s 			page 91
 
 
+ 2787 2208 504700BF 		_NEST
  2788 220c B1140000 		_ADR	DEPTH
  2789 2210 D50D0000 		_ADR	ZLESS	// check only for underflow
  2790 2214 1D210000 		_ABORQ	9,"underflow"
@@ -5457,10 +5458,10 @@ ARM GAS  forth.s 			page 1
  2834 2291 51554954 		.ascii "QUIT"
  2835 2295 0000BF   		.p2align 2 	
  2836              	QUIT:
- 2837 2298 6D0C0000 		_DOLIT RPP 
 ARM GAS  forth.s 			page 92
 
 
+ 2837 2298 6D0C0000 		_DOLIT RPP 
  2837      80FF0120 
  2838 22a0 5D0D0000 		_ADR RPSTOR 
  2839              	QUIT1:
@@ -5517,10 +5518,10 @@ ARM GAS  forth.s 			page 1
  2885      30230000 
  2886 232c 030B0000 		_UNNEST	// yes, push code address
  2887              	TICK1:	
- 2888 2330 F1200000 		_ADR ABORT	// no, error
 ARM GAS  forth.s 			page 93
 
 
+ 2888 2330 F1200000 		_ADR ABORT	// no, error
  2889              	
  2890              	//    ALLOT	( n -- )
  2891              	// 	Allocate n bytes to the ram area.
@@ -5577,10 +5578,10 @@ ARM GAS  forth.s 			page 1
  2938              		.p2align 2 	
  2939              	COMPI:
  2940 23a4 504700BF 		_NEST
- 2941 23a8 210D0000 		_ADR	RFROM
 ARM GAS  forth.s 			page 94
 
 
+ 2941 23a8 210D0000 		_ADR	RFROM
  2942 23ac A10D0000 		_ADR	DUPP 
  2943 23b0 F50C0000 		_ADR	AT
  2944 23b4 6D0C0000 		_DOLIT 1 
@@ -5637,10 +5638,10 @@ ARM GAS  forth.s 			page 1
  2989              	// 	Start a FOR-NEXT loop structure in a colon definition.
  2990              	
  2991 242c D4230000 		.word	_LITER
- 2992 2430 C3       	_FOR:	.byte  COMPO+IMEDD+3
 ARM GAS  forth.s 			page 95
 
 
+ 2992 2430 C3       	_FOR:	.byte  COMPO+IMEDD+3
  2993 2431 464F52   		.ascii "FOR"
  2994              		.p2align 2 	
  2995              	FOR:
@@ -5697,10 +5698,10 @@ ARM GAS  forth.s 			page 1
  3038              	
  3039              	//    AGAIN	( a -- )
  3040              	// 	Terminate a BEGIN-AGAIN infinite loop structure.
- 3041              	
 ARM GAS  forth.s 			page 96
 
 
+ 3041              	
  3042 24ac 8C240000 		.word	_UNTIL
  3043 24b0 C5       	_AGAIN:	.byte  COMPO+IMEDD+5
  3044 24b1 41474149 		.ascii "AGAIN"
@@ -5757,10 +5758,10 @@ ARM GAS  forth.s 			page 1
  3085              	// 	Terminate a BEGIN-WHILE-REPEAT indefinite loop.
  3086              	
  3087 2534 04250000 		.word	_AHEAD
- 3088 2538 C6       	_REPEA:	.byte  COMPO+IMEDD+6
 ARM GAS  forth.s 			page 97
 
 
+ 3088 2538 C6       	_REPEA:	.byte  COMPO+IMEDD+6
  3089 2539 52455045 		.ascii "REPEAT"
  3089      4154
  3090 253f 00       		.p2align 2 	
@@ -5817,10 +5818,10 @@ ARM GAS  forth.s 			page 1
  3141              	
  3142              	//    WHILE	( a -- A a )
  3143              	// 	Conditional branch out of a BEGIN-WHILE-REPEAT loop.
- 3144              	
 ARM GAS  forth.s 			page 98
 
 
+ 3144              	
  3145 25b8 9C250000 		.word	_ELSEE
  3146 25bc C5       	_WHILE:	.byte  COMPO+IMEDD+5
  3147 25bd 5748494C 		.ascii "WHILE"
@@ -5877,10 +5878,10 @@ ARM GAS  forth.s 			page 1
  3190      CD270000 
  3191 2630 F5230000 		_ADR	STRCQ
  3192 2634 030B0000 		_UNNEST
- 3193              	
 ARM GAS  forth.s 			page 99
 
 
+ 3193              	
  3194              	// **************************************************************************
  3195              	//  Name compiler
  3196              	
@@ -5937,10 +5938,10 @@ ARM GAS  forth.s 			page 1
  3242              	SNAM1:
  3243 26c0 AD1A0000 		_ADR	STRQP
  3244 26c4 07       		.byte	7
- 3245 26c5 206E616D 		.ascii " name? "
 ARM GAS  forth.s 			page 100
 
 
+ 3245 26c5 206E616D 		.ascii " name? "
  3245      653F20
  3246 26cc F1200000 		_ADR	ABORT
  3247              	
@@ -5997,10 +5998,10 @@ ARM GAS  forth.s 			page 1
  3293              	
  3294              	//    OVERT	( -- )
  3295              	// 	Link a new word into the current vocabulary.
- 3296              	
 ARM GAS  forth.s 			page 101
 
 
+ 3296              	
  3297 2764 D4260000 		.word	_SCOMP
  3298 2768 05       	_OVERT:	.byte  5
  3299 2769 4F564552 		.ascii "OVERT"
@@ -6057,10 +6058,10 @@ ARM GAS  forth.s 			page 1
  3347 27d0 6D0C0000 		_DOLIT 1 
  3347      01000000 
  3348 27d8 F90D0000 		_ADR ORR 
- 3349 27dc 59230000 		_ADR COMMA  
 ARM GAS  forth.s 			page 102
 
 
+ 3349 27dc 59230000 		_ADR COMMA  
  3350 27e0 030B0000 		_UNNEST 
  3351              	
  3352              	
@@ -6117,10 +6118,10 @@ ARM GAS  forth.s 			page 1
  3399 2854 D91D0000 		_ADR	TOKEN
  3400 2858 79260000 		_ADR	SNAME
  3401 285c 71270000 		_ADR	OVERT
- 3402 2860 0D0B0000 		_ADR	COMPI_NEST
 ARM GAS  forth.s 			page 103
 
 
+ 3402 2860 0D0B0000 		_ADR	COMPI_NEST
  3403 2864 6D0C0000 		_DOLIT	DOCON
  3403      58110000 
  3404 286c CD270000 		_ADR	CALLC
@@ -6177,10 +6178,10 @@ ARM GAS  forth.s 			page 1
  3450 28ed 44454645 		.ascii "DEFER@"
  3450      5240
  3451 28f3 00       		.p2align 2 
- 3452              	DEFERAT: 
 ARM GAS  forth.s 			page 104
 
 
+ 3452              	DEFERAT: 
  3453 28f4 504700BF 		_NEST 
  3454 28f8 19230000 		_ADR TICK
  3455 28fc 010F0000 		_ADR CELLP 
@@ -6237,10 +6238,10 @@ ARM GAS  forth.s 			page 1
  3502 2984 38290000 		.word	_DEFER 
  3503 2988 06       	_CREAT:	.byte  6
  3504 2989 43524541 		.ascii "CREATE"
- 3504      5445
 ARM GAS  forth.s 			page 105
 
 
+ 3504      5445
  3505 298f 00       		.p2align 2 	
  3506              	CREAT:
  3507 2990 504700BF 		_NEST 
@@ -6297,10 +6298,10 @@ ARM GAS  forth.s 			page 1
  3552 2a10 150D0000 		_ADR	CAT
  3553 2a14 6D0C0000 		_DOLIT	3
  3553      03000000 
- 3554 2a1c 0D1B0000 		_ADR	UDOTR			// display numeric data
 ARM GAS  forth.s 			page 106
 
 
+ 3554 2a1c 0D1B0000 		_ADR	UDOTR			// display numeric data
  3555 2a20 C10E0000 		_ADR	ONEP			// increment address
  3556              	PDUM2:
  3557 2a24 910C0000 	  _ADR	DONXT
@@ -6357,10 +6358,10 @@ ARM GAS  forth.s 			page 1
  3604 2ab3 00       		.p2align 2 	
  3605              	DOTS:
  3606 2ab4 504700BF 		_NEST
- 3607 2ab8 D9190000 		_ADR	SPACE
 ARM GAS  forth.s 			page 107
 
 
+ 3607 2ab8 D9190000 		_ADR	SPACE
  3608 2abc B1140000 		_ADR	DEPTH			// stack depth
  3609 2ac0 490D0000 		_ADR	TOR			// start count down loop
  3610 2ac4 C30C0000 		_BRAN	DOTS2			// skip first pass
@@ -6417,10 +6418,10 @@ ARM GAS  forth.s 			page 1
  3655              	DOTID:
  3656 2b4c 504700BF 		_NEST
  3657 2b50 750F0000 		_ADR	QDUP			// if zero no name
- 3658 2b54 AF0C0000 		_QBRAN	DOTI1
 ARM GAS  forth.s 			page 108
 
 
+ 3658 2b54 AF0C0000 		_QBRAN	DOTI1
  3658      742B0000 
  3659 2b5c 25110000 		_ADR	COUNT
  3660 2b60 6D0C0000 		_DOLIT	0x1F
@@ -6477,10 +6478,10 @@ ARM GAS  forth.s 			page 1
  3707              		_DOLIT	0xF000D000 //0xF800F000
  3708              		_ADR	EQUAL			//  a code ?
  3709              		_ADR	INVER 
- 3710              		_QBRAN	DECOM2	//  not a command
 ARM GAS  forth.s 			page 109
 
 
+ 3710              		_QBRAN	DECOM2	//  not a command
  3711              		//  a valid_code --, extract address and display name
  3712              		MOVW	IP,#0xFFE
  3713              		MOV	WP,TOS
@@ -6537,10 +6538,10 @@ ARM GAS  forth.s 			page 1
  3762 2bbc 110F0000 		_ADR	CELLM
  3763 2bc0 F50C0000 		_ADR	AT
  3764 2bc4 C30C0000 		_BRAN	WORS1
- 3764      A42B0000 
 ARM GAS  forth.s 			page 110
 
 
+ 3764      A42B0000 
  3765              	WORS2:
  3766 2bcc 030B0000 		_UNNEST
  3767              	
@@ -6597,10 +6598,10 @@ ARM GAS  forth.s 			page 1
  3812              	//    COLD	( -- )
  3813              	// 	The high level cold start sequence.
  3814              	
- 3815 2c4c E42B0000 		.word	_HI
 ARM GAS  forth.s 			page 111
 
 
+ 3815 2c4c E42B0000 		.word	_HI
  3816 2c50 04       	_LASTN:	.byte  4
  3817 2c51 434F4C44 		.ascii "COLD"
  3818 2c55 0000BF   		.p2align 2	
@@ -7005,7 +7006,7 @@ DEFINED SYMBOLS
               init.s:281    .text:0000000000000114 init_devices
               init.s:376    .text:00000000000001ea uart_init
              tvout.s:62     .text:00000000000003b4 tv_init
-           ps2_kbd.s:137    .text:0000000000000a54 kbd_init
+           ps2_kbd.s:138    .text:0000000000000a54 kbd_init
               init.s:268    .text:00000000000000ec forth_init
              forth.s:3819   .text:0000000000002c58 COLD
              forth.s:85     .text:0000000000000af4 NEST
@@ -7060,7 +7061,7 @@ DEFINED SYMBOLS
 
              tvout.s:177    .text:00000000000004be sync_end
              tvout.s:238    .text:0000000000000554 frame_end
-           ps2_kbd.s:167    .text:0000000000000ab6 LINK
+           ps2_kbd.s:168    .text:0000000000000ab6 LINK
              tvout.s:257    .text:000000000000056a $d
              tvout.s:257    .text:000000000000056e _BACKCOLOR
              tvout.s:257    .text:000000000000057c BACKCOLOR
@@ -7187,22 +7188,22 @@ DEFINED SYMBOLS
            ps2_kbd.s:51     *ABS*:000000000000006e KBD_FLAGS
            ps2_kbd.s:52     *ABS*:000000000000006d KBD_RXSHIFT
            ps2_kbd.s:53     *ABS*:000000000000006c KBD_BITCNTR
-           ps2_kbd.s:54     *ABS*:000000000000006f KBD_ONES
+           ps2_kbd.s:54     *ABS*:000000000000006f KBD_PARITY
            ps2_kbd.s:63     .text:0000000000000980 $t
-           ps2_kbd.s:88     .text:00000000000009d4 start_bit
-           ps2_kbd.s:97     .text:00000000000009f0 parity_bit
-           ps2_kbd.s:109    .text:0000000000000a12 stop_bit
-           ps2_kbd.s:151    .text:0000000000000a74 $d
-           ps2_kbd.s:151    .text:0000000000000a78 _KEYERRQ
-           ps2_kbd.s:151    .text:0000000000000a84 KEYERRQ
-           ps2_kbd.s:159    .text:0000000000000a92 $d
-           ps2_kbd.s:159    .text:0000000000000a96 _KEY_RST_ERR
-           ps2_kbd.s:159    .text:0000000000000aa2 $t
-           ps2_kbd.s:159    .text:0000000000000aa4 KEY_RST_ERR
-           ps2_kbd.s:167    .text:0000000000000ab2 $d
-           ps2_kbd.s:167    .text:0000000000000ab6 _KEYCODE
-           ps2_kbd.s:167    .text:0000000000000abe $t
-           ps2_kbd.s:167    .text:0000000000000ac0 KEYCODE
+           ps2_kbd.s:89     .text:00000000000009d4 start_bit
+           ps2_kbd.s:98     .text:00000000000009f0 parity_bit
+           ps2_kbd.s:108    .text:0000000000000a10 stop_bit
+           ps2_kbd.s:152    .text:0000000000000a74 $d
+           ps2_kbd.s:152    .text:0000000000000a78 _KEYERRQ
+           ps2_kbd.s:152    .text:0000000000000a84 KEYERRQ
+           ps2_kbd.s:160    .text:0000000000000a92 $d
+           ps2_kbd.s:160    .text:0000000000000a96 _KEY_RST_ERR
+           ps2_kbd.s:160    .text:0000000000000aa2 $t
+           ps2_kbd.s:160    .text:0000000000000aa4 KEY_RST_ERR
+           ps2_kbd.s:168    .text:0000000000000ab2 $d
+           ps2_kbd.s:168    .text:0000000000000ab6 _KEYCODE
+           ps2_kbd.s:168    .text:0000000000000abe $t
+           ps2_kbd.s:168    .text:0000000000000ac0 KEYCODE
              forth.s:75     .text:0000000000000ae8 TPUSH
              forth.s:80     .text:0000000000000aee TPOP
              forth.s:105    .text:0000000000000b0c COMPI_NEST
@@ -8068,8 +8069,8 @@ DEFINED SYMBOLS
              tvout.s:418    .text:0000000000000752 $t
              tvout.s:564    .text:0000000000000917 $d
              tvout.s:564    .text:0000000000000918 $t
-           ps2_kbd.s:151    .text:0000000000000a81 $d
-           ps2_kbd.s:151    .text:0000000000000a82 $t
+           ps2_kbd.s:152    .text:0000000000000a81 $d
+           ps2_kbd.s:152    .text:0000000000000a82 $t
              forth.s:124    .text:0000000000000b35 $d
              forth.s:124    .text:0000000000000b36 $t
              forth.s:175    .text:0000000000000be5 $d

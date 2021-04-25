@@ -96,27 +96,22 @@ start_bit:
     strb r1,[UP,#KBD_PARITY]
     b 9f 
 parity_bit:
-    ldr r1,[UP,#KBD_PARITY]
+    ldrb r1,[UP,#KBD_PARITY]
     tst r0,#(1<<12)
-    beq 1f 
+    beq 1f  
     add r1,#1 
-1:  tst r1,#1 
-    bne 9f      
-2: // parity error
-    ldrb r1,[UP,#KBD_FLAGS]
-    orr r1,#KBD_PAR_ERR // parity error flags 
-    strb r1,[UP,#KBD_FLAGS]
-    b 8f      
+    strb r1,[UP,#KBD_PARITY]  
+1:  ldrb r1,[UP,#KBD_BITCNTR]
+    add r1,#1
+    strb r1,[UP,#KBD_BITCNTR]    
+    b 9f      
 stop_bit:
-    tst r0,#(1<<12)
-    bne 3f
     ldrb r1,[UP,#KBD_FLAGS]
-    orr r1,#KBD_FRAME_ERR 
-    strb r1,[UP,#KBD_FLAGS]
-    b 8f  
-3:  ldrb r1,[UP,#KBD_FLAGS]
-    tst r1,#KBD_PAR_ERR 
-    bne 8f // drop this code 
+    tst r0,#(1<<12)
+    beq 2f
+    ldrb r1,[UP,#KBD_PARITY]
+    tst r1,#1 
+    beq 8f // parity error 
 // store code in queue 
     ldr r1,[UP,#KBD_QTAIL]
     add r2,UP,#KBD_QUEUE
@@ -125,6 +120,11 @@ stop_bit:
     add r1,#1
     and r1,#KBD_QUEUE_SIZE-1
     strb r1,[UP,#KBD_QTAIL]
+    b 8f 
+2:  // framing error 
+    orr r1,#KBD_FRAME_ERR   
+    strb r1,[UP,#KBD_FLAGS]
+    b 8f 
 8:  eor r0,r0 
     strh r0,[UP,#KBD_BITCNTR]
 9:  _RET 
