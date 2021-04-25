@@ -113,11 +113,11 @@ NOTES:
   str r0,[r2,#TIM_DIER]
   str r0,[r2,#TIM_CR1] //CEN 
 // enable interrupt in NVIC controller 
-  lsl r0,#29 // IRQ29
-  _MOV32 r2,NVIC_BASE_ADR
-  ldr r1,[r2,#NVIC_ISER0]
-  orr r1,r0 
-  str r1,[r2,#NVIC_ISER0]
+  mov r0,#TIM3_IRQ 
+  mov r1,#1
+  _CALL nvic_set_priority
+  mov r0,#TIM3_IRQ 
+  _CALL nvic_enable_irq
   _RET
 
 /*************************************
@@ -438,10 +438,15 @@ plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
   ldr T0,[UP,#COL]
   add T0,#1
   cmp T0,#53
-  bpl 1f 
+  bpl TVCR  
   str T0,[UP,#COL]
   _NEXT 
-1: eor T0,T0 
+
+
+// TV-CR 
+// carriage return line feed 
+  _HEADER TVCR,5,"TV-CR"
+  eor T0,T0 
   str T0,[UP,#COL]
   ldr T0,[UP,#ROW]
   cmp T0,#24
@@ -457,6 +462,7 @@ plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
 3: 
   _ADR SCROLLUP 
   _UNNEST  
+
 
 // extract font pixel 
 FONT_PIXEL: // ( r -- 0|1 )
@@ -537,6 +543,51 @@ CHAR_FONT: // ( c -- c-adr )
     _ADR TDROP  
     _ADR RIGHT
     _UNNEST  
+
+// PRINT ( cstr -- )
+// print counted string 
+    _HEADER PRINT,5,"PRINT"
+    _NEST 
+    _ADR COUNT 
+    _ADR ONEM 
+    _ADR TOR 
+1:  _ADR DUPP 
+    _ADR CAT 
+    _ADR TVPUTC 
+    _ADR ONEP 
+    _DONXT 1b 
+    _ADR DROP 
+    _UNNEST 
+
+// CURPOS ( line col -- )
+// set text cursor position 
+    _HEADER CURPOS,6,"CURPOS"
+    cmp TOS,#53
+    bmi 1f 
+    mov TOS,#52
+1:  str TOS,[UP,#COL]
+    _POP
+    cmp TOS,#25
+    bmi 1f 
+    mov TOS,#24 
+1:  str TOS,[UP,#ROW]
+    _POP 
+    _NEXT 
+
+// INPUT ( -- c-adr )
+// input a string in pad 
+    _HEADER INPUT,5,"INPUT"
+    _NEST 
+    _ADR PAD 
+    _ADR DUPP 
+    _ADR ONEP 
+    _DOLIT 53
+    _ADR ACCEP
+    _ADR SWAP 
+    _ADR DROP 
+    _ADR OVER 
+    _ADR CSTOR  
+    _UNNEST 
 
 
 	.section .rodata 

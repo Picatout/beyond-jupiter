@@ -201,6 +201,75 @@
 /*  NVIC_IPR0 - NVIC_IPR59 */
    .equ NVIC_IPR_BASE, 0xE000E400 
 
+/*  IRQ number */
+   .equ NMI_IRQ, (-14) // non maskable
+   .equ HF_IRQ, (-13)  // hard fault
+   .equ MM_IRQ, (-12)  // memory Management
+   .equ BF_IRQ, (-11)  // bus fault 
+   .equ UF_IRQ, (-10)  // usage fault 
+   .equ SVC_IRQ, (-5)  // service call 
+   .equ DM_IRQ, (-4)  // debug monitor
+   .equ PSV_IRQ, (-2) // pending service 
+   .equ STCK_IRQ, (-1) // systick 
+   .equ WWDG_IRQ, (0) // window watchdog 
+   .equ EXTI16_IRQ, (1) // external interrupt line 16
+   .equ EXTI21_IRQ, (2) // external interrupt line 21
+   .equ EXTI22_IRQ, (3) // external interrupt line 22
+   .equ FLASH_IRQ, (4) // flash global 
+   .equ RCC_IRQ, (5)  // real time clock 
+   .equ EXTI0_IRQ, (6) // 
+   .equ EXTI1_IRQ, (7)
+   .equ EXTI2_IRQ, (8)
+   .equ EXTI3_IRQ, (9)
+   .equ EXTI4_IRQ, (10)
+   .equ DMA1S0_IRQ, (11) // DMA1 stream 0 
+   .equ DMA1S1_IRQ, (12)
+   .equ DMA1S2_IRQ, (13)
+   .equ DMA1S3_IRQ, (14)
+   .equ DMA1S4_IRQ, (15)
+   .equ DMA1S5_IRQ, (16)
+   .equ DMA1S6_IRQ, (17)
+   .equ ADC_IRQ, (18)
+   .equ EXIT9_5_IRQ, (23)
+   .equ TIM1BRK_IRQ, (24) // TIMER1 BREAK 
+   .equ TIM1UP_IRQ, (25) // TIMER1 Update
+   .equ TIM1TRG_IRQ, (26) // TIMER1 trigger & commutation 
+   .equ TIM1CC_IRQ, (27) // TIMER1 capture compare 
+   .equ TIM2_IRQ, (28) // TIMER2 global 
+   .equ TIM3_IRQ, (29) // TIMER3  global 
+   .equ TIM4_IRQ, (30) // TIMER4 global
+   .equ I2C1EV_IRQ, (31) // i2c1 event 
+   .equ I2C1ER_IRQ, (32) // i2c1 error 
+   .equ I2C2EV_IRQ, (33) // i2c2 event 
+   .equ I2C2ER_IRQ, (34) // i2c2 error 
+   .equ SPI1_IRQ, (35)  // SPI1 global 
+   .equ SPI2_IRQ, (36)  // SPI2 global
+   .equ USART1_IRQ, (37) // USART1 global
+   .equ USART2_IRQ, (38) // USART2 global
+   .equ EXTI15_10_IRQ, (40) // external interrupt lines 10,15
+   .equ EXTI17_IRQ, (41)
+   .equ EXTI18_IRQ, (42) // exti and OTG_FS_WKUP
+   .equ DMA1S7_IRQ, (47) // DMA1 stream 7
+   .equ SDIO_IRQ, (49) // SDIO global
+   .equ TIM5_IRQ, (50) // TIMER5 global 
+   .equ SPI3_IRQ, (51)
+   .equ DMA2S0_IRQ, (56) // DMA2 stream 0 
+   .equ DMA2S1_IRQ, (57) 
+   .equ DMAS2_IRQ, (58)
+   .equ DMAS3_IRQ, (59)
+   .equ DMAS4_IRQ, (60)
+   .equ OTG_FS_IRQ, (67)
+   .equ DMA2S5_IRQ, (68)
+   .equ DMA2S6_IRQ, (69)
+   .equ DMA2S7_IRQ, (70)
+   .equ USART6_IRQ, (71)
+   .equ I2C3EV_IRQ, (72)
+   .equ I2C3ER_IRQ, (73)
+   .equ FPU_IRQ, (81) // FPU global
+   .equ SPI4_IRQ, (84)
+   .equ SPI5_IRQ, (85)
+   
+
 /* TIMERS registers */
 .equ TIM1_BASE_ADR,0x40010000
 .equ TIM9_BASE_ADR,0x40010400

@@ -3169,7 +3169,7 @@ ABRTQ:
 // 	Compile an inline word literal.
 
 	.word	_ABRTQ
-_STRQ:	.byte  IMEDD+2
+_STRQ:	.byte  IMEDD+COMPO+2
 	.ascii	"$\""
 	.p2align 2 	
 STRQ:

@@ -40,17 +40,18 @@ struct {
     byte bitcntr; received bit counter 
     byte rxshift; shiftin keycode 
     byte flags; flags 
-    byte ones; count bits to 1 
+    byte parity; count parity bits 
     }
 
 flags 
    :0 -> parity error flags 
 **********************************/
-    .equ KBD_F_PAR_ERR,1
+    .equ KBD_PAR_ERR,1
+    .equ KBD_FRAME_ERR,2
     .equ KBD_FLAGS,KBD_STRUCT+2 
     .equ KBD_RXSHIFT,KBD_STRUCT+1
     .equ KBD_BITCNTR,KBD_STRUCT 
-    .equ KBD_ONES,KBD_STRUCT+3 
+    .equ KBD_PARITY,KBD_STRUCT+3 
 
 /**********************************
     kbd_isr
@@ -61,7 +62,7 @@ flags
 **********************************/
     _GBL_FUNC kbd_isr 
     _MOV32 r2,EXTI_BASE_ADR
-    mov r0,#1 
+    mov r0,#(1<<11) 
     str r0,[r2,#EXTI_PR] // reset pending flag 
     _MOV32 r2,GPIOA_BASE_ADR
     ldrh r0,[r2,#GPIO_IDR]
@@ -72,27 +73,30 @@ flags
     beq parity_bit 
     cmp r1,#10 
     beq stop_bit 
+    // data bit 
     ldrb r2,[UP,#KBD_RXSHIFT]
     lsr r2,#1 
     tst r0,#(1<<12) // data bit 
     beq 1f 
     orr r2,#(1<<7)
-    ldrb r0,[UP,#KBD_ONES]
+    ldrb r0,[UP,#KBD_PARITY]
     add r0,#1 
-    strb r0,[UP,#KBD_ONES]
+    strb r0,[UP,#KBD_PARITY]
 1:  strb r2,[UP,#KBD_RXSHIFT]
     add r1,#1 
     strb r1,[UP,#KBD_BITCNTR]
     b 9f         
 start_bit:
+    tst r0,#(1<<12) 
+    bne 9f // not a start bit 
     add r1,#1 
     strb r1,[UP,#KBD_BITCNTR]
     eor r1,r1 
     strb r1,[UP,#KBD_RXSHIFT]
-    strb r1,[UP,#KBD_ONES]
+    strb r1,[UP,#KBD_PARITY]
     b 9f 
 parity_bit:
-    ldr r1,[UP,#KBD_ONES]
+    ldr r1,[UP,#KBD_PARITY]
     tst r0,#(1<<12)
     beq 1f 
     add r1,#1 
@@ -100,13 +104,19 @@ parity_bit:
     bne 9f      
 2: // parity error
     ldrb r1,[UP,#KBD_FLAGS]
-    orr r1,#KBD_F_PAR_ERR // parity error flags 
+    orr r1,#KBD_PAR_ERR // parity error flags 
     strb r1,[UP,#KBD_FLAGS]
-    b 9f      
+    b 8f      
 stop_bit:
+    tst r0,#(1<<12)
+    bne 3f
     ldrb r1,[UP,#KBD_FLAGS]
-    tst r1,#KBD_F_PAR_ERR 
-    bne 9f // drop this code 
+    orr r1,#KBD_FRAME_ERR 
+    strb r1,[UP,#KBD_FLAGS]
+    b 8f  
+3:  ldrb r1,[UP,#KBD_FLAGS]
+    tst r1,#KBD_PAR_ERR 
+    bne 8f // drop this code 
 // store code in queue 
     ldr r1,[UP,#KBD_QTAIL]
     add r2,UP,#KBD_QUEUE
@@ -115,7 +125,7 @@ stop_bit:
     add r1,#1
     and r1,#KBD_QUEUE_SIZE-1
     strb r1,[UP,#KBD_QTAIL]
-    eor r0,r0 
+8:  eor r0,r0 
     strh r0,[UP,#KBD_BITCNTR]
 9:  _RET 
     
@@ -126,23 +136,46 @@ stop_bit:
     PS2 data on PA12 
 **********************************/
     _GBL_FUNC kbd_init 
-// configure EXTI0 on pin PA11 
-   _MOV32 r2,SYSCFG_BASE_ADR
-   mov r0,#11 
-   str r0,[R2,#SYSCFG_EXTICR1]
 // interrupt triggered on falling edge 
    _MOV32 r2,EXTI_BASE_ADR
-   mov r0,#(1<<0)
-   str r0,[r2,#EXTI_IMR] // enable EXTI0 
+   mov r0,#(1<<11)
+   str r0,[r2,#EXTI_IMR] // enable EXTI11 
    str r0,[r2,#EXTI_FTSR] // on falling edge 
-// enable interrupt EXIT0 in NVIC 
-   mov r0,#(1<<6) // IRQ6
-   _MOV32 r2,NVIC_BASE_ADR
-   ldr r1,[r2,#NVIC_ISER0]
-   orr r1,r0 
-   str r1,[r2,#NVIC_ISER0]
+// enable interrupt EXTI15_10_IRQ in NVIC 
+   mov r0,#EXTI15_10_IRQ
+   _CALL nvic_enable_irq 
    _RET 
 
 
+// KEY-ERR? ( -- 0|1|2)
+// report keyboard error 
+    _HEADER KEYERRQ,8,"KEY-ERR?"
+    _PUSH 
+    ldrb TOS,[UP,#KBD_FLAGS]
+    and TOS,#3 
+    _NEXT     
 
+// KEY-RST-ERR ( -- )
+// reset keyboard error flags 
+    _HEADER KEY_RST_ERR,11,"KEY-RST-ERR"
+    ldrb T0,[UP,#KBD_FLAGS]
+    and T0,#0xFC 
+    strb T0,[UP,#KBD_FLAGS]
+    _NEXT 
+
+// KEYCODE ( -- c )
+// extract keyboard scancode from queue.
+    _HEADER KEYCODE,7,"KEYCODE"
+    _PUSH
+    eor TOS,TOS  
+    add T3,UP,#KBD_QUEUE
+    ldr T0,[UP,#KBD_QHEAD]
+    ldr T1,[UP,#KBD_QTAIL]
+    cmp T0,T1 
+    beq 2f  
+    ldrb TOS,[T3,T0]
+    add T0,#1 
+    and T0,#KBD_QUEUE_SIZE-1
+    str T0,[UP,#KBD_QHEAD]
+2:  _NEXT 
 

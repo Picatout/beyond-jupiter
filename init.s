@@ -62,7 +62,7 @@ isr_vectors:
   .word      default_handler /* IRQ3, RTC  */                      
   .word      default_handler /* IRQ4, FLASH */                                          
   .word      default_handler /* IRQ5, RCC */                                            
-  .word      kbd_isr         /* IRQ6, EXTI Line0 */                        
+  .word      default_handler /* IRQ6, EXTI Line0 */                        
   .word      default_handler /* IRQ7, EXTI Line1  */                          
   .word      default_handler /* IRQ8, EXTI Line2 */                          
   .word      default_handler /* IRQ9, EXTI Line3 */                          
@@ -96,7 +96,7 @@ isr_vectors:
   .word      uart_rx_handler /* IRQ37, USART1 */                   
   .word      default_handler /* IRQ38, USART2 */                   
   .word      0 /* IRQ39, not used */                   
-  .word      default_handler /* IRQ40, External Line[15:10]s */                          
+  .word      kbd_isr /* IRQ40, External Line[15:10]s */                          
   .word      default_handler /* IRQ41, RTC Alarm , EXTI17 */                 
   .word      default_handler /* IRQ42, USB Wakeup, EXTI18 */                       
   .word      0 /* IRQ43, not used  */         
@@ -208,16 +208,14 @@ uart_rx_handler:
 user_reboot:
 	ldr r5,user_reboot_msg
 	bl uart_puts 
-reset_mcu: 
-	ldr r0,scb_adr 
+reset_mcu:
+  _MOV32 r0,SCB_BASE_ADR  
 	ldr r1,[r0,#SCB_AIRCR]
 	orr r1,#(1<<2)
 	movt r1,#SCB_VECTKEY
 	str r1,[r0,#SCB_AIRCR]
 	b . 
 	.p2align 2 
-scb_adr:
-	.word SCB_BASE_ADR 
 user_reboot_msg:
 	.word .+4
 	.byte 13 
@@ -258,28 +256,15 @@ reset_handler:
 	bl	remap 
 	bl	init_devices	 	/* RCC, GPIOs, USART */
 	bl  uart_init
-	bl	tv_init 
+	bl	tv_init
+  bl  kbd_init  
 	bl forth_init 
-/****** test code ******/
-	_MOV32 T3,VID_BUFF 
-	mov T2,#32000
-	eor T0,T0 
-1:  mov T1,#10
-2:	strb T0,[T3],#1
-	subs T1,#1 
-	bne 2b  
-	add T0,#0x11
-	tst T0,#15
-	bne 3f
-	eor T0,T0
-3:  subs T2,#10 
-	bne 1b 
-/***** end test code ****/
 	b COLD 
 
 
 
 	.type forth_init, %function 
+  .p2align 2 
 forth_init:
 	_MOV32 UP,UPP 
 	_MOV32 DSP,SPP
@@ -289,34 +274,7 @@ forth_init:
 	EOR TOS,TOS  
 	_RET 
 
-/************
-// test code 
-	.type echo, %function 
-ECHO:
-	.word KEY,EMIT,BRANCH,echo  
 
-	.type blink, %function 
-blink:
-	_MOV32 r0,GPIOC_BASE_ADR
-0:	mov r4,#1<<LED_PIN 
-	str r4,[r0,GPIO_BSRR]
-	mov	r4,#500
-	str r4,[R3,#TIMER] 
-	_CALL timeout
-	mov r4,#1<<(LED_PIN+16)
-	str r4,[r0,#GPIO_BSRR]
-	mov	r4,#500
-	str r4,[R3,#TIMER] 
-	_CALL timeout 
-	b 0b 
-
-	.type timeout, %function 
-timeout:
-	ldr r4,[r3,#TIMER]
-	orrs r4,r4
-	bne timeout 
-	bx lr 
-***** end test code *****/
 
   .type init_devices, %function
   .p2align 2 
@@ -401,9 +359,9 @@ wait_sws:
 
 /* configure systicks for 1msec ticks */
 // set priority to 15 (lowest)
-  _MOV32 r0,NVIC_IPR_BASE
-  mov r1,#15<<4
-  strb r1,[r0,#24]
+  mov r0,#STCK_IRQ
+  mov r1,#15 
+  _CALL nvic_set_priority
   _MOV32 r0,STK_BASE_ADR 
   _MOV32 r1,95999 
   str r1,[r0,#STK_LOAD]
@@ -434,12 +392,14 @@ uart_init:
   str r1,[r0,#USART_BRR]
   mov r1,#(3<<2)+(1<<13)+(1<<5) // TE+RE+UE+RXNEIE
   str r1,[r0,#USART_CR1] /*enable usart*/
+/* set interrupt priority */
+  mov r0,#USART1_IRQ 
+  mov r1,#1 
+  _CALL nvic_set_priority
 /* enable interrupt in NVIC */
-  _MOV32 r0,NVIC_BASE_ADR
-  ldr r1,[r0,#NVIC_ISER1]
-  orr r1,#32   
-  str r1,[r0,#NVIC_ISER1]
-  bx lr 
+  mov r0,#USART1_IRQ 
+  _CALL nvic_enable_irq  
+  _RET  
 
 /* copy system variables to RAM */ 
 	.type remap, %function 
@@ -463,6 +423,65 @@ remap:
 	blt 2b 
 	_MOV32 UP,RAM_ADR  
 	_RET 
+
+// set irq priority 
+// 0 highest 
+// 15 lowest
+// input: r0 IRQn  
+//        r1  ipr 
+nvic_set_priority:
+    push {r3}
+    cmp r0,#0 
+    bmi negative_irq 
+    _mov32 r3,NVIC_IPR_BASE
+    lsl r1,#4 
+    strb r1,[r3,r0]
+    pop {r3}
+    _RET 
+negative_irq:
+    _MOV32 r3,(SCB_BASE_ADR+SCB_SHPR1)
+    and r0,#0XF 
+    sub r0,#4 
+    lsl r1,#4 
+    strb r1,[r3,r0]
+    pop {r3}
+    _RET 
+
+
+// enable interrupt in nvic 
+// input: r0 = IRQn 
+nvic_enable_irq: 
+    push {r1,r2,r3}
+    _MOV32 r3,(NVIC_BASE_ADR+NVIC_ISER0)
+    mov r1,r0 
+    lsr r1,#5  
+    lsl r1,#2  // ISERn  
+    and r0,#31 // bit#
+    mov r2,#1 
+    lsl r2,r0
+    ldr r0,[r3,r1]
+    orr r0,r2  
+    str r0,[r3,r1]
+    pop {r1,r2,r3}
+    _RET 
+
+// disable interrupt in nvic
+// input: r0 = IRQn
+nvic_disable_irq:
+    push {r1,r2,r3}
+    _MOV32 T0,(NVIC_BASE_ADR+NVIC_ICER0)
+    mov r1,r0 
+    lsr r1,#5  
+    lsl r1,#2  // ISERn
+    and r0,#31 // bit#
+    mov r2,#1 
+    lsl r2,r0
+    ldr r0,[r3,r1]
+    orr r0,r2  
+    str r0,[r3,r1]
+    pop {r1,r2,r3}
+    _RET 
+
 
 /******************************************************
 *  COLD start moves the following to USER variables.
