@@ -1,3 +1,11 @@
+2021-04-25
+
+* Ajout de **ASYNC-KEY** retourne l'état des touches asynchrones 
+
+* Travail sur **INKEY**.
+
+* Travail sur ps2-kbd.s 
+
 2021-04-24
 
 * travail sur ps2-kbd.s, ajout de **KEYCODE**, **KEY-ERR?**, **KEY-RST-ERR**.
