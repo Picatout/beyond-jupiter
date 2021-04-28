@@ -112,6 +112,26 @@
     .equ GPIO_AFRL, 32
     .equ GPIO_AFRH, 36
     
+   /* GPIO mode and type */
+   .equ INP,(0) // input mode 
+   .equ GPO,(1)   // general purpose output
+   .equ AFO,(2)   // alternate fucntion 
+   .equ ANA,(3)   // analog mode 
+   .equ PP,(0)    // push pull output 
+   .equ OD,(1)    // open drain output 
+   // output, low nibble mode, high nibble type 
+   .equ OUTPUT_PP,(PP<<4)+GPO 
+   .equ OUTPUT_OD,(OD<<4)+GPO 
+   .equ OUTPUT_AFPP,(PP<<4)+AFO
+   .equ OUTPUT_AFOD,(OD<<4)+AFO 
+   // input high nibble pull mode, low input type  
+   .equ FLOAT,(0)
+   .equ PULLUP,(1)
+   .equ PULLDOWN,(2)
+   .equ INPUT_ANA,(FLOAT<<4)+ANA     
+   .equ INPUT_FLOAT,(FLOAT<<4)+INP
+   .equ INPUT_PD,(PULLDOWN<<4)+INP
+   .equ INPUT_PU,(PULLUP<<4)+INP 
 
     /* USART1 registers */
     .equ USART1_BASE_ADR, 0x40011000

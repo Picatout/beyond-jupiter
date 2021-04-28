@@ -1,9 +1,9 @@
 // PS/2 scancode set 2 
     
 // keyboard control commands 
-KBD_RESET =	0xFF  // RESET keyboard 
-KBD_LED =	0xED  // keyboard LEDS control 
-KBD_RESEND =  0xFE  // resend command 
+KBD_CMD_RESET =	0xFF  // RESET keyboard 
+KBD_CMD_LED =	0xED  // keyboard LEDS control 
+KBD_CMD_RESEND =  0xFE  // resend command 
  
 // keyboard state codes 
 BAT_OK =	0xAA // keyboard test OK 

@@ -337,16 +337,11 @@ wait_sws:
   str	r1,[r0,#RCC_APB2ENR]	
 /* configure GPIOC:13 as output for user LED */
   _MOV32 r0,LED_GPIO 
-  ldr r1,[r0,#GPIO_MODER]
-  mvn r2,#(3<<(2*LED_PIN))
-  and r1,r1,r2
-  orr r1,#(1<<(2*LED_PIN))
-  str r1,[r0,#GPIO_MODER]
-  ldr r1,[r0,#GPIO_OTYPER]
-  orr r1,#(1<<LED_PIN)
-  str r1,[r0,#GPIO_OTYPER] // open drain 
-  eor r1,r1 
-  strh r1,[r0,#GPIO_ODR]	
+  mov r1,#LED_PIN
+  mov r2,#OUTPUT_OD 
+  _CALL gpio_config 
+  mov r2,#1
+  _CALL gpio_out 
 /* enable compensation CELL for fast I/O */
 	_MOV32 r1,SYSCFG_BASE_ADR
 	mov r0,#1 
@@ -469,19 +464,126 @@ nvic_enable_irq:
 // input: r0 = IRQn
 nvic_disable_irq:
     push {r1,r2,r3}
-    _MOV32 T0,(NVIC_BASE_ADR+NVIC_ICER0)
+    _MOV32 r3,(NVIC_BASE_ADR+NVIC_ICER0)
     mov r1,r0 
     lsr r1,#5  
     lsl r1,#2  // ISERn
     and r0,#31 // bit#
     mov r2,#1 
     lsl r2,r0
-    ldr r0,[r3,r1]
-    orr r0,r2  
-    str r0,[r3,r1]
+    str r2,[r3,r1]
     pop {r1,r2,r3}
     _RET 
 
+// micorseconds delay 
+// input: r0 delay 
+usec:
+    push {r1,r3}
+    mov r1,#96 
+    mul r0,r1 
+    _MOV32 r3,STK_BASE_ADR
+    ldr r1,[r3,#STK_VAL]
+    sub r1,r0 
+1:  ldr r0,[r3,#STK_VAL]
+    cmp r0,r1 
+    bpl 1b
+    pop {r1,r3}
+    _RET 
+
+/**********************************
+  gpio_config 
+  Configure gpio mode 
+  input:
+    r0   GPIOx 
+    r1   pin 
+    r2   mode 
+  output:
+    none 
+  use:
+    r3,r5,r11  
+**********************************/
+gpio_config:
+    push {r3,r5,r11}
+//  clear registers field 
+    mov r5,#1
+    lsl r5,r1
+    mvn r5,r5 // 1 bit field mask 
+    ldr r3,[r0,#GPIO_OTYPER]
+    and r3,r5 
+    str r3,[r0,#GPIO_OTYPER]
+    mov r5,#3 
+    mov r11,#2 
+    mul r11,r1 
+    lsl r5,r11 
+    mvn r5,r5 // 2 bits field mask 
+    ldr r3,[r0,#GPIO_MODER]
+    and r3,r5 
+    str r3,[r0,#GPIO_MODER]
+    ldr r3,[r0,#GPIO_PUPDR]
+    and r3,r5 
+    str r3,[r0,#GPIO_PUPDR]
+// set mode register, r2 low nibble  
+    and r5,r2,#3    
+    lsl r5,r11 // mode 
+    ldr r3,[r0,#GPIO_MODER]
+    orr r3,r5 
+    str r3,[r0,#GPIO_MODER]
+    cmp r2,#3
+    beq 9f // analog input 
+    ands r5,r2,#3 
+    beq input_pull 
+output_type:
+    lsr r2,#4 
+    lsl r2,r1 // 1 bit field 
+    ldr r3,[r0,#GPIO_OTYPER]
+    orr r3,r2 
+    str r3,[r0,#GPIO_OTYPER]
+    b 9f 
+input_pull:
+    ldr r3,[r0,#GPIO_PUPDR]
+    lsr r2,#4 
+    lsl r2,r11 // 2 bits field 
+    orr r3,r2 
+    str r3,[r0,#GPIO_PUPDR]
+9:  pop {r3,r5,r11}
+    _RET 
+
+// configure gpio speed 
+// input:
+//    r0   GPIO_BASE_ADR 
+//    r1   pin 
+//    r2   speed
+// use:
+//  r3,r5,r11 
+gpio_speed:
+    push {r3,r5,r11}
+    ldr r3,[r0,#GPIO_OSPEEDR]
+    mov r5,#3
+    mov r11,#2 
+    mul r11,r1 
+    lsl r5,r11
+    mvn r5,r5 
+    and r3,r5   
+    lsl r2,r11  
+    orr r3,r2 
+    str r3,[r0,#GPIO_OSPEEDR]
+    pop {r3,r5,r11}
+    _RET
+
+/**************************** 
+  gpio_out port,pin,0|1
+  input:
+    r0   gpio_base_adr 
+    r1   pin 
+    r2   data 0|1 
+**************************/
+gpio_out: 
+    mov r3,#1 
+    lsl r3,r1 
+    cbnz r2, 1f 
+    lsl r3,#16 
+1:  str r3,[r0,#GPIO_BSRR]    
+    _RET 
 
 /******************************************************
 *  COLD start moves the following to USER variables.

@@ -1,3 +1,9 @@
+2021-04-27
+
+* Ajout de **KBD-RST** et **KBD-LED** 
+
+* Ajout de **usec** for µseconds delay in init.s 
+
 2021-04-25
 
 * Ajout de **ASYNC-KEY** retourne l'état des touches asynchrones 

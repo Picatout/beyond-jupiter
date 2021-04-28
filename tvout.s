@@ -61,36 +61,26 @@ NOTES:
 **************************************/ 
   _GBL_FUNC tv_init
 // configure PA0:3 as OUTPUT_OD 
-  _MOV32 r2,GPIOA_BASE_ADR 
-  ldr r1,[r2,#GPIO_MODER]
-  mov r0,#0x55
-  orr r1,r0
-  str r1,[r2,#GPIO_MODER]
-//  mov r0,#15 
-//  ldr r1,[r2,#GPIO_OTYPER]
-//  orr r1,r0 
-//  str r1,[r2,#GPIO_OTYPER]
-//  str r1,[r2,#GPIO_BSRR]
-//  ldr r1,[r2,GPIO_OSPEEDR]
-//  lsl r0,#1 // fast speed  
-//  orr r1,r0 
-//  str r1,[r2,#GPIO_OSPEEDR]
-  eor r0,r0 
-  str r0,[r2,#GPIO_ODR]  
+  _MOV32 r0,GPIOA_BASE_ADR 
+  ldr r1,[r0,#GPIO_MODER]
+  mov r2,#0x55
+  orr r1,r2
+  str r1,[r0,#GPIO_MODER]
+  eor r1,r1 
+  str r1,[r0,#GPIO_ODR]  
 // configure PB1 as OUTPUT_AFPP 
 // this is TIM3_CC4 output compare 
-  add r2,#0x400 // GPIOB_BASE_ADR
-  mov r0,(2<<2) // alternate function output 
-  ldr r1,[r2,#GPIO_MODER]
-  orr r1,r0 
-  str r0,[r2,#GPIO_MODER] // output AFPP
-  ldr r1,[r2,#GPIO_OSPEEDR]
-  orr r1,r0 
-  str r1,[r2,#GPIO_OSPEEDR] // 2= fast speed 
-  lsl r0,#2 // alternate function 2 on BP1==TIM3_CH4 
-  ldr r1,[r2,#GPIO_AFRL]
-  orr r1,r0 
-  str r1,[r2,#GPIO_AFRL]
+  add r0,#0x400 // GPIOB_BASE_ADR
+  mov r1,#1 // pin 1 
+  mov r2,#OUTPUT_AFPP // mode+type  
+  _CALL gpio_config 
+  mov r1,#1 
+  mov r2,#2
+  _CALL gpio_speed 
+//  mov r2,#(2<<4) // alternate function 2 on BP1==TIM3_CH4 
+  ldr r1,[r0,#GPIO_AFRL]
+  orr r1,#(2<<4) // r2 
+  str r1,[r0,#GPIO_AFRL]
 // enable peripheral clock 
   _MOV32 r2,RCC_BASE_ADR 
   mov r0,#2 
