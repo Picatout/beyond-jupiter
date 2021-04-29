@@ -1,3 +1,7 @@
+2021-04-28
+
+* Modifié **nvic_enable_irq* dans *init.s*.
+
 2021-04-27
 
 * Ajout de **KBD-RST** et **KBD-LED** 

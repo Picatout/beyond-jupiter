@@ -207,7 +207,7 @@ uart_rx_handler:
 
 user_reboot:
 	ldr r5,user_reboot_msg
-	bl uart_puts 
+	_CALL uart_puts 
 reset_mcu:
   _MOV32 r0,SCB_BASE_ADR  
 	ldr r1,[r0,#SCB_AIRCR]
@@ -222,26 +222,44 @@ user_reboot_msg:
 	.ascii "\ruser reboot!"
 	.p2align 2 
 
-   
-// send counted string to uart 
-// input: r5 string* 
+ /***********************
+  send byte to uart 
+  input: 
+    r0 byte to send 
+    r1 UART_BASE_ADR 
+************************/
+uart_putc:
+    push {r2}
+1:  ldr r2,[r1,#USART_SR]
+    ands r2,#0x80 // TXE 
+    beq 1b
+    str r0,[r1,#USART_DR] 
+    pop {r2}
+    _RET 
+
+/*****************************
+ send counted string to uart 
+ input: 
+    r5 string* 
+ use:
+    r0  byte to send 
+    r1  UART_BASE_ADR
+    r2  string length 
+*****************************/
 	.type uart_puts,%function 
 uart_puts:
-	_MOV32 r0,UART 
-	ldrb r1,[r5],#1 // string length
-	ands r1,r1
+  	_MOV32 r1,UART 
+	  ldrb r2,[r5],#1 // string length
+	  ands r2,r2
 1:	beq 9f 
-2:  ldr r2,[r0,#USART_SR]
-	ands r2,#0x80 
-	beq 2b 	
-	ldrb r2,[r5],#1
-	strb r2,[r0,#USART_DR]
-	subs r1,r1,#1 
-	bne 2b 
-3:	ldr r2,[r0,#USART_SR]
-	ands r2,#(1<<6)
-	beq 3b 
-9:  bx lr 
+2:  ldrb r0,[r5],#1
+    _CALL uart_putc 
+	  subs r2,r2,#1 
+	  bne 2b 
+3:	ldr r2,[r1,#USART_SR]
+	  ands r2,#(1<<6)
+	  beq 3b 
+9:  _RET  
 
 
 /**************************************
@@ -454,9 +472,7 @@ nvic_enable_irq:
     and r0,#31 // bit#
     mov r2,#1 
     lsl r2,r0
-    ldr r0,[r3,r1]
-    orr r0,r2  
-    str r0,[r3,r1]
+    str r2,[r3,r1]
     pop {r1,r2,r3}
     _RET 
 
@@ -473,21 +489,6 @@ nvic_disable_irq:
     lsl r2,r0
     str r2,[r3,r1]
     pop {r1,r2,r3}
-    _RET 
-
-// micorseconds delay 
-// input: r0 delay 
-usec:
-    push {r1,r3}
-    mov r1,#96 
-    mul r0,r1 
-    _MOV32 r3,STK_BASE_ADR
-    ldr r1,[r3,#STK_VAL]
-    sub r1,r0 
-1:  ldr r0,[r3,#STK_VAL]
-    cmp r0,r1 
-    bpl 1b
-    pop {r1,r3}
     _RET 
 
 /**********************************
@@ -577,12 +578,14 @@ gpio_speed:
     r1   pin 
     r2   data 0|1 
 **************************/
-gpio_out: 
+gpio_out:
+    push {r3}
     mov r3,#1 
     lsl r3,r1 
     cbnz r2, 1f 
     lsl r3,#16 
 1:  str r3,[r0,#GPIO_BSRR]    
+    pop {r3}
     _RET 
 
 /******************************************************
