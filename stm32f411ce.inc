@@ -347,3 +347,4 @@
 .equ EXTI_FTSR,12
 .equ EXTI_SWIER,16
 .equ EXTI_PR,20
+

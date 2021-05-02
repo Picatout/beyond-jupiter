@@ -11,7 +11,12 @@ KBD_ACK =	0xFA // keyboard ACK code
 KEY_REL =	0xF0 // key released code 
 XT_KEY =	0xE0 // extended key 
 XT2_KEY =	0xE1 // start  8 codes PAUSE key sequence 
- 
+
+// keyboard LEDS 
+LED_CAPLOCK = 4 
+LED_NUMLOCK = 2
+LED_SCROLL = 1 
+  
 // control keys 
 SC_TAB =	    0x0D    //standard
 SC_ENTER =	    0x5A    //standard

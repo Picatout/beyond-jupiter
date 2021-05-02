@@ -50,8 +50,8 @@ flags
    :0 -> parity error flags 
 **********************************/
     // keyboard state flags 
-    .equ KBD_PAR_ERR,(1<<0)     // parity error 
-    .equ KBD_FRAME_ERR,(1<<1)   // frame error 
+    .equ KBD_ERR,(1<<0)     // reception error 
+    .equ KBD_TX,(1<<1)   // transmit character to keyboard  
     .equ KBD_CAPSLK,(1<<2) // capslock 
     .equ KBD_SHIFT,(1<<3)  // shift down
     .equ KBD_CTRL,(1<<4)   // ctrl down 
@@ -60,7 +60,7 @@ flags
     .equ KBD_REL,(1<<7) // key released flag 
     // structure members offset 
     .equ KBD_FLAGS,KBD_STRUCT+2 
-    .equ KBD_RXSHIFT,KBD_STRUCT+1
+    .equ KBD_SHIFTER,KBD_STRUCT+1
     .equ KBD_BITCNTR,KBD_STRUCT 
     .equ KBD_PARITY,KBD_STRUCT+3 
 
@@ -78,17 +78,22 @@ flags
     _MOV32 r2,EXTI_BASE_ADR
     mov r0,#(1<<KBD_CLOCK_PIN) 
     str r0,[r2,#EXTI_PR] // reset pending flag 
-    _MOV32 r2,GPIOA_BASE_ADR
-    ldrh r0,[r2,#GPIO_IDR]
+    _MOV32 r3,GPIOA_BASE_ADR
+    ldr r0,[UP,#KBD_FLAGS]
+    tst r0,#KBD_TX 
+    bne send_bit  
+    ldrh r0,[r3,#GPIO_IDR]
     ldrb r1,[UP,#KBD_BITCNTR]
-    cmp r1,#0 
+    add r2,r1,#1
+    strb r2,[UP,#KBD_BITCNTR]
+    cmp r1,#0
     beq start_bit 
     cmp r1,#9 
     beq parity_bit 
     cmp r1,#10 
     beq stop_bit 
     // data bit 
-    ldrb r2,[UP,#KBD_RXSHIFT]
+    ldrb r2,[UP,#KBD_SHIFTER]
     lsr r2,#1 
     tst r0,#(1<<KBD_DATA_PIN) // data bit 
     beq 1f 
@@ -96,53 +101,109 @@ flags
     ldrb r0,[UP,#KBD_PARITY]
     add r0,#1 
     strb r0,[UP,#KBD_PARITY]
-1:  strb r2,[UP,#KBD_RXSHIFT]
-    add r1,#1 
-    strb r1,[UP,#KBD_BITCNTR]
+1:  strb r2,[UP,#KBD_SHIFTER]
     b 9f         
 start_bit:
     tst r0,#(1<<KBD_DATA_PIN) 
     bne 9f // not a start bit 
-    add r1,#1 
-    strb r1,[UP,#KBD_BITCNTR]
-    eor r1,r1 
-    strb r1,[UP,#KBD_RXSHIFT]
-    strb r1,[UP,#KBD_PARITY]
+    eor r0,r0 
+    strb r0,[UP,#KBD_SHIFTER]
+    strb r0,[UP,#KBD_PARITY]
+    ldrb r0,[UP,#KBD_FLAGS]
+    and r0,#~3 // clear error flag 
+    strb r0,[UP,#KBD_FLAGS]
     b 9f 
 parity_bit:
     ldrb r1,[UP,#KBD_PARITY]
     tst r0,#(1<<KBD_DATA_PIN)
-    beq 1f  
+    beq 9f  
     add r1,#1 
     strb r1,[UP,#KBD_PARITY]  
-1:  ldrb r1,[UP,#KBD_BITCNTR]
-    add r1,#1
-    strb r1,[UP,#KBD_BITCNTR]    
     b 9f      
 stop_bit:
     ldrb r1,[UP,#KBD_FLAGS]
     tst r0,#(1<<KBD_DATA_PIN)
-    beq 2f
+    beq 2f // stop bit expected 
     ldrb r1,[UP,#KBD_PARITY]
     tst r1,#1 
-    beq 8f // parity error 
+    beq 2f // parity error  
 // store code in queue 
-    ldr r1,[UP,#KBD_QTAIL]
+1:  ldr r1,[UP,#KBD_QTAIL]
     add r2,UP,#KBD_QUEUE
-    ldrb r0,[UP,#KBD_RXSHIFT]
+    ldrb r0,[UP,#KBD_SHIFTER]
     strb r0,[r2,r1]
     add r1,#1
     and r1,#KBD_QUEUE_SIZE-1
     strb r1,[UP,#KBD_QTAIL]
     b 8f 
-2:  // framing error 
-    orr r1,#KBD_FRAME_ERR   
-    strb r1,[UP,#KBD_FLAGS]
-    b 8f 
+2:  // keyboard error 
+    ldrb r0,[UP,#KBD_FLAGS]
+    orr r0,#KBD_ERR
+    strb r0,[UP,#KBD_FLAGS]
 8:  eor r0,r0 
     strh r0,[UP,#KBD_BITCNTR]
 9:  _RET 
-    
+
+/* send bit to keyboard 
+ registers usage:
+    r0 bit shifter 
+    r1 bit counter 
+    r2 output bit 
+    r3 GPIOA_BASE_ADR 
+*/
+send_bit:
+    ldrb r1,[UP,#KBD_BITCNTR]
+    add r0,r1,#1
+    strb r0,[UP,#KBD_BITCNTR]
+    ldrb r0,[UP,#KBD_SHIFTER]
+    mov r2,#(1<<KBD_DATA_PIN)
+//    cbz r1,9f 
+1:  cmp r1,#8 
+    beq send_parity 
+    cmp r1,#9 
+    beq send_stop
+    cmp r1,#10
+    beq rx_ack_bit  
+// data bits
+    tst r0,#1
+    lsr r0,#1
+    strb r0,[UP,#KBD_SHIFTER]
+    bne 1f 
+    lsl r2,#16
+    b 2f  
+1:  ldrb r0,[UP,#KBD_PARITY]
+    add r0,#1 
+    strb r0,[UP,#KBD_PARITY]
+2:  str r2,[R3,#GPIO_BSRR]
+    b 9f 
+send_parity:
+    ldrb r0,[UP,#KBD_PARITY]
+    tst r0,#1
+    beq 1f 
+    lsl r2,#16
+1:  str r2,[r3,#GPIO_BSRR]
+    b 9f 
+send_stop:
+//    str r2,[r3,#GPIO_BSRR]
+// release data pin 
+    mvn r0,#(3<<(2*KBD_DATA_PIN))
+    ldr r1,[r3,#GPIO_MODER]
+    and r1,r0 
+    str r1,[r3,#GPIO_MODER]
+    b 9f
+rx_ack_bit:
+    ldrb r0,[UP,#KBD_FLAGS]
+    mvn r1,#KBD_TX 
+    and r0,r1 
+    ldrh r1,[r3,#GPIO_IDR]
+    tst r1,#(1<<KBD_DATA_PIN)
+    beq 1f // ACK ok 
+    orr r0,#KBD_ERR 
+1:  strb r0,[UP,#KBD_FLAGS]
+    eor r0,r0 
+    strb r0,[UP,#KBD_BITCNTR]     
+9:  _RET 
+
 /**********************************
     kbd_init 
     initialize keyboard 
@@ -160,9 +221,11 @@ stop_bit:
    str r0,[UP,#KBD_QTAIL]
 // enable interrupt EXTI15_10_IRQ in NVIC 
    mov r0,#EXTI15_10_IRQ
+   mov r1,#1 
+   _CALL nvic_set_priority
+   mov r0,#EXTI15_10_IRQ
    _CALL nvic_enable_irq 
    _RET 
-
 
 // ASYNC-KEY ( -- n )
 // return async key flags 
@@ -239,7 +302,7 @@ table_scan:
     eor TOS,TOS 
     ldr T1,=sc_ascii // translation table
     _CALL keycode
-    cbz T0,inkey_exit  
+    cbz T0,inkey_exit
     cmp T0,#XT_KEY // extended keycode 
     beq xcode
     cmp T0,#XT2_KEY // pause 
@@ -287,6 +350,7 @@ toggle_capslock:
     mov T1,#KBD_CAPSLK 
     eor T0,T1 
     strb T0,[UP,#KBD_FLAGS]
+    mov TOS,#KBD_CAPSLK  
     b inkey_exit 
 
 // check if async key 
@@ -389,58 +453,47 @@ async_jump: // tbb table for async keys
     .byte (alt_key-shift_key)/2
     .byte (altchar_key-shift_key)/2
 
-/**************************
-wait next clock pulse falling edge 
-    input:
-        r3 is gpio base address
-***************************/
-wait_kbd_clock:
-    push {r0}
-1:  ldr r0,[r3,#GPIO_IDR]
-    tst r0,#(1<<KBD_CLOCK_PIN)
-    beq 1b
-2:  ldr r0,[r3,#GPIO_IDR]
-    tst r0,#(1<<KBD_CLOCK_PIN)
-    bne 2b 
-    pop {r0}
-    _RET 
 
 /***************************
  send byte do keyboard
  input:
     r0  byte to send 
  use: 
-    r0 temp 
-    r1 io pin  
-    r2 bit to send 
+    r1,r2 temp 
     r3 GPIOA_BASE_ADR 
-    r5 byte to send
-    r6 bit counter  
-    r11 parity counter 
 ***************************/
 kbd_send:
-    push {r1,r2,r3,r5,r6,r11}
-// disable keyboard interrupt 
-    mov r5,r0  
-    mov r0,#EXTI15_10_IRQ
-    _CALL nvic_disable_irq 
+    push {r0,r1,r2,r3}
+// wait pre-video phase
+// for least video output disturbance
+1:  ldr r0,[UP,#VID_STATE]
+    cmp r0,ST_PREVID 
+    bne 1b
 // disable video interrupt 
-//    mov r0,#TIM3_IRQ 
-//    _CALL nvic_disable_irq 
-// hold clock low for 150µsec 
+    mov r0,#TIM3_IRQ 
+    _CALL nvic_disable_irq
+// take control of keyboard clock line  
     _MOV32 r3,GPIOA_BASE_ADR
     mov r0,r3 
     mov r1,#KBD_CLOCK_PIN 
     mov r2,#OUTPUT_OD
     _CALL gpio_config 
-// put clock line to 0 for 150µsec     
     mov r0,r3 
     mov r1,#KBD_CLOCK_PIN
     eor r2,r2 
     _CALL gpio_out 
-    mov r0,#150*96 
+// delay to hold clock line to 0 for 150µsec     
+    mov r0,#150*48
 1:  subs r0,#1 
     bne 1b
+    pop {r0}
+    strb r0,[UP,#KBD_SHIFTER]
+    ldr r0,[UP,#KBD_FLAGS]
+    orr r0,#KBD_TX 
+    strb r0,[UP,#KBD_FLAGS]
+    eor r0,r0 
+    strb r0,[UP,#KBD_BITCNTR]
+    strb r0,[UP,#KBD_PARITY]
 // take control of data line 
 // and put it to 0 for start bit.    
     mov r0,r3 
@@ -456,53 +509,14 @@ kbd_send:
     mov r1,#KBD_CLOCK_PIN 
     mov r2,#INPUT_FLOAT
     _CALL gpio_config
-    mov r6,#8 // bit counter 
-    eor r11,r11 // parity counter  
-1:  _CALL wait_kbd_clock 
-    mov r0,r3 
-    mov r1,#KBD_DATA_PIN
-    ubfx r2,r5,#0,#1 // extract bit to send 
-    cbz r2,2f 
-    add r11,#1 // increment parity counter  
-2:  _CALL gpio_out
-    lsr r5,#1  // next bit to send in b0 
-    subs r6,#1  // decrement bit counter 
-    bne 1b
-//  send parity bit 
-    eor r2,r2 
-    tst r11,#1
-    bne 3f 
-    add r2,#1
-3:  mov r0,r3
-    mov r1,#KBD_DATA_PIN
-    _CALL gpio_out
-    _CALL wait_kbd_clock
-// send stop bit 
-// by releasing data line 
-    mov r0,r3 
-    mov r1,#KBD_DATA_PIN  
-    mov r2,#INPUT_FLOAT  
-    _CALL gpio_config 
-1:  ldr r0,[r3,#GPIO_IDR]
-    tst r0,#(1<<KBD_CLOCK_PIN)
-    beq 1b
-// wait ACK bit i.e. both lines == 0 
-2:  ldr r0,[r3,#GPIO_IDR]
-    tst r0,#(1<<KBD_CLOCK_PIN)+(1<<KBD_DATA_PIN)
-    bne 2b
-// wait both line released to 1
-3:  ldr r0,[r3,#GPIO_IDR]
-    and r0,#(1<<KBD_CLOCK_PIN)+(1<<KBD_DATA_PIN)
-    cmp r0,#(1<<KBD_CLOCK_PIN)+(1<<KBD_DATA_PIN)
-    bne 3b 
-    _MOV32 r2,EXTI_BASE_ADR
-    mov r0,#(1<<KBD_CLOCK_PIN) 
-    str r0,[r2,#EXTI_PR] // reset pending flag 
-    mov r0,#EXTI15_10_IRQ
+// wait send completed 
+2:  ldrb r0,[UP,#KBD_FLAGS]
+    tst r0,#KBD_TX
+    bne 2b 
+// enable video interrupt     
+    mov r0,#TIM3_IRQ
     _CALL nvic_enable_irq
-//    mov r0,#TIM3_IRQ 
-//    _CALL nvic_enable_irq 
-    pop {r1,r2,r3,r5,r11}
+    pop {r1,r2,r3}
     _RET 
 
  
@@ -517,14 +531,17 @@ kbd_clear_queue:
 // send a reset command to keyboard
     _HEADER KBD_RST,7,"KBD-RST"
 1:  mov T0,#KBD_CMD_RESET 
-    _CALL kbd_send 
-    _CALL kbd_clear_queue 
-2:  _CALL wait_code 
-    cmp T0,#KBD_CMD_RESEND 
-    beq 1b 
-    cmp T0,#KBD_ACK 
-    bne 2b
+    _CALL kbd_send
+    _CALL kbd_clear_queue
     _CALL wait_code 
+    cmp r0,KBD_CMD_RESEND
+    beq 1b 
+    mov T0,#100
+    str T0,[UP,#CD_TIMER]
+2:  ldr T0,[UP,#CD_TIMER]
+    cmp T0,#0 
+    bne 2b 
+2:  _CALL wait_code 
     _PUSH 
     mov TOS,T0  
     _NEXT 
@@ -535,7 +552,7 @@ kbd_clear_queue:
     _HEADER KBD_LED,7,"KBD-LED"
 1:  _CALL kbd_clear_queue
      mov T0,#KBD_CMD_LED 
-    _CALL kbd_send 
+    _CALL kbd_send
 2:  _CALL wait_code 
     cmp T0,#KBD_CMD_RESEND
     beq 1b
@@ -552,3 +569,19 @@ kbd_clear_queue:
     _POP 
     _NEXT 
 
+// WAIT-KEY ( -- c )
+// wait for keyboard key 
+    _HEADER WKEY,8,"WAIT-KEY"
+    _NEST 
+1:  _ADR INKEY 
+    _ADR DUPP 
+    _DOLIT 4 
+    _ADR EQUAL 
+    _QBRAN 2f 
+    _ADR ASYNC_KEY 
+    _ADR ANDD 
+    _ADR KBD_LED
+    _DOLIT 0  
+2:  _ADR QDUP
+    _QBRAN 1b  
+    _UNNEST 

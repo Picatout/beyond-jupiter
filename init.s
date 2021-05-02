@@ -156,14 +156,56 @@ isr_end:
   .global default_handler
 default_handler:
 	ldr r5,exception_msg 
-	bl uart_puts 
-	b reset_mcu    
+	_CALL uart_puts 
+  _MOV32 r3,(SCB_BASE_ADR+SCB_CFSR)  
+  eor r4,r4  
+  ldr r5,[r3]
+  tst r5,#(1<<15)
+  beq 1f
+  ldr r4,[R3,#16] // buss fault address 
+  _CALL print_hex
+  cbz r4,1f 
+  mov r0,#','
+  _CALL uart_putc 
+  mov r0,#' '
+  _CALL uart_putc
+  mov r5,r4 
+  _CALL print_hex 
+1:
+	b reset_mcu
+
   .size  default_handler, .-default_handler
 exception_msg:
 	.word .+4 
-	.byte 18
-	.ascii "\n\rexeption reboot!"
+	.byte 25
+	.ascii "\n\rexeption reboot, CFSR: "
 	.p2align 2
+
+/************************
+ print hexadecimal number
+ input: 
+    r1   uart_base_adr 
+    r5   number to print 
+*************************/    
+print_hex:
+    mov r0,#'$'
+    _CALL uart_putc 
+    mov r3,#8
+1:  ubfx r0,r5,#28,#4
+    add r0,#'0' 
+    cmp r0,#'9'+1
+    bmi 2f     
+    add r0,#7 
+2:  _CALL uart_putc
+    lsl r5,#4
+    subs r3,#1
+    bne 1b
+    mov r0,#' '
+    _CALL uart_putc 
+3:	ldr r2,[r1,#USART_SR]
+    ands r2,#(1<<6)
+    beq 3b 
+    _RET
 
 /*********************************
 	system milliseconds counter
@@ -472,7 +514,9 @@ nvic_enable_irq:
     and r0,#31 // bit#
     mov r2,#1 
     lsl r2,r0
+    cpsid I
     str r2,[r3,r1]
+    cpsie I 
     pop {r1,r2,r3}
     _RET 
 
@@ -488,6 +532,8 @@ nvic_disable_irq:
     mov r2,#1 
     lsl r2,r0
     str r2,[r3,r1]
+    dsb 
+    isb 
     pop {r1,r2,r3}
     _RET 
 

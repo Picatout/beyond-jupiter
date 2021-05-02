@@ -92,6 +92,8 @@ sc_ascii:
    .byte SC_KPMINUS,'-'
    .byte SC_KPDOT,'.'
    .byte SC_KPENTER,'\r'
+   .byte KBD_ACK,KBD_ACK 
+   .byte BAT_OK,BAT_OK  
    .byte 0,0
    
 // shifted key 

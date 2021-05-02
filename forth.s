@@ -118,6 +118,27 @@ COMPI_NEST:
 // return pseudo random number 
 // REF: https://en.wikipedia.org/wiki/Xorshift
 
+//	.word LINK 
+// GET-IP ( n - c )
+// return interrupt priority 
+	_HEADER GETIP,6,"GET-IP" 
+	_NEST 
+	_ADR DUPP 
+	_ADR ZLESS
+	_QBRAN 1f 
+	_DOLIT 15
+	_ADR ANDD
+	_DOLIT 4
+	_ADR SUBB  
+	_DOLIT 0xE000ED18 
+	_BRAN 2f 
+1:	_DOLIT 0xE000E400 
+2:	_ADR PLUS 
+	_ADR CAT
+	_DOLIT 4 
+	_ADR RSHIFT 
+	_UNNEST 
+
 	.word LINK 
 _RAND: .byte 6
 	.ascii "RANDOM"

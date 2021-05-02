@@ -104,7 +104,7 @@ NOTES:
   str r0,[r2,#TIM_CR1] //CEN 
 // enable interrupt in NVIC controller 
   mov r0,#TIM3_IRQ 
-  mov r1,#1
+  mov r1,#2
   _CALL nvic_set_priority
   mov r0,#TIM3_IRQ 
   _CALL nvic_enable_irq
