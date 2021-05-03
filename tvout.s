@@ -444,11 +444,7 @@ plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
   add T0,#1 
   str T0,[UP,#ROW]
   _NEXT 
-// calling a colon word 
-// from a code word   
-2: STMFD	RSP!,{IP}
-   ldr IP,=3f 
-   b INEXT 
+2:_CALL_COLWORD 3f 
 3: 
   _ADR SCROLLUP 
   _UNNEST  

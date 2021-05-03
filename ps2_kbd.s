@@ -50,14 +50,14 @@ flags
    :0 -> parity error flags 
 **********************************/
     // keyboard state flags 
-    .equ KBD_ERR,(1<<0)     // reception error 
+    .equ KBD_F_CTGL,(1<<0)     // capslock was toggled  
     .equ KBD_TX,(1<<1)   // transmit character to keyboard  
-    .equ KBD_CAPSLK,(1<<2) // capslock 
-    .equ KBD_SHIFT,(1<<3)  // shift down
-    .equ KBD_CTRL,(1<<4)   // ctrl down 
-    .equ KBD_ALT,(1<<5)    // alt down
-    .equ KBD_ALTCHAR,(1<<6) // altchar down 
-    .equ KBD_REL,(1<<7) // key released flag 
+    .equ KBD_F_CAPS,(1<<2) // capslock 
+    .equ KBD_F_SHIFT,(1<<3)  // shift down
+    .equ KBD_F_CTRL,(1<<4)   // ctrl down 
+    .equ KBD_F_ALT,(1<<5)    // alt down
+    .equ KBD_F_ACHAR,(1<<6) // altchar down 
+    .equ KBD_F_REL,(1<<7) // key released flag 
     // structure members offset 
     .equ KBD_FLAGS,KBD_STRUCT+2 
     .equ KBD_SHIFTER,KBD_STRUCT+1
@@ -110,7 +110,8 @@ start_bit:
     strb r0,[UP,#KBD_SHIFTER]
     strb r0,[UP,#KBD_PARITY]
     ldrb r0,[UP,#KBD_FLAGS]
-    and r0,#~3 // clear error flag 
+    mvn r1,#1
+    and r0,r1 // clear error flag 
     strb r0,[UP,#KBD_FLAGS]
     b 9f 
 parity_bit:
@@ -121,25 +122,44 @@ parity_bit:
     strb r1,[UP,#KBD_PARITY]  
     b 9f      
 stop_bit:
-    ldrb r1,[UP,#KBD_FLAGS]
     tst r0,#(1<<KBD_DATA_PIN)
-    beq 2f // stop bit expected 
+    beq 8f // error stop bit expected 
     ldrb r1,[UP,#KBD_PARITY]
     tst r1,#1 
-    beq 2f // parity error  
-// store code in queue 
-1:  ldr r1,[UP,#KBD_QTAIL]
-    add r2,UP,#KBD_QUEUE
+    beq 8f // error parity
     ldrb r0,[UP,#KBD_SHIFTER]
-    strb r0,[r2,r1]
-    add r1,#1
-    and r1,#KBD_QUEUE_SIZE-1
-    strb r1,[UP,#KBD_QTAIL]
-    b 8f 
-2:  // keyboard error 
-    ldrb r0,[UP,#KBD_FLAGS]
-    orr r0,#KBD_ERR
-    strb r0,[UP,#KBD_FLAGS]
+    ldrb r1,[UP,#KBD_FLAGS]
+    tst r1,#KBD_F_REL
+    beq store_code   
+1:  
+    cmp r0,#SC_CAPS
+    bne 1f
+    eor r1,#KBD_F_CAPS
+    orr r1,#KBD_F_CTGL 
+    b 2f 
+1:  _CALL do_async_key 
+    ldrb r1,[UP,#KBD_FLAGS]
+2:  mvn r2,#KBD_F_REL 
+    and r1,r2
+    strb r1,[UP,#KBD_FLAGS]
+    b 8f
+// store code in queue 
+store_code:
+    cmp r0,#KEY_REL
+    bne 1f
+// set release flags 
+    orr r1,#KBD_F_REL 
+    strb r1,[UP,#KBD_FLAGS]
+    b 8f     
+1:  mov r1,r0 
+    _CALL do_async_key 
+    bne 8f // was async key 
+    ldr r0,[UP,#KBD_QTAIL]
+    add r2,UP,#KBD_QUEUE
+    strb r1,[r2,r0]
+    add r0,#1
+    and r0,#KBD_QUEUE_SIZE-1
+    strb r0,[UP,#KBD_QTAIL]
 8:  eor r0,r0 
     strh r0,[UP,#KBD_BITCNTR]
 9:  _RET 
@@ -197,12 +217,86 @@ rx_ack_bit:
     and r0,r1 
     ldrh r1,[r3,#GPIO_IDR]
     tst r1,#(1<<KBD_DATA_PIN)
-    beq 1f // ACK ok 
-    orr r0,#KBD_ERR 
-1:  strb r0,[UP,#KBD_FLAGS]
+    strb r0,[UP,#KBD_FLAGS]
     eor r0,r0 
     strb r0,[UP,#KBD_BITCNTR]     
 9:  _RET 
+
+/*************************************
+ check if it is an asynchronous key 
+ input:
+    r0  virtual code
+ output:
+    r0 code order | 255 
+*************************************/
+is_async_key:
+    push {r1}
+    ldr r1,=async_keys
+    _CALL table_scan
+    pop {r1}
+    _RET 
+
+
+/***************************
+ check if async key 
+ and process it
+ input: 
+    r0 code 
+ output:
+    r0 0|-1  
+    Z flag set->not async, reset->async key      
+****************************/
+do_async_key:
+    _CALL is_async_key  
+    cmp r0,#255
+    bne set_async_key 
+    movs r0,#0 
+    _RET  
+// asynchornous key, set/reset flag 
+set_async_key:
+    push {r1,r2}
+    ldrb r2,[UP,#KBD_FLAGS] 
+    ldr r1,=async_jump 
+    tbb [r1,r0]
+shift_key:
+    mov r0,#KBD_F_SHIFT 
+    b set_reset
+ctrl_key:
+    mov r0,#KBD_F_CTRL
+    b set_reset 
+alt_key:
+    mov r0,#KBD_F_ALT 
+    b set_reset 
+altchar_key:
+    mov r0,#KBD_F_ACHAR 
+set_reset:
+    tst r2,#KBD_F_REL 
+    beq 1f 
+    mvn r0,r0
+    and r2,r0
+    b 2f
+1:  orr r2,r0 
+2:  strb r2,[UP,#KBD_FLAGS]
+    movs r0,#-1
+9:  pop {r1,r2}
+    _RET 
+
+// asynchronous key table 
+async_keys:
+    .byte SC_LSHIFT,0 // left shift 
+    .byte SC_RSHIFT,0 // right shift 
+    .byte SC_LCTRL,1  // left control 
+    .byte SC_RCTRL,1  // right control 
+    .byte SC_LALT,2  // left alt 
+    .byte SC_RALT,3   // right alt (alt char)
+    .byte 0,255 
+
+async_jump: // tbb table for async keys 
+    .byte 0 // shift  key 
+    .byte (ctrl_key-shift_key)/2
+    .byte (alt_key-shift_key)/2
+    .byte (altchar_key-shift_key)/2
+
 
 /**********************************
     kbd_init 
@@ -227,28 +321,12 @@ rx_ack_bit:
    _CALL nvic_enable_irq 
    _RET 
 
-// ASYNC-KEY ( -- n )
+// KEY-ASYNC ( -- n )
 // return async key flags 
-    _HEADER ASYNC_KEY,9,"ASYNC-KEY"
+    _HEADER KEY_ASYNC,9,"KEY-ASYNC"
     _PUSH 
     ldrb TOS,[UP,#KBD_FLAGS]
     and TOS,#0xFC  
-    _NEXT 
-
-// KEY-ERR? ( -- 0|1|2)
-// report keyboard error 
-    _HEADER KEYERRQ,8,"KEY-ERR?"
-    _PUSH 
-    ldrb TOS,[UP,#KBD_FLAGS]
-    and TOS,#3 
-    _NEXT     
-
-// KEY-RST-ERR ( -- )
-// reset keyboard error flags 
-    _HEADER KEY_RST_ERR,11,"KEY-RST-ERR"
-    ldrb T0,[UP,#KBD_FLAGS]
-    and T0,#0xFC 
-    strb T0,[UP,#KBD_FLAGS]
     _NEXT 
 
 // KEYCODE 
@@ -281,7 +359,8 @@ wait_code:
 //      T0   target code 
 //      T1   table pointer 
 // output: 
-//        T0   0 | code 
+//        T0   0 | code
+//        Z flag  
 table_scan:
     push {T2}
 1:  ldrb T2,[T1],#1
@@ -290,7 +369,8 @@ table_scan:
     beq 2f 
     add T1,#1 
     b 1b 
-2:  ldrb T0,[T1] 
+2:  ldrb T0,[T1]
+    movs T0,T0 // set/reset zero flag 
 9:  pop {T2}
     _RET 
 
@@ -303,25 +383,17 @@ table_scan:
     ldr T1,=sc_ascii // translation table
     _CALL keycode
     cbz T0,inkey_exit
-    cmp T0,#XT_KEY // extended keycode 
-    beq xcode
     cmp T0,#XT2_KEY // pause 
-    beq pause_key 
-    cmp T0,#KEY_REL // key released
-    beq released 
-7:  _CALL table_scan 
-    cmp T0,#VK_CLOCK
-    beq inkey_exit 
+    beq pause_key
+    cmp T0,#XT_KEY // extended keycode 
+    bne 1f 
+xcode: // extended scancode 
+    ldr T1,=extended // extended code translation table 
+    _CALL wait_code
+1:  _CALL table_scan 
     mov TOS,T0
-8:  _CALL do_async_key 
-    cmp T0,#255
-    bne inkey_exit 
     _CALL do_modifiers
 inkey_exit:     
-    ldrb T0,[UP,#KBD_FLAGS]
-    mvn T1,#KBD_REL 
-    and T0,T1 
-    strb T0,[UP,#KBD_FLAGS]
     _NEXT
 pause_key: // discard next 7 codes 
     mov T1,#7 
@@ -329,72 +401,16 @@ pause_key: // discard next 7 codes
     subs T1,#1
     bne 1b 
     _NEXT 
-xcode: // extended scancode 
-    ldr T1,=extended // extended code translation table 
-    _CALL wait_code
-    cmp T0,#KEY_REL
-    bne 7b 
-released: // key released
-    ldrb T0,[UP,#KBD_FLAGS]
-    orr T0,#KBD_REL 
-    strb T0,[UP,#KBD_FLAGS]
-    _CALL wait_code 
-    _CALL table_scan
-    cmp T0,#VK_CLOCK
-    beq toggle_capslock 
-    _CALL do_async_key 
-    b inkey_exit  
-toggle_capslock:
-// when capslock is released toggle its flag
-    ldrb T0,[UP,#KBD_FLAGS]
-    mov T1,#KBD_CAPSLK 
-    eor T0,T1 
-    strb T0,[UP,#KBD_FLAGS]
-    mov TOS,#KBD_CAPSLK  
-    b inkey_exit 
-
-// check if async key 
-// and process it
-do_async_key:
-    _CALL is_async_key  
-    cmp T0,#255
-    beq 9f 
-// asynchornous key, set/reset flag 
-set_async_key: 
-    eor TOS,TOS // no key to return 
-    ldrb T2,[UP,#KBD_FLAGS] 
-    ldr T1,=async_jump 
-    tbb [T1,T0]
-shift_key:
-    mov T0,#KBD_SHIFT 
-    b set_reset
-ctrl_key:
-    mov T0,#KBD_CTRL
-    b set_reset 
-alt_key:
-    mov T0,#KBD_ALT 
-    b set_reset 
-altchar_key:
-    mov T0,#KBD_ALTCHAR 
-set_reset:
-    tst T2,#KBD_REL 
-    beq 1f 
-    mvn T0,T0
-    and T2,T0
-    b 2f
-1:  orr T2,T0 
-2:  strb T2,[UP,#KBD_FLAGS]
-9:  _RET 
 
 // check for modifiers flags 
 // and process it.
 do_modifiers:
     ldrb T0,[UP,#KBD_FLAGS]
-    tst T0,#KBD_SHIFT 
+    tst T0,#KBD_F_SHIFT 
     bne shift_down 
-    tst T0,#KBD_ALTCHAR 
+    tst T0,#KBD_F_ACHAR 
     bne altchar_down 
-    tst T0,#KBD_CTRL
+    tst T0,#KBD_F_CTRL
     b 9f 
 shift_down:
     mov T0,TOS 
@@ -414,7 +430,7 @@ ctrl_down:
 
 do_capslock:
     ldrb T0,[UP,#KBD_FLAGS]
-    tst T0,#KBD_CAPSLK 
+    tst T0,#KBD_F_CAPS 
     beq 9f 
     cmp TOS,#'A'
     bmi 9f 
@@ -428,30 +444,6 @@ do_capslock:
     eor TOS,T0 
 9:  _RET 
 
-// check if it is an asynchronous key 
-// input:
-//        T0  virtual code
-// output:
-//        T0 code order | -1 
-is_async_key:
-    ldr T1,=async_keys
-    b table_scan
-
-// asynchronous key table 
-async_keys:
-    .byte VK_LSHIFT,0 // left shift 
-    .byte VK_RSHIFT,0 // right shift 
-    .byte VK_LCTRL,1  // left control 
-    .byte VK_RCTRL,1  // right control 
-    .byte VK_LALT,2  // left alt 
-    .byte VK_RALT,3   // right alt (alt char)
-    .byte 0,255 
-
-async_jump: // tbb table for async keys 
-    .byte 0 // shift  key 
-    .byte (ctrl_key-shift_key)/2
-    .byte (alt_key-shift_key)/2
-    .byte (altchar_key-shift_key)/2
 
 
 /***************************
@@ -525,6 +517,10 @@ kbd_clear_queue:
     eor T0,T0 
     str T0,[UP,#KBD_QHEAD]
     str T0,[UP,#KBD_QTAIL]
+    ldrb T0,[UP,#KBD_FLAGS]
+    mvn T1,#3
+    and T0,T1 
+    strb T0,[UP,#KBD_FLAGS]
     _RET 
 
 // KBD-RST ( -- c )
@@ -569,19 +565,30 @@ kbd_clear_queue:
     _POP 
     _NEXT 
 
+// CAPS-LED ( -- )
+// synch capslock LED
+// to KBD_F_CAPS 
+    _HEADER CAPS_LED,8,"CAPS-LED"
+    ldrb T0,[UP,#KBD_FLAGS]
+    tst T0,#1
+    bne 1f 
+    _NEXT 
+1: _PUSH 
+    mvn T1,#1 
+    and T0,T1 
+    strb T0,[UP,#KBD_FLAGS]
+    and TOS,T0,#KBD_F_CAPS   
+    _CALL_COLWORD 1f
+1:  _ADR KBD_LED       
+    _UNNEST
+
+
 // WAIT-KEY ( -- c )
 // wait for keyboard key 
     _HEADER WKEY,8,"WAIT-KEY"
-    _NEST 
-1:  _ADR INKEY 
-    _ADR DUPP 
-    _DOLIT 4 
-    _ADR EQUAL 
-    _QBRAN 2f 
-    _ADR ASYNC_KEY 
-    _ADR ANDD 
-    _ADR KBD_LED
-    _DOLIT 0  
-2:  _ADR QDUP
+    _NEST
+1:  _ADR CAPS_LED  
+    _ADR INKEY 
+    _ADR QDUP 
     _QBRAN 1b  
     _UNNEST 

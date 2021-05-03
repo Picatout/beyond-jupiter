@@ -63,7 +63,7 @@ sc_ascii:
    .byte SC_LCTRL,VK_LCTRL
    .byte SC_SCROLL,VK_SCROLL
    .byte SC_NUM,VK_NLOCK 
-   .byte SC_CAPS,VK_CLOCK 
+   .byte SC_CAPS,0
    .byte SC_F1,VK_F1
    .byte SC_F2,VK_F2
    .byte SC_F3,VK_F3

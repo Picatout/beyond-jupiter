@@ -213,3 +213,11 @@
  	.macro	_POP /*pop data stack to TOS */
 	LDR	TOS,[DSP],#4
 	.endm
+
+	// calling a colon word 
+	// from a code word   
+	.macro _CALL_COLWORD target 
+    STMFD	RSP!,{IP}
+    ldr IP,=\target  
+   	b INEXT 
+	.endm 
