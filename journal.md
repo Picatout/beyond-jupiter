@@ -1,3 +1,7 @@
+2021-05-03
+
+* Travail sur ps2_kdb.s, modification du code et débogage.
+
 2021-04-28
 
 * Modifié **nvic_enable_irq* dans *init.s*.

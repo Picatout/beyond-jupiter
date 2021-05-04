@@ -56,7 +56,7 @@ flags
     .equ KBD_F_SHIFT,(1<<3)  // shift down
     .equ KBD_F_CTRL,(1<<4)   // ctrl down 
     .equ KBD_F_ALT,(1<<5)    // alt down
-    .equ KBD_F_ACHAR,(1<<6) // altchar down 
+    .equ KBD_F_XT,(1<<6) // extended key  
     .equ KBD_F_REL,(1<<7) // key released flag 
     // structure members offset 
     .equ KBD_FLAGS,KBD_STRUCT+2 
@@ -129,9 +129,13 @@ stop_bit:
     beq 8f // error parity
     ldrb r0,[UP,#KBD_SHIFTER]
     ldrb r1,[UP,#KBD_FLAGS]
-    tst r1,#KBD_F_REL
-    beq store_code   
-1:  
+    cmp r0,#XT_KEY
+    bne 1f
+    orr r1,#KBD_F_XT
+    strb r1,[UP,#KBD_FLAGS]
+    b 8f  
+1:  tst r1,#KBD_F_REL
+    beq store_code
     cmp r0,#SC_CAPS
     bne 1f
     eor r1,#KBD_F_CAPS
@@ -139,7 +143,7 @@ stop_bit:
     b 2f 
 1:  _CALL do_async_key 
     ldrb r1,[UP,#KBD_FLAGS]
-2:  mvn r2,#KBD_F_REL 
+2:  mvn r2,#(KBD_F_REL+KBD_F_XT) 
     and r1,r2
     strb r1,[UP,#KBD_FLAGS]
     b 8f
@@ -266,9 +270,6 @@ ctrl_key:
     b set_reset 
 alt_key:
     mov r0,#KBD_F_ALT 
-    b set_reset 
-altchar_key:
-    mov r0,#KBD_F_ACHAR 
 set_reset:
     tst r2,#KBD_F_REL 
     beq 1f 
@@ -288,14 +289,13 @@ async_keys:
     .byte SC_LCTRL,1  // left control 
     .byte SC_RCTRL,1  // right control 
     .byte SC_LALT,2  // left alt 
-    .byte SC_RALT,3   // right alt (alt char)
+    .byte SC_RALT,2   // right alt (alt char)
     .byte 0,255 
 
 async_jump: // tbb table for async keys 
     .byte 0 // shift  key 
     .byte (ctrl_key-shift_key)/2
     .byte (alt_key-shift_key)/2
-    .byte (altchar_key-shift_key)/2
 
 
 /**********************************
@@ -381,16 +381,16 @@ table_scan:
     _PUSH 
     eor TOS,TOS 
     ldr T1,=sc_ascii // translation table
-    _CALL keycode
+    ldrb T0,[UP,#KBD_FLAGS]
+    mov T2,#KBD_F_XT 
+    tst T0,T2
+    beq 1f
+    ldr T1,=extended // extended code translation
+1:  _CALL keycode
     cbz T0,inkey_exit
     cmp T0,#XT2_KEY // pause 
     beq pause_key
-    cmp T0,#XT_KEY // extended keycode 
-    bne 1f 
-xcode: // extended scancode 
-    ldr T1,=extended // extended code translation table 
-    _CALL wait_code
-1:  _CALL table_scan 
+    _CALL table_scan 
     mov TOS,T0
     _CALL do_modifiers
 inkey_exit:     
@@ -408,7 +408,7 @@ do_modifiers:
     ldrb T0,[UP,#KBD_FLAGS]
     tst T0,#KBD_F_SHIFT 
     bne shift_down 
-    tst T0,#KBD_F_ACHAR 
+    tst T0,#KBD_F_ALT  
     bne altchar_down 
     tst T0,#KBD_F_CTRL
     b 9f 
