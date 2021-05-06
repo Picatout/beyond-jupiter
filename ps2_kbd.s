@@ -374,10 +374,12 @@ table_scan:
 9:  pop {T2}
     _RET 
 
-// INKEY ( -- 0|key )
-// get a character from keyboard
-// don't wait for it.
-    _HEADER INKEY,5,"INKEY"
+/**********************************
+   PS2-KEY? ( -- key -1 | 0 )
+   get a character from keyboard
+   don't wait for it.
+*********************************/
+    _HEADER PS2_QKEY,8,"PS2-KEY?"
     _PUSH 
     eor TOS,TOS 
     ldr T1,=sc_ascii // translation table
@@ -393,6 +395,8 @@ table_scan:
     _CALL table_scan 
     mov TOS,T0
     _CALL do_modifiers
+    _PUSH 
+    mov TOS,#-1
 inkey_exit:     
     _NEXT
 pause_key: // discard next 7 codes 
@@ -523,8 +527,10 @@ kbd_clear_queue:
     strb T0,[UP,#KBD_FLAGS]
     _RET 
 
-// KBD-RST ( -- c )
-// send a reset command to keyboard
+/**********************************
+ KBD-RST ( -- c )
+ send a reset command to keyboard
+**********************************/
     _HEADER KBD_RST,7,"KBD-RST"
 1:  mov T0,#KBD_CMD_RESET 
     _CALL kbd_send
@@ -542,9 +548,11 @@ kbd_clear_queue:
     mov TOS,T0  
     _NEXT 
 
-// KBD-LED ( c -- )
-// send command to control
-// keyboard LEDS 
+/*****************************
+ KBD-LED ( c -- )
+ send command to control
+ keyboard LEDS 
+*****************************/
     _HEADER KBD_LED,7,"KBD-LED"
 1:  _CALL kbd_clear_queue
      mov T0,#KBD_CMD_LED 
@@ -565,9 +573,11 @@ kbd_clear_queue:
     _POP 
     _NEXT 
 
-// CAPS-LED ( -- )
-// synch capslock LED
-// to KBD_F_CAPS 
+/**************************
+ CAPS-LED ( -- )
+ synch capslock LED
+ to KBD_F_CAPS 
+**************************/
     _HEADER CAPS_LED,8,"CAPS-LED"
     ldrb T0,[UP,#KBD_FLAGS]
     tst T0,#1
@@ -582,13 +592,15 @@ kbd_clear_queue:
 1:  _ADR KBD_LED       
     _UNNEST
 
-
-// WAIT-KEY ( -- c )
-// wait for keyboard key 
+/************************
+ WAIT-KEY ( -- c )
+ wait for keyboard key 
+*************************/
     _HEADER WKEY,8,"WAIT-KEY"
     _NEST
 1:  _ADR CAPS_LED  
-    _ADR INKEY 
+    _ADR PS2_QKEY 
     _ADR QDUP 
     _QBRAN 1b  
     _UNNEST 
+

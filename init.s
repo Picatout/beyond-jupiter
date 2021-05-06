@@ -1,22 +1,21 @@
-/*****************************************************
-*  STM32eForth version 7.20
-*  Adapted to beyond Jupiter board by Picatout
-*  date: 2020-11-22
-*  IMPLEMENTATION NOTES:
+/**************************************************************************
+ Copyright Jacques Deschênes 2021 
+ This file is part of beyond-Jupiter 
 
-*     Use USART1 for console I/O
-*     port config: 115200 8N1 
-*     TX on  PA9,  RX on PA10  
-*
-*     eForth is executed from flash, not copied to RAM
-*     eForth use main stack R13 as return stack (thread stack not used) 
-*
-*     Forth return stack is at end of RAM (addr=0x200005000) and reserve 512 bytes
-*     a 128 bytes flwr_buffer is reserved below rstack for flash row writing
-*     a 128 bytes tib is reserved below flwr_buffer 
-*     Forth dstack is below tib and reserve 512 bytes 
-*   
-******************************************************/
+     beyond-Jupiter is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+
+     beyond-Jupiter is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with beyond-Jupiter.  If not, see <http://www.gnu.org/licenses/>.
+
+***************************************************************************/
 
 /**********************************
    Hardware initialization
@@ -155,57 +154,59 @@ isr_end:
   .p2align 2 
   .global default_handler
 default_handler:
-	ldr r5,exception_msg 
-	_CALL uart_puts 
-  _MOV32 r3,(SCB_BASE_ADR+SCB_CFSR)  
-  eor r4,r4  
-  ldr r5,[r3]
-  tst r5,#(1<<15)
-  beq 1f
-  ldr r4,[R3,#16] // buss fault address 
-  _CALL print_hex
-  cbz r4,1f 
-  mov r0,#','
-  _CALL uart_putc 
-  mov r0,#' '
-  _CALL uart_putc
-  mov r5,r4 
-  _CALL print_hex 
+  _CALL forth_init 
+  ldr IP,=dh
+  b INEXT  
+dh:
+  _ADR PRESE    
+	_DOLIT exception_msg 
+  _ADR COUNT 
+  _ADR TYPEE 
+  _ADR GET_CFSR 
+  _ADR DUPP
+  _ADR TOR 
+  _DOLIT 16 
+  _ADR BASE 
+  _ADR STORE 
+  _ADR DOT 
+  _ADR RFROM
+  _DOLIT (1<<15)
+  _ADR ANDD
+  _QBRAN 1f
+  _ADR GET_BFAR
+  _DOLIT ','
+  _ADR EMIT 
+  _ADR SPACE 
+  _ADR DOT 
 1:
-	b reset_mcu
+  _ADR reset_mcu 
+
+/***************************
+  GET_CFSR ( -- u )
+  stack CFSR register 
+***************************/
+GET_CFSR:
+    _MOV32 r3,SCB_BASE_ADR  
+    _PUSH 
+    ldr TOS,[r3,SCB_CFSR]
+    _NEXT 
+
+/*****************************
+  GET_BFAR ( -- u )
+  stack BFAR register
+*****************************/
+GET_BFAR:
+    _MOV32 r3,SCB_BASE_ADR  
+    _PUSH 
+    ldr TOS,[r3,SCB_BFAR]
+    _NEXT 
+
 
   .size  default_handler, .-default_handler
 exception_msg:
-	.word .+4 
-	.byte 25
-	.ascii "\n\rexeption reboot, CFSR: "
+	.byte 23
+	.ascii "exeption reboot, CFSR: "
 	.p2align 2
-
-/************************
- print hexadecimal number
- input: 
-    r1   uart_base_adr 
-    r5   number to print 
-*************************/    
-print_hex:
-    mov r0,#'$'
-    _CALL uart_putc 
-    mov r3,#8
-1:  ubfx r0,r5,#28,#4
-    add r0,#'0' 
-    cmp r0,#'9'+1
-    bmi 2f     
-    add r0,#7 
-2:  _CALL uart_putc
-    lsl r5,#4
-    subs r3,#1
-    bne 1b
-    mov r0,#' '
-    _CALL uart_putc 
-3:	ldr r2,[r1,#USART_SR]
-    ands r2,#(1<<6)
-    beq 3b 
-    _RET
 
 /*********************************
 	system milliseconds counter
@@ -225,84 +226,33 @@ systick_handler:
 systick_exit:
   bx lr
 
-/**************************
-	UART RX handler
-**************************/
-	.p2align 2
-	.type uart_rx_handler, %function
-uart_rx_handler:
-	_MOV32 r3,UART 
-	ldr r0,[r3,#USART_SR]
-	ldr r1,[r3,#USART_DR]
-	tst r0,#(1<<5) // RXNE 
-	beq 2f // no char received 
-	cmp r1,#3
-	beq user_reboot // received CTRL-C then reboot MCU 
-	add r0,UP,#RX_QUEUE
-	ldr r2,[UP,#RX_TAIL]
-	strb r1,[r0,r2]
-	add r2,#1 
-	and r2,#(RX_QUEUE_SIZE-1)
-	str r2,[UP,#RX_TAIL]
-2:	
-	bx lr 
-
 user_reboot:
-	ldr r5,user_reboot_msg
-	_CALL uart_puts 
+  _NEST 
+  _PUSH 
+	_DOLIT user_reboot_msg
+	_ADR COUNT 
+  _ADR TYPEE 
+  _ADR reset_mcu 
+
+	.p2align 2 
+user_reboot_msg:
+	.byte 13 
+	.ascii "\ruser reboot!"
+	.p2align 2 
+
 reset_mcu:
+  _MOV32 r0,UART 
+1: ldr r1,[r0,#USART_SR]
+  tst r1,#(1<<6)
+  beq 1b
   _MOV32 r0,SCB_BASE_ADR  
 	ldr r1,[r0,#SCB_AIRCR]
 	orr r1,#(1<<2)
 	movt r1,#SCB_VECTKEY
 	str r1,[r0,#SCB_AIRCR]
 	b . 
-	.p2align 2 
-user_reboot_msg:
-	.word .+4
-	.byte 13 
-	.ascii "\ruser reboot!"
-	.p2align 2 
 
- /***********************
-  send byte to uart 
-  input: 
-    r0 byte to send 
-    r1 UART_BASE_ADR 
-************************/
-uart_putc:
-    push {r2}
-1:  ldr r2,[r1,#USART_SR]
-    ands r2,#0x80 // TXE 
-    beq 1b
-    str r0,[r1,#USART_DR] 
-    pop {r2}
-    _RET 
-
-/*****************************
- send counted string to uart 
- input: 
-    r5 string* 
- use:
-    r0  byte to send 
-    r1  UART_BASE_ADR
-    r2  string length 
-*****************************/
-	.type uart_puts,%function 
-uart_puts:
-  	_MOV32 r1,UART 
-	  ldrb r2,[r5],#1 // string length
-	  ands r2,r2
-1:	beq 9f 
-2:  ldrb r0,[r5],#1
-    _CALL uart_putc 
-	  subs r2,r2,#1 
-	  bne 2b 
-3:	ldr r2,[r1,#USART_SR]
-	  ands r2,#(1<<6)
-	  beq 3b 
-9:  _RET  
-
+ 
 
 /**************************************
   reset_handler execute at MCU reset
@@ -315,7 +265,7 @@ reset_handler:
 	mov sp,r0  
 	bl	remap 
 	bl	init_devices	 	/* RCC, GPIOs, USART */
-	bl  uart_init
+	bl  ser_init
 	bl	tv_init
   bl  kbd_init  
 	bl forth_init 
@@ -424,37 +374,6 @@ wait_sws:
   str r1,[r0,STK_CTL]
   _RET  
 
-/*******************************
-  initialize UART peripheral 
-********************************/
-	.type uart_init, %function
-uart_init:
-/* set GPIOA PIN 9, uart TX  */
-  _MOV32 r0,GPIOA_BASE_ADR
-  ldr r1,[r0,#GPIO_MODER]
-  mvn r2,#0xf<<(2*9)
-  and r1,r1,r2
-  mov r2,#0xa<<(2*9) // alternate function mode for PA9 and PA10
-  orr r1,r1,r2 
-  str r1,[r0,#GPIO_MODER]
-/* select alternate functions USART1==AF07 */ 
-  mov r1,#0x77<<4 
-  str r1,[r0,#GPIO_AFRH]
-/* configure USART1 registers */
-  _MOV32 r0,UART 
-/* BAUD rate */
-  mov r1,#(52<<4)+1  /* (96Mhz/16)/115200=52,0833333 quotient=52, reste=0,083333*16=1 */
-  str r1,[r0,#USART_BRR]
-  mov r1,#(3<<2)+(1<<13)+(1<<5) // TE+RE+UE+RXNEIE
-  str r1,[r0,#USART_CR1] /*enable usart*/
-/* set interrupt priority */
-  mov r0,#USART1_IRQ 
-  mov r1,#1 
-  _CALL nvic_set_priority
-/* enable interrupt in NVIC */
-  mov r0,#USART1_IRQ 
-  _CALL nvic_enable_irq  
-  _RET  
 
 /* copy system variables to RAM */ 
 	.type remap, %function 
@@ -645,7 +564,9 @@ UZERO:
 	.word 0      /* TICKS */
     .word 0     /* CD_TIMER */
 	.word HI  /*'BOOT */
-	.word BASEE 	/*BASE */
+	.word SER_QKEY /* query for character */
+  .word SER_EMIT  /* char output device */
+  .word BASEE 	/*BASE */
 	.word 0			/*tmp */
 	.word 0			/*SPAN */
 	.word 0			/*>IN */
@@ -675,3 +596,7 @@ UZERO:
     .word 0,0 
 ULAST:
 
+// used by _HEADER macro 
+// to link names field
+// in dictionary  
+    .equ LINK, 0 

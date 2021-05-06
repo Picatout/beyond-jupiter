@@ -250,7 +250,7 @@
    .equ DMA1S5_IRQ, (16)
    .equ DMA1S6_IRQ, (17)
    .equ ADC_IRQ, (18)
-   .equ EXIT9_5_IRQ, (23)
+   .equ EXTI9_5_IRQ, (23)
    .equ TIM1BRK_IRQ, (24) // TIMER1 BREAK 
    .equ TIM1UP_IRQ, (25) // TIMER1 Update
    .equ TIM1TRG_IRQ, (26) // TIMER1 trigger & commutation 

@@ -74,7 +74,9 @@
   .equ TICKS, RNDSEED+4  // millseconds counter
   .equ CD_TIMER, TICKS+4  // count down timer
   .equ BOOT, CD_TIMER+4  // boot program address
-  .equ NBASE, BOOT+4  // numeric conversion base 
+  .equ STDIN, BOOT+4   //character ouput device 
+  .equ STDOUT, STDIN+4 // character input device 
+  .equ NBASE, STDOUT+4  // numeric conversion base 
   .equ TMP, NBASE+4   // temporary variable
   .equ CSPAN, TMP+4  // character count received by expect  
   .equ TOIN, CSPAN+4  // >IN  parse pointer in TIB

@@ -1,22 +1,26 @@
-/*****************************************************
-*  STM32eForth version 7.20
-*  Adapted to beyond Jupiter board by Picatout
-*  date: 2020-11-22
-*  IMPLEMENTATION NOTES:
+/**************************************************************************
+ Copyright Jacques Deschênes 2021 
+ This file is part of beyond-Jupiter 
 
-*     Use USART1 for console I/O
-*     port config: 115200 8N1 
-*     TX on  PA9,  RX on PA10  
-*
-*     eForth is executed from flash, not copied to RAM
-*     eForth use main stack R13 as return stack (thread stack not used) 
-*
-*     Forth return stack is at end of RAM (addr=0x200005000) and reserve 512 bytes
-*     a 128 bytes flwr_buffer is reserved below rstack for flash row writing
-*     a 128 bytes tib is reserved below flwr_buffer 
-*     Forth dstack is below tib and reserve 512 bytes 
-*   
-******************************************************/
+     beyond-Jupiter is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+
+     beyond-Jupiter is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with beyond-Jupiter.  If not, see <http://www.gnu.org/licenses/>.
+
+***************************************************************************/
+
+/*********************************************
+    user interface using an NTSC monitor and 
+    a PS2 keyboard 
+**********************************************/
 
   .syntax unified
   .cpu cortex-m4
@@ -240,7 +244,6 @@ tv_isr_exit:
 /***************************
     FORTH WORDS 
 ***************************/
-    .equ LINK, 0 
 
 // BACK-COLOR ( -- a )
 //   back color variable 
@@ -502,12 +505,17 @@ CHAR_FONT: // ( c -- c-adr )
    _NEXT 
 
 /**********************************
-   TV-PUTC ( c -- )
+   TV-EMIT ( c -- )
    draw character in video buffer
 **********************************/
-    _HEADER TVPUTC,7,"TV-PUTC"
-    _NEST 
-    _ADR CHAR_FONT 
+    _HEADER TV_EMIT,7,"TV-EMIT"
+    _NEST
+    _ADR DUPP 
+    _DOLIT 32 
+    _ADR ULESS
+    _QBRAN 1f
+    _BRAN CTRL_KEY
+1:  _ADR CHAR_FONT 
     _ADR COLUMN 
     _ADR AT
     _ADR COLX  // x coord 
@@ -528,22 +536,75 @@ CHAR_FONT: // ( c -- c-adr )
     _DONXT 1b
     _ADR TDROP  
     _ADR RIGHT
+9:  _UNNEST  
+CTRL_KEY:
+    _ADR DUPP 
+    _DOLIT 8 
+    _ADR EQUAL 
+    _QBRAN 1f
+    _ADR DELBACK
+8:  _ADR TDROP 
     _UNNEST  
-
-// PRINT ( cstr -- )
-// print counted string 
-    _HEADER PRINT,5,"PRINT"
-    _NEST 
-    _ADR COUNT 
-    _ADR ONEM 
-    _ADR TOR 
 1:  _ADR DUPP 
-    _ADR CAT 
-    _ADR TVPUTC 
-    _ADR ONEP 
-    _DONXT 1b 
-    _ADR DROP 
+    _DOLIT 13
+    _ADR EQUAL 
+    _QBRAN 1f 
+    _ADR CAR_RET
+    _BRAN 8b
+1:  _DOLIT 10 
+    _ADR EQUAL 
+    _QBRAN 9b 
+    _ADR LN_FEED
     _UNNEST 
+
+/*******************************
+  CAR_RET 
+  carriage return
+*******************************/
+CAR_RET:
+   mov T0,#0 
+   str T0,[UP,#COL] 
+   _NEXT 
+
+/*************************
+  LN_FEED 
+  send cursor to next line 
+**************************/
+LN_FEED:
+  ldr T0,[UP,#ROW]
+  cmp T0,#24
+  beq 2f 
+  add T0,#1 
+  str T0,[UP,#ROW]
+  _NEXT 
+2:_CALL_COLWORD 3f 
+3: 
+  _ADR SCROLLUP 
+  _UNNEST  
+
+/*****************************
+  DELBACK 
+  delete character left to 
+  cursor 
+*****************************/
+DELBACK: 
+  _NEST 
+  _ADR COLUMN 
+  _ADR AT 
+  _ADR QDUP 
+  _QBRAN 9f
+  _ADR ONEM
+  _ADR COLUMN 
+  _ADR STORE
+  _DOLIT 32 
+  _ADR TV_EMIT 
+  _ADR COLUMN 
+  _ADR DUPP 
+  _ADR AT 
+  _ADR ONEM 
+  _ADR SWAP 
+  _ADR STORE 
+9: _UNNEST    
 
 // CURPOS ( line col -- )
 // set text cursor position 

@@ -1,5 +1,23 @@
-/* 
-****************************************************
+/**************************************************************************
+ Copyright Jacques Deschênes 2021 
+ This file is part of beyond-Jupiter 
+
+     beyond-Jupiter is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+
+     beyond-Jupiter is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with beyond-Jupiter.  If not, see <http://www.gnu.org/licenses/>.
+
+***************************************************************************/
+
+/*****************************************************
 *  STM32eForth version 7.20
 *  Adapted to blue pill board by Picatout
 *  date: 2020-11-22
@@ -8,24 +26,14 @@
 *	This version use indirect threaded model. This model enable 
 *	leaving the core Forth system in FLASH memory while the users 
 *	definitions reside in RAM. 
-*	R12	is used as IP , inner interpreter address pointer 
-*   UP  IS used AS WP 
-*	WP 	is used as UP , working register 
-*	R8 	is used as link register by _NEST macro it is initialized 
-*  		NEST address and MUST BE PRESERVED.
-*
+
 *     Use USART1 for console I/O
 *     port config: 115200 8N1 
 *     TX on  PA9,  RX on PA10  
 *
-*     eForth is executed from flash, not copied to RAM
-*     eForth use main stack R13 as return stack (thread stack not used) 
-*
-*     Forth return stack is at end of RAM (addr=0x200020000) and reserve 512 bytes
-*   
-******************************************************
+******************************************************/
 
-*****************************************************************************
+/*****************************************************************************
 *	STM32eForth version 7.20
 *	Chen-Hanson Ting,  July 2014
 
@@ -96,11 +104,11 @@ UNNEST:
 
 	.p2align 2 
 
-// compile "BX 	R8" 
+// compile "BX 	INX" 
 // this is the only way 
 // a colon defintion in RAM 
 // can jump to NEST
-// R8 is initialized to NEST address 
+// INX is initialized to NEST address 
 // and must be preserved   
 COMPI_NEST:
 	add T1,UP,#USER_CTOP 
@@ -113,14 +121,60 @@ COMPI_NEST:
 	str T1,[T2]
 	_NEXT  
 
+// ' STDIN 
+// stdin vector 
+TSTDIN:
+	_PUSH 
+	ADD TOS,UP,#STDIN 
+	_NEXT 
 
-// RANDOM ( n+ -- {0..n+ - 1} )
-// return pseudo random number 
-// REF: https://en.wikipedia.org/wiki/Xorshift
+// ' STDOUT 
+// stdout vector 
+TSTDOUT:
+	_PUSH 
+	ADD TOS,UP,#STDOUT
+	_NEXT 
+	
+/********************************************
+	KEY? ( -- c T | F )
+	check if available character 
+********************************************/
+	_HEADER QKEY,4,"KEY?"
+QRX: 
+	_NEST 
+	_ADR TSTDIN // ' STDIN 
+	_ADR ATEXE
+	_UNNEST 
 
-//	.word LINK 
-// GET-IP ( n - c )
-// return interrupt priority 
+/********************************************
+    KEY	 ( -- c )
+ 	Wait for and return an input character.
+********************************************/
+	_HEADER KEY,3,"KEY"
+	_NEST
+KEY1:
+	_ADR CAPS_LED 
+	_ADR	QRX
+	_QBRAN	KEY1
+	_UNNEST
+
+/**********************************************
+	EMIT ( c -- )
+	transmit a character to console 
+**********************************************/
+	_HEADER EMIT,4,"EMIT"
+TECHO:
+	_NEST 
+	_ADR TSTDOUT 
+	_ADR ATEXE 
+	_UNNEST 
+
+
+/************************************************
+ GET-IP ( n - c )
+ return interrupt priority of IRQn 
+************************************************/
+/*
 	_HEADER GETIP,6,"GET-IP" 
 	_NEST 
 	_ADR DUPP 
@@ -138,12 +192,14 @@ COMPI_NEST:
 	_DOLIT 4 
 	_ADR RSHIFT 
 	_UNNEST 
+*/
 
-	.word LINK 
-_RAND: .byte 6
-	.ascii "RANDOM"
-	.p2align 2 
-RAND:
+/***********************************************
+ RANDOM ( n+ -- {0..n+ - 1} )
+ return pseudo random number 
+ REF: https://en.wikipedia.org/wiki/Xorshift
+************************************************/
+	_HEADER RAND,6,"RANDOM"
 	_NEST
 	_ADR ABSS   
 	_ADR SEED 
@@ -170,13 +226,11 @@ RAND:
 	_UNNEST 
 
 
-// PAUSE ( u -- ) 
-// suspend execution for u milliseconds
-	.word _RAND
-_PAUSE: .byte 5
-	.ascii "PAUSE"
-	.p2align 2
-PAUSE:
+/****************************************
+ PAUSE ( u -- ) 
+ suspend execution for u milliseconds
+****************************************/
+	_HEADER PAUSE,5,"PAUSE"
 	_NEST 
 	_ADR TIMER 
 	_ADR STORE 
@@ -188,14 +242,11 @@ PAUSE_LOOP:
 PAUSE_EXIT: 		
 	_UNNEST 
 
-//  ULED ( T|F -- )
-// control user LED, -1 ON, 0 OFF  
-	.word _PAUSE
-_ULED: .byte 4
-	.ascii "ULED"
-	.p2align 2
-	.type ULED, %function 
-ULED:
+/******************************************
+  ULED ( T|F -- )
+  control user LED, -1 ON, 0 OFF 
+*******************************************/
+	_HEADER ULED,4,"ULED"
 	mov T0,#(1<<LED_PIN)
 	_MOV32 T1,LED_GPIO 
 	movs TOS,TOS 
@@ -208,96 +259,46 @@ ULED_OFF:
 	str T0,[T1,#GPIO_BSRR]
 	_NEXT    
 
-//    ?KEY	 ( -- c T | F )
-// 	Return input character and true, or a false if no input.
-	.word	_ULED
-_QRX:	.byte   4
-	.ascii "?KEY"
-	.p2align 2 
-QKEY:
-QRX: 
-	_PUSH
-	ldr T0,[UP,#RX_TAIL] 
-	ldr T1,[UP,#RX_HEAD]
-	eors TOS,T0,T1 
-	beq 1f
-	add T0,UP,#RX_QUEUE 
-	add T0,T1 
-	ldrb TOS,[T0]
-	add T1,#1 
-	and T1,#(RX_QUEUE_SIZE-1)
-	str T1,[UP,#RX_HEAD]
-	_PUSH 
-	mov TOS,#-1
-1:	_NEXT 
 
-//    TX!	 ( c -- )
-// 	Send character c to the output device.
-
-	.word	_QRX
-_TXSTO:	.byte 4
-	.ascii "EMIT"
-	.p2align 2 	
-TXSTO:
-EMIT:
-TECHO:
-	_MOV32 WP,UART 
-1:  ldr T0,[WP,#USART_SR]
-    tst T0,#0x80 // TXE flag 
-	beq 1b 
-	strb TOS,[WP,#USART_DR]	 
-	_POP
-	_NEXT 
 	
 /***************
 //  The kernel
 ***************/
 
-//    NOP	( -- )
-// 	do nothing.
-
-	.word	_TXSTO
-_NOP:	.byte   3
-	.ascii "NOP"
-	.p2align 2 	
-NOP:
+/********************
+    NOP	( -- )
+ 	do nothing.
+*********************/
+	_HEADER NOP,3,"NOP"
 	_NEXT 
  
-
-//    doLIT	( -- w )
-// 	Push an inline literal.
-
-// 	.word	_NOP
-// _LIT	.byte   COMPO+5
-// 	.ascii "doLIT"
- 	.p2align 2 	
+/********************
+    doLIT	( -- w )
+ 	Push an inline literal.
+hidden word used by compiler 
+*********************/
 DOLIT:
 	_PUSH				//  store TOS on data stack
 	LDR	TOS,[IP],#4		//  get literal at word boundary
 	_NEXT 
 
-//    EXECUTE	( ca -- )
-// 	Execute the word at ca.
-
-	.word	_NOP
-_EXECU:	.byte   7
-	.ascii "EXECUTE"
-	.p2align 2 	
-EXECU: 
+/*******************************
+    EXECUTE	( ca -- )
+ 	Execute the word at ca.
+*******************************/
+	_HEADER EXECU,7,"EXECUTE"
 	ORR	WP,TOS,#1 
 	_POP
 	BX WP 
 	_NEXT 
 
-//    next	( -- ) counter on R:
-// 	Run time code for the single index loop.
-// 	: next ( -- ) \ hilevel model
-// 	 r> r> dup if 1 - >r @ >r exit then drop cell+ >r // 
-
-// 	.word	_EXECU
-// _DONXT	.byte   COMPO+4
-// 	.ascii "next"
-// 	.p2align 2 	
+/**********************************************************
+    donext	( -- ) counter on R:
+ 	Run time code for the single index loop.
+ 	: next ( -- ) \ hilevel model
+ 	 r> r> dup if 1 - >r @ >r exit then drop cell+ >r // 
+hidden word used by compiler 	  
+*********************************************************/
 DONXT:
 	LDR	T2,[RSP]   // ( -- u )  
 	CBNZ T2,NEXT1 
@@ -312,13 +313,11 @@ NEXT1:
 	LDR	IP,[IP]	// go begining of loop 
 	_NEXT 
 
-//    ?branch	( f -- )
-// 	Branch if flag is zero.
-
-// 	.word	_DONXT
-// _QBRAN	.byte   COMPO+7
-// 	.ascii "?branch"
-// 	.p2align 2 	
+/**************************************
+    ?branch	( f -- )
+ 	Branch if flag is zero.
+hiddend word used by compiler
+**************************************/
 QBRAN:
 	MOVS	TOS,TOS
 	_POP
@@ -329,250 +328,187 @@ QBRAN1:
  	ADD	IP,IP,#4
 	_NEXT
 
-//    branch	( -- )
-// 	Branch to an inline address.
-
-// 	.word	_QBRAN
-// _BRAN	.byte   COMPO+6
-// 	.ascii "branch"
-// 	.p2align 2 	
+/***********************************
+    branch	( -- )
+ 	Branch to an inline address.
+hidden word used by compiler 
+***********************************/
 BRAN:
 	LDR	IP,[IP]
 	_NEXT
 
-//    EXIT	(  -- )
-// 	Exit the currently executing command.
-
-	.word	_EXECU
-_EXIT:	.byte   4
-	.ascii "EXIT"
-	.p2align 2 	
-EXIT:
+/******************************************
+    EXIT	(  -- )
+ 	Exit the currently executing command.
+******************************************/
+	_HEADER EXIT,4,"EXIT"
 	_UNNEST
 
-//    !	   ( w a -- )
-// 	Pop the data stack to memory.
-
-	.word	_EXIT
-_STORE:	.byte   1
-	.ascii "!"
-	.p2align 2 	
-STORE:
+/***********************************
+    !	   ( w a -- )
+ 	Pop the data stack to memory.
+************************************/
+	_HEADER STORE,1,"!"
 	LDR	WP,[DSP],#4
 	STR	WP,[TOS]
 	_POP
 	_NEXT 
 
-//    @	   ( a -- w )
-// 	Push memory location to the data stack.
-
-	.word	_STORE
-_AT:	.byte   1
-	.ascii "@"
-	.p2align 2 	
-AT:
+/********************************************
+    @	   ( a -- w )
+ 	Push memory location to the data stack.
+*********************************************/
+	_HEADER AT,1,"@"
 	LDR	TOS,[TOS]
 	_NEXT 
 
-//    C!	  ( c b -- )
-// 	Pop the data stack to byte memory.
-
-	.word	_AT
-_CSTOR:	.byte   2
-	.ascii "C!"
-	.p2align 2 	
-CSTOR:
+/*******************************************
+    C!	  ( c b -- )
+ 	Pop the data stack to byte memory.
+*******************************************/
+	_HEADER CSTOR,2,"C!"
 	LDR	WP,[DSP],#4
 	STRB WP,[TOS]
 	_POP
 	_NEXT
 
-//    C@	  ( b -- c )
-// 	Push byte memory location to the data stack.
-
-	.word	_CSTOR
-_CAT:	.byte   2
-	.ascii "C@"
-	.p2align 2 	
-CAT:
+/*********************************************
+    C@	  ( b -- c )
+ 	Push byte memory location to the data stack.
+**********************************************/
+	_HEADER CAT,2,"C@"
 	LDRB	TOS,[TOS]
 	_NEXT 
 
-//    R>	  ( -- w )
-// 	Pop the return stack to the data stack.
-
-	.word	_CAT
-_RFROM:	.byte   2
-	.ascii "R>"
-	.p2align 2 	
-RFROM:
+/*********************************************
+    R>	  ( -- w )
+ 	Pop the return stack to the data stack.
+**********************************************/
+	_HEADER RFROM,2,"R>"
 	_PUSH
 	LDR	TOS,[RSP],#4
 	_NEXT 
 
-//    R@	  ( -- w )
-// 	Copy top of return stack to the data stack.
-
-	.word	_RFROM
-_RAT:	.byte   2
-	.ascii "R@"
-	.p2align 2 	
-RAT:
+/************************************************
+    R@	  ( -- w )
+ 	Copy top of return stack to the data stack.
+************************************************/
+	_HEADER RAT,2,"R@"
 	_PUSH
 	LDR	TOS,[RSP]
 	_NEXT 
 
-//    >R	  ( w -- )
-// 	Push the data stack to the return stack.
-
-	.word	_RAT
-_TOR:	.byte   COMPO+2
-	.ascii ">R"
-	.p2align 2 	
-TOR:
+/***********************************************
+    >R	  ( w -- )
+ 	Push the data stack to the return stack.
+************************************************/
+	_HEADER TOR,2,">R"
 	STR	TOS,[RSP,#-4]!
 	_POP
 	_NEXT
 
+/*******************************
 //	RP! ( u -- )
 // initialize RPP with u 
-	.word _TOR 
-_RPSTOR: .byte 3 
-	.ascii "RP!" 
-	.p2align 2 
-RPSTOR:
+*******************************/
+	_HEADER RPSTOR,3,"RP!"
 	MOV RSP,TOS 
 	_POP  
 	_NEXT 
 
-
-//	SP! ( u -- )
-// initialize SPP with u 
-	.word _RPSTOR  
-_SPSTOR: .byte 3 
-	.ascii "SP!" 
-	.p2align 2 
-SPSTOR:
+/********************************
+	SP! ( u -- )
+ initialize SPP with u 
+********************************/
+	_HEADER SPSTOR,3,"SP!"
 	MOV DSP,TOS 
 	EOR TOS,TOS,TOS 
 	_NEXT 
 
-//    SP@	 ( -- a )
-// 	Push the current data stack pointer.
-
-	.word	_SPSTOR
-_SPAT:	.byte   3
-	.ascii "SP@"
-	.p2align 2 	
-SPAT:
+/**************************************
+    SP@	 ( -- a )
+ 	Push the current data stack pointer.
+***************************************/
+	_HEADER SPAT,3,"SP@"
 	_PUSH
 	MOV	TOS,DSP
 	_NEXT
 
-//    DROP	( w -- )
-// 	Discard top stack item.
-
-	.word	_SPAT
-_DROP:	.byte   4
-	.ascii "DROP"
-	.p2align 2 	
-DROP:
+/********************************
+    DROP	( w -- )
+ 	Discard top stack item.
+********************************/
+	_HEADER DROP,4,"DROP"
 	_POP
 	_NEXT 
 
-//    DUP	 ( w -- w w )
-// 	Duplicate the top stack item.
-
-	.word	_DROP
-_DUPP:	.byte   3
-	.ascii "DUP"
-	.p2align 2 	
-DUPP:
+/*********************************
+    DUP	 ( w -- w w )
+ 	Duplicate the top stack item.
+*********************************/
+	_HEADER DUPP,3,"DUP"
 	_PUSH
 	_NEXT 
 
-//    SWAP	( w1 w2 -- w2 w1 )
-// 	Exchange top two stack items.
-
-	.word	_DUPP
-_SWAP:	.byte   4
-	.ascii "SWAP"
-	.p2align 2 	
-SWAP:
+/**********************************
+    SWAP	( w1 w2 -- w2 w1 )
+ 	Exchange top two stack items.
+**********************************/
+	_HEADER SWAP,4,"SWAP"
 	LDR	WP,[DSP]
 	STR	TOS,[DSP]
 	MOV	TOS,WP
 	_NEXT 
 
-//    OVER	( w1 w2 -- w1 w2 w1 )
-// 	Copy second stack item to top.
-
-	.word	_SWAP
-_OVER:	.byte   4
-	.ascii "OVER"
-	.p2align 2 	
-OVER:
+/***********************************
+    OVER	( w1 w2 -- w1 w2 w1 )
+ 	Copy second stack item to top.
+***********************************/
+	_HEADER OVER,4,"OVER"
 	_PUSH
 	LDR	TOS,[DSP,#4]
 	_NEXT 
 
-//    0<	  ( n -- t )
-// 	Return true if n is negative.
-
-	.word	_OVER
-_ZLESS:	.byte   2
-	.ascii "0<"
-	.p2align 2 	
-ZLESS:
-//	MOV	WP,#0
-//	ADD	TOS,WP,TOS,ASR #32
+/***********************************
+    0<	  ( n -- t )
+ 	Return true if n is negative.
+***********************************/
+	_HEADER ZLESS,2,"0<"
 	ASR TOS,#31
 	_NEXT 
 
-//    AND	 ( w w -- w )
-// 	Bitwise AND.
-
-	.word	_ZLESS
-_ANDD:	.byte   3
-	.ascii "AND"
-	.p2align 2 	
-ANDD:
+/********************************
+    AND	 ( w w -- w )
+ 	Bitwise AND.
+********************************/
+	_HEADER ANDD,3,"AND"
 	LDR	WP,[DSP],#4
 	AND	TOS,TOS,WP
 	_NEXT 
 
-//    OR	  ( w w -- w )
-// 	Bitwise inclusive OR.
-
-	.word	_ANDD
-_ORR:	.byte   2
-	.ascii "OR"
-	.p2align 2 	
-ORR:
+/******************************
+    OR	  ( w w -- w )
+ 	Bitwise inclusive OR.
+******************************/
+	_HEADER ORR,2,"OR"
 	LDR	WP,[DSP],#4
 	ORR	TOS,TOS,WP
 	_NEXT 
 
-//    XOR	 ( w w -- w )
-// 	Bitwise exclusive OR.
-
-	.word	_ORR
-_XORR:	.byte   3
-	.ascii "XOR"
-	.p2align 2 	
-XORR:
+/*****************************
+    XOR	 ( w w -- w )
+ 	Bitwise exclusive OR.
+*****************************/
+	_HEADER XORR,3,"XOR"
 	LDR	WP,[DSP],#4
 	EOR	TOS,TOS,WP
 	_NEXT 
 
-//    UM+	 ( w w -- w cy )
-// 	Add two numbers, return the sum and carry flag.
-
-	.word	_XORR
-_UPLUS:	.byte   3
-	.ascii "UM+"
-	.p2align 2 	
-UPLUS:
+/**************************************************
+    UM+	 ( w w -- w cy )
+ 	Add two numbers, return the sum and carry flag.
+***************************************************/
+	_HEADER UPLUS,3,"UM+"
 	LDR	WP,[DSP]
 	ADDS	WP,WP,TOS
 	MOV	TOS,#0
@@ -580,298 +516,227 @@ UPLUS:
 	STR	WP,[DSP]
 	_NEXT 
 
-//    RSHIFT	 ( w # -- w )
-// 	arithmetic Right shift # bits.
-
-	.word	_UPLUS
-_RSHIFT:	.byte   6
-	.ascii "RSHIFT"
-	.p2align 2 	
-RSHIFT:
+/*********************************
+    RSHIFT	 ( w # -- w )
+ 	arithmetic Right shift # bits.
+**********************************/
+	_HEADER RSHIFT,6,"RSHIFT"
 	LDR	WP,[DSP],#4
 	MOV	TOS,WP,ASR TOS
 	_NEXT 
 
-//    LSHIFT	 ( w # -- w )
-// 	Right shift # bits.
-
-	.word	_RSHIFT
-_LSHIFT:	.byte   6
-	.ascii "LSHIFT"
-	.p2align 2 	
-LSHIFT:
+/****************************
+    LSHIFT	 ( w # -- w )
+ 	Right shift # bits.
+****************************/
+	_HEADER LSHIFT,6,"LSHIFT"
 	LDR	WP,[DSP],#4
 	MOV	TOS,WP,LSL TOS
 	_NEXT
 
-//    +	 ( w w -- w )
-// 	Add.
-
-	.word	_LSHIFT
-_PLUS:	.byte   1
-	.ascii "+"
-	.p2align 2 	
-PLUS:
+/*************************
+    +	 ( w w -- w )
+ 	Add.
+*************************/
+	_HEADER PLUS,1,"+"
 	LDR	WP,[DSP],#4
 	ADD	TOS,TOS,WP
 	_NEXT 
 
-//    -	 ( w w -- w )
-// 	Subtract.
-
-	.word	_PLUS
-_SUBB:	.byte   1
-	.ascii "-"
-	.p2align 2 	
-SUBB:
+/************************
+    -	 ( w w -- w )
+ 	Subtract.
+************************/
+	_HEADER SUBB,1,"-"
 	LDR	WP,[DSP],#4
 	RSB	TOS,TOS,WP
 	_NEXT 
 
-//    *	 ( w w -- w )
-// 	Multiply.
-
-	.word	_SUBB
-_STAR:	.byte   1
-	.ascii "*"
-	.p2align 2 	
-STAR:
+/************************
+    *	 ( w w -- w )
+ 	Multiply.
+***********************/
+	_HEADER STAR,1,"*"
 	LDR	WP,[DSP],#4
 	MUL	TOS,WP,TOS
 	_NEXT 
 
-//    UM*	 ( w w -- ud )
-// 	Unsigned multiply.
-
-	.word	_STAR
-_UMSTA:	.byte   3
-	.ascii "UM*"
-	.p2align 2 	
-UMSTA:
+/***************************
+    UM*	 ( w w -- ud )
+ 	Unsigned multiply.
+****************************/
+	_HEADER UMSTA,3,"UM*"
 	LDR	WP,[DSP]
 	UMULL	T2,T3,TOS,WP
 	STR	T2,[DSP]
 	MOV	TOS,T3
 	_NEXT 
 
-//    M*	 ( w w -- d )
-// 	signed multiply.
-
-	.word	_UMSTA
-_MSTAR:	.byte   2
-	.ascii "M*"
-	.p2align 2 	
-MSTAR:
+/***************************
+    M*	 ( w w -- d )
+ 	signed multiply.
+***************************/
+	_HEADER MSTAR,2,"M*"
 	LDR	WP,[DSP]
 	SMULL	T2,T3,TOS,WP
 	STR	T2,[DSP]
 	MOV	TOS,T3
 	_NEXT 
 
-//    1+	 ( w -- w+1 )
-// 	Add 1.
-
-	.word	_MSTAR
-_ONEP:	.byte   2
-	.ascii "1+"
-	.p2align 2 	
-ONEP:
+/***************************
+    1+	 ( w -- w+1 )
+ 	Add 1.
+***************************/
+	_HEADER ONEP,2,"1+"
 	ADD	TOS,TOS,#1
 	_NEXT 
 
-//    1-	 ( w -- w-1 )
-// 	Subtract 1.
-
-	.word	_ONEP
-_ONEM:	.byte   2
-	.ascii "1-"
-	.p2align 2 	
-ONEM:
+/***************************
+    1-	 ( w -- w-1 )
+ 	Subtract 1.
+***************************/
+	_HEADER ONEM,2,"1-"
 	SUB	TOS,TOS,#1
 	_NEXT 
 
-//    2+	 ( w -- w+2 )
-// 	Add 1.
-
-	.word	_ONEM
-_TWOP:	.byte   2
-	.ascii "2+"
-	.p2align 2 	
-TWOP:
+/***************************
+    2+	 ( w -- w+2 )
+ 	Add 2.
+**************************/
+	_HEADER TWOP,2,"2+"
 	ADD	TOS,TOS,#2
 	_NEXT
 
-//    2-	 ( w -- w-2 )
-// 	Subtract 2.
-
-	.word	_TWOP
-_TWOM:	.byte   2
-	.ascii "2-"
-	.p2align 2 	
-TWOM:
+/**************************
+    2-	 ( w -- w-2 )
+ 	Subtract 2.
+**************************/
+	_HEADER TWOM,2,"2-"
 	SUB	TOS,TOS,#2
 	_NEXT
 
-//    CELL+	( w -- w+4 )
-// 	Add CELLL.
-
-	.word	_TWOM
-_CELLP:	.byte   5
-	.ascii "CELL+"
-	.p2align 2 	
-CELLP:
+/***************************
+    CELL+	( w -- w+4 )
+ 	Add CELLL.
+***************************/
+	_HEADER CELLP,5,"CELL+"
 	ADD	TOS,TOS,#CELLL
 	_NEXT
 
-//    CELL-	( w -- w-4 )
-// 	Subtract CELLL.
-
-	.word	_CELLP
-_CELLM:	.byte   5
-	.ascii "CELL-"
-	.p2align 2 	
-CELLM:
+/***************************
+    CELL-	( w -- w-4 )
+ 	Subtract CELLL.
+**************************/
+	_HEADER CELLM,5,"CELL-"
 	SUB	TOS,TOS,#CELLL
 	_NEXT
- 
-//    BL	( -- 32 )
-// 	Blank (ASCII space).
 
-	.word	_CELLM
-_BLANK:	.byte   2
-	.ascii "BL"
-	.p2align 2 	
-BLANK:
+/**************************** 
+    BL	( -- 32 )
+ 	Blank (ASCII space).
+*****************************/
+	_HEADER BLANK,2,"BL"
 	_PUSH
 	MOV	TOS,#32
 	_NEXT 
 
-//    CELLS	( w -- w*4 )
-// 	Multiply 4.
-
-	.word	_BLANK
-_CELLS:	.byte   5
-	.ascii "CELLS"
-	.p2align 2 	
-CELLS:
-	MOV	TOS,TOS,LSL#2
+/**************************
+    CELLS	( w -- w*4 )
+ 	Multiply CELLL 
+***************************/
+	_HEADER CELLS,5,"CELLS"
+	LSL TOS,#2
 	_NEXT
 
-//    CELL/	( w -- w/4 )
-// 	Divide by 4.
-
-	.word	_CELLS
-_CELLSL:	.byte   5
-	.ascii "CELL/"
-	.p2align 2 	
-CELLSL:
-	MOV	TOS,TOS,ASR#2
+/***************************
+    CELL/	( w -- w/4 )
+ 	Divide by CELLL.
+***************************/
+	_HEADER CELLSL,5,"CELL/"
+	ASR TOS,#2
 	_NEXT
 
-//    2*	( w -- w*2 )
-// 	Multiply 2.
-
-	.word	_CELLSL
-_TWOST:	.byte   2
-	.ascii "2*"
-	.p2align 2 	
-TWOST:
+/*************************
+    2*	( w -- w*2 )
+ 	Multiply 2.
+*************************/
+	_HEADER TWOST,2,"2*"
 	MOV	TOS,TOS,LSL#1
 	_NEXT
 
-//    2/	( w -- w/2 )
-// 	Divide by 2.
-
-	.word	_TWOST
-_TWOSL:	.byte   2
-	.ascii "2/"
-	.p2align 2 	
-TWOSL:
+/*************************
+    2/	( w -- w/2 )
+ 	Divide by 2.
+***********************/
+	_HEADER TWOSL,2,"2/"
 	MOV	TOS,TOS,ASR#1
 	_NEXT
 
-//    ?DUP	( w -- w w | 0 )
-// 	Conditional duplicate.
-
-	.word	_TWOSL
-_QDUP:	.byte   4
-	.ascii "?DUP"
-	.p2align 2 	
-QDUP:
+/****************************
+    ?DUP	( w -- w w | 0 )
+ 	Conditional duplicate.
+*****************************/
+	_HEADER QDUP,4,"?DUP"
 	MOVS	WP,TOS
 	IT NE 
     STRNE	TOS,[DSP,#-4]!
 	_NEXT
 
-//    ROT	( w1 w2 w3 -- w2 w3 w1 )
-// 	Rotate top 3 items.
-
-	.word	_QDUP
-_ROT:	.byte   3
-	.ascii "ROT"
-	.p2align 2 	
-ROT:
+/***********************************
+    ROT	( w1 w2 w3 -- w2 w3 w1 )
+ 	Rotate top 3 items.
+*************************************/
+	_HEADER ROT,3,"ROT"
 	LDR	T0,[DSP]  // w2 
 	STR	TOS,[DSP]  // w3 replace w2 
 	LDR	TOS,[DSP,#4] // w1 replace w3 
 	STR	T0,[DSP,#4] // w2 rpelace w1 
 	_NEXT
 
-// -ROT ( w1 w2 w3 -- w3 w1 w2 )
-// left rotate top 3 elements 
-	.word _ROT 
-_NROT: .byte 4 
-	.ascii "-ROT"
-	.p2align 2 
-NROT:
+/*********************************
+ -ROT ( w1 w2 w3 -- w3 w1 w2 )
+ left rotate top 3 elements 
+********************************/
+	_HEADER NROT,4,"-ROT"
 	LDR T0,[DSP,#4]
 	STR TOS,[DSP,#4]	
 	LDR TOS,[DSP]
 	STR T0,[DSP]
 	_NEXT 
 
-//    2DROP	( w1 w2 -- )
-// 	Drop top 2 items.
-
-	.word	_NROT
-_DDROP:	.byte   5
-	.ascii "2DROP"
-	.p2align 2 	
-DDROP:
+/*********************************
+    2DROP	( w1 w2 -- )
+ 	Drop top 2 items.
+*********************************/
+	_HEADER DDROP,5,"2DROP"
 	_POP
 	_POP
 	_NEXT 
 
-	.word _DDROP 
-_TDROP: .byte 5 
-	.ascii "3DROP"
-	.p2align 2
-TDROP:
+/********************************
+	3DROP ( w1 w2 w3 -- )
+	drop top 3 items 
+********************************/
+	_HEADER TDROP,5,"3DROP"
     add DSP,#8 
     _POP 
     _NEXT 
 
-//    2DUP	( w1 w2 -- w1 w2 w1 w2 )
-// 	Duplicate top 2 items.
-
-	.word	_TDROP
-_DDUP:	.byte   4
-	.ascii "2DUP"
-	.p2align 2 	
-DDUP:
+/***********************************
+    2DUP	( w1 w2 -- w1 w2 w1 w2 )
+ 	Duplicate top 2 items.
+************************************/
+	_HEADER DDUP,4,"2DUP"
 	LDR	T0,[DSP] // w1
 	STR	TOS,[DSP,#-4]! // push w2  
 	STR	T0,[DSP,#-4]! // push w1 
 	_NEXT
 
-//    D+	( d1 d2 -- d3 )
-// 	Add top 2 double numbers.
-
-	.word	_DDUP
-_DPLUS:	.byte   2
-	.ascii "D+"
-	.p2align 2 	
-DPLUS:
+/******************************
+    D+	( d1 d2 -- d3 )
+ 	Add top 2 double numbers.
+******************************/
+	_HEADER DPLUS,2,"D+"
 	LDR	WP,[DSP],#4
 	LDR	T2,[DSP],#4
 	LDR	T3,[DSP]
@@ -880,63 +745,48 @@ DPLUS:
 	ADC	TOS,TOS,T2
 	_NEXT
 
-//    NOT	 ( w -- !w )
-// 	1"s complement.
-
-	.word	_DPLUS
-_INVER:	.byte   3
-	.ascii "NOT"
-	.p2align 2 	
-INVER:
+/*****************************
+    NOT	 ( w -- !w )
+ 	1"s complement.
+*****************************/
+	_HEADER INVER,3,"NOT"
 	MVN	TOS,TOS
 	_NEXT
 
-//    NEGATE	( w -- -w )
-// 	2's complement.
-
-	.word	_INVER
-_NEGAT:	.byte   6
-	.ascii "NEGATE"
-	.p2align 2 	
-NEGAT:
+/*****************************
+    NEGATE	( w -- -w )
+ 	2's complement.
+***************************/
+	_HEADER NEGAT,6,"NEGATE"
 	RSB	TOS,TOS,#0
 	_NEXT
 
-//    ABS	 ( w -- |w| )
-// 	Absolute.
-
-	.word	_NEGAT
-_ABSS:	.byte   3
-	.ascii "ABS"
-	.p2align 2 	
-ABSS:
+/***************************
+    ABS	 ( w -- |w| )
+ 	Absolute.
+**************************/
+	_HEADER ABSS,3,"ABS"
 	TST	TOS,#0x80000000
 	IT NE
     RSBNE   TOS,TOS,#0
 	_NEXT
 
-//  0= ( w -- f )
-// TOS==0?
-
-	.word _ABSS
-_ZEQUAL: .byte 2
-	.ascii "0="
-	.p2align 2
-ZEQUAL:
+/*******************
+  0= ( w -- f )
+ TOS==0?
+*******************/
+	_HEADER ZEQUAL,2,"0="
 	cbnz TOS,1f
 	mov TOS,#-1
 	_NEXT 
 1:  eor TOS,TOS,TOS  
 	_NEXT 	
 
-//    =	 ( w w -- t )
-// 	Equal?
-
-	.word	_ZEQUAL
-_EQUAL:	.byte   1
-	.ascii "="
-	.p2align 2 	
-EQUAL:
+/*********************
+    =	 ( w w -- t )
+ 	Equal?
+*********************/
+	_HEADER EQUAL,1,"="
 	LDR	WP,[DSP],#4
 	CMP	TOS,WP
 	ITE EQ 
@@ -944,14 +794,11 @@ EQUAL:
 	MOVNE	TOS,#0
 	_NEXT
 
-//    U<	 ( w w -- t )
-// 	Unsigned less?
-
-	.word	_EQUAL
-_ULESS:	.byte   2
-	.ascii "U<"
-	.p2align 2 	
-ULESS:
+/************************
+    U<	 ( w w -- t )
+ 	Unsigned less?
+*************************/
+	_HEADER ULESS,2,"U<"
 	LDR	WP,[DSP],#4
 	CMP	WP,TOS
 	ITE CC 
@@ -959,14 +806,11 @@ ULESS:
 	MOVCS	TOS,#0
 	_NEXT
 
-//    <	( w w -- t )
-// 	Less?
-
-	.word	_ULESS
-_LESS:	.byte   1
-	.ascii "<"
-	.p2align 2 	
-LESS:
+/**********************
+    <	( w w -- t )
+ 	Less?
+**********************/
+	_HEADER LESS,1,"<"
 	LDR	WP,[DSP],#4
 	CMP	WP,TOS
     ITE LT
@@ -974,14 +818,11 @@ LESS:
 	MOVGE	TOS,#0
 	_NEXT 
 
-//    >	( w w -- t )
-// 	greater?
-
-	.word	_LESS
-_GREAT:	.byte   1
-	.ascii ">"
-	.p2align 2 	
-GREAT:
+/***********************
+    >	( w w -- t )
+ 	greater?
+***********************/
+	_HEADER GREAT,1,">"
 	LDR	WP,[DSP],#4
 	CMP	WP,TOS
 	ITE GT
@@ -989,42 +830,33 @@ GREAT:
 	MOVLE	TOS,#0
 	_NEXT
 
-//    MAX	 ( w w -- max )
-// 	Leave maximum.
-
-	.word	_GREAT
-_MAX:	.byte   3
-	.ascii "MAX"
-	.p2align 2 	
-MAX:
+/***************************
+    MAX	 ( w w -- max )
+ 	Leave maximum.
+***************************/
+	_HEADER MAX,3,"MAX"
 	LDR	WP,[DSP],#4
 	CMP	WP,TOS
 	IT GT 
 	MOVGT	TOS,WP
 	_NEXT 
 
-//    MIN	 ( w w -- min )
-// 	Leave minimum.
-
-	.word	_MAX
-_MIN:	.byte   3
-	.ascii "MIN"
-	.p2align 2 	
-MIN:
+/**************************
+    MIN	 ( w w -- min )
+ 	Leave minimum.
+**************************/
+	_HEADER MIN,3,"MIN"
 	LDR	WP,[DSP],#4
 	CMP	WP,TOS
 	IT LT
 	MOVLT	TOS,WP
 	_NEXT
 
-//    +!	 ( w a -- )
-// 	Add to memory.
-
-	.word	_MIN
-_PSTOR:	.byte   2
-	.ascii "+!"
-	.p2align 2 	
-PSTOR:
+/***********************
+    +!	 ( w a -- )
+ 	Add to memory.
+***********************/
+	_HEADER PSTOR,2,"+!"
 	LDR	WP,[DSP],#4
 	LDR	T2,[TOS]
 	ADD	T2,T2,WP
@@ -1032,14 +864,11 @@ PSTOR:
 	_POP
 	_NEXT
 
-//    2!	 ( d a -- )
-// 	Store double number.
-
-	.word	_PSTOR
-_DSTOR:	.byte   2
-	.ascii "2!"
-	.p2align 2 	
-DSTOR:
+/************************
+    2!	 ( d a -- )
+ 	Store double number.
+*************************/
+	_HEADER DSTOR,2,"2!"
 	LDR	WP,[DSP],#4
 	LDR	T2,[DSP],#4
 	STR	WP,[TOS],#4
@@ -1047,40 +876,31 @@ DSTOR:
 	_POP
 	_NEXT
 
-//    2@	 ( a -- d )
-// 	Fetch double number.
-
-	.word	_DSTOR
-_DAT:	.byte   2
-	.ascii "2@"
-	.p2align 2 	
-DAT:
+/************************
+    2@	 ( a -- d )
+ 	Fetch double number.
+************************/
+	_HEADER DAT,2,"D@"
 	LDR	WP,[TOS,#4]
 	STR	WP,[DSP,#-4]!
 	LDR	TOS,[TOS]
 	_NEXT
 
-//    COUNT	( b -- b+1 c )
-// 	Fetch length of string.
-
-	.word	_DAT
-_COUNT:	.byte   5
-	.ascii "COUNT"
-	.p2align 2 	
-COUNT:
+/***************************
+    COUNT	( b -- b+1 c )
+ 	Fetch length of string.
+****************************/
+	_HEADER COUNT,5,"COUNT"
 	LDRB	WP,[TOS],#1
 	_PUSH
 	MOV	TOS,WP
 	_NEXT
 
-//    DNEGATE	( d -- -d )
-// 	Negate double number.
-
-	.word	_COUNT
-_DNEGA:	.byte   7
-	.ascii "DNEGATE"
-	.p2align 2 	
-DNEGA:
+/******************************
+    DNEGATE	( d -- -d )
+ 	Negate double number.
+**************************/
+	_HEADER DNEGA,7,"DNEGATE"
 	LDR	WP,[DSP]
 	SUB	T2,T2,T2
 	SUBS WP,T2,WP
@@ -1088,29 +908,26 @@ DNEGA:
 	STR	WP,[DSP]
 	_NEXT
 
-// **************************************************************************
-//  System and user variables
+/******************************
+  System and user variables
+******************************/
 
-//    doVAR	( -- a )
-// 	Run time routine for VARIABLE and CREATE.
-
-// 	.word	_DNEGA
-// _DOVAR	.byte  COMPO+5
-// 	.ascii "doVAR"
-// 	.p2align 2 	
+/*******************************
+  doVAR	( -- a )
+  Run time routine for VARIABLE and CREATE.
+hidden word used by compiler
+********************************/
 DOVAR:
 	_PUSH
 	MOV TOS,IP
 	ADD IP,IP,#4 
 	B UNNEST 
 
-//    doCON	( -- a ) 
-// 	Run time routine for CONSTANT.
-
-// 	.word	_DOVAR
-// _DOCON	.byte  COMPO+5
-// 	.ascii "doCON"
-// 	.p2align 2 	
+/**********************************
+    doCON	( -- a ) 
+ 	Run time routine for CONSTANT.
+hidden word used by compiler 
+***********************************/
 DOCON:
 	_PUSH
 	LDR.W TOS,[IP],#4 
@@ -1120,180 +937,145 @@ DOCON:
   system variables 
 ***********************/
 
- // SEED ( -- a)
- // return PRNG seed address 
-
-	.word _DNEGA
-_SEED: .byte 4
-	.ascii "SEED"
-	.p2align 2
-SEED:
+/**************************
+ SEED ( -- a)
+ return PRNG seed address 
+**************************/
+	_HEADER SEED,4,"SEED"
 	_PUSH 
 	ADD TOS,UP,#RNDSEED
 	_NEXT 	
 
-//  MSEC ( -- a)
-// return address of milliseconds counter
-  .word _SEED 
-_MSEC: .byte 4
-  .ascii "MSEC"
-  .p2align 2 
-MSEC:
-  _PUSH
-  ADD TOS,UP,#TICKS
-  _NEXT 
+/****************************************
+  MSEC ( -- a)
+ return address of milliseconds counter
+****************************************/
+	_HEADER MSEC,4,"MSEC"
+    _PUSH
+    ADD TOS,UP,#TICKS
+    _NEXT 
 
-// TIMER ( -- a )
-// count down timer 
-  .word _MSEC
-_TIMER:  .byte 5
-  .ascii "TIMER"
-  .p2align 2 
-TIMER:
-  _PUSH 
-  ADD TOS,UP,#CD_TIMER
-  _NEXT
+/*************************
+ TIMER ( -- a )
+ count down timer 
+**********************/
+	_HEADER TIMER,5,"TIMER"
+	 _PUSH 
+    ADD TOS,UP,#CD_TIMER
+    _NEXT
 
-//    'BOOT	 ( -- a )
-// 	Application.
-
-	.word	_TIMER
-_TBOOT:	.byte   5
-	.ascii "'BOOT"
-	.p2align 2 	
-TBOOT:
+/*****************************
+    'BOOT	 ( -- a )
+ 	boot up application vector 
+*****************************/
+	_HEADER TBOOT,5,"'BOOT"
 	_PUSH
 	ADD	TOS,UP,#BOOT 
 	_NEXT
 	
-//    BASE	( -- a )
-// 	Storage of the radix base for numeric I/O.
-
-	.word	_TBOOT
-_BASE:	.byte   4
-	.ascii "BASE"
-	.p2align 2 	
-BASE:
+/********************************************	
+    BASE	( -- a )
+ 	Storage of the radix base for numeric I/O.
+**********************************************/
+	_HEADER BASE,4,"BASE"
 	_PUSH
 	ADD	TOS,UP,#NBASE
 	_NEXT
 
-//    tmp	 ( -- a )
-// 	A temporary storage location used in parse and find.
-
-// 	.word	_BASE
-// _TEMP	.byte   COMPO+3
-// 	.ascii "tmp"
-// 	.p2align 2 	
+/*****************************************************
+    temp	 ( -- a )
+ 	A temporary storage location used in parse and find.
+hidden word for internal use
+********************************************************/
 TEMP:
 	_PUSH
 	ADD	TOS,UP,#TMP
 	_NEXT
 
-//    SPAN	( -- a )
-// 	Hold character count received by EXPECT.
-
-	.word	_BASE
-_SPAN:	.byte   4
-	.ascii "SPAN"
-	.p2align 2 	
-SPAN:
+/*******************************************
+    SPAN	( -- a )
+ 	Hold character count received by EXPECT.
+********************************************/
+	_HEADER SPAN,4,"SPAN"
 	_PUSH
 	ADD	TOS,UP,#CSPAN
 	_NEXT
 
-//    >IN	 ( -- a )
-// 	Hold the character pointer while parsing input stream.
-
-	.word	_SPAN
-_INN:	.byte   3
-	.ascii ">IN"
-	.p2align 2 	
-INN:
+/***********************************************************
+    >IN	 ( -- a )
+ 	Hold the character pointer while parsing input stream.
+***********************************************************/
+	_HEADER INN,3,">IN"
 	_PUSH
 	ADD	TOS,UP,#TOIN
 	_NEXT
 
-//    #TIB	( -- a )
-// 	Hold the current count and address of the terminal input buffer.
-
-	.word	_INN
-_NTIB:	.byte   4
-	.ascii "#TIB"
-	.p2align 2 	
-NTIB:
+/**************************************
+    #TIB	( -- a )
+ 	Hold the current count and address 
+	of the terminal input buffer.
+**************************************/
+	_HEADER NTIB,4,"#TIB"
 	_PUSH
 	ADD	TOS,UP,#NTIBB
 	_NEXT
 
-//    'EVAL	( -- a )
-// 	Execution vector of EVAL.
-
-	.word	_NTIB
-_TEVAL:	.byte   5
-	.ascii "'EVAL"
-	.p2align 2 	
-TEVAL:
+/******************************
+    'EVAL	( -- a )
+ 	Execution vector of EVAL.
+*******************************/
+	_HEADER TEVAL,5,"'EVAL"
 	_PUSH
 	ADD	TOS,UP,#EVAL
 	_NEXT
 
-//    HLD	 ( -- a )
-// 	Hold a pointer in building a numeric output string.
-
-	.word	_TEVAL
-_HLD:	.byte   3
-	.ascii "HLD"
-	.p2align 2 	
-HLD:
+/*********************************
+    HLD	 ( -- a )
+ 	Hold a pointer in building a 
+	numeric output string.
+*********************************/
+	_HEADER HLD,3,"HLD"
 	_PUSH
 	ADD	TOS,UP,#HOLD
 	_NEXT
 
-//    CONTEXT	( -- a )
-// 	A area to specify vocabulary search order.
-
-	.word	_HLD
-_CNTXT:	.byte   7
-	.ascii "CONTEXT"
-	.p2align 2 	
-CNTXT:
+/**********************************
+    CONTEXT	( -- a )
+ 	A area to specify vocabulary 
+	search order.
+**********************************/
+	_HEADER CNTXT,7,"CONTEXT"
 CRRNT:
 	_PUSH
 	ADD	TOS,UP,#CTXT
 	_NEXT
 
-//    CP	( -- a )
-// 	Point to top name in RAM vocabulary.
-
-	.word	_CNTXT
-_CP:	.byte   2
-	.ascii "CP"
-	.p2align 2 	
-CPP:
+/******************************
+    CP	( -- a )
+ 	Point to top name in RAM 
+	vocabulary.
+******************************/
+	_HEADER CPP,2,"CP"
 	_PUSH
 	ADD	TOS,UP,#USER_CTOP
 	_NEXT
 
-//   FCP ( -- a )
-//  Point ot top of Forth system dictionary
-	.word _CP
-_FCP: .byte 3            
-	.ascii "FCP"
-	.p2align 2 
-FCP: 
+/****************************
+   FCP ( -- a )
+  Point ot top of Forth 
+  system dictionary
+****************************/
+	_HEADER FCP,3,"FCP"
 	_PUSH 
 	ADD TOS,UP,#FORTH_CTOP 
 	_NEXT 
 
-//    LAST	( -- a )
-// 	Point to the last name in the name dictionary.
-
-	.word	_FCP
-_LAST:	.byte   4
-	.ascii "LAST"
-	.p2align 2 	
-LAST:
+/***************************
+    LAST	( -- a )
+ 	Point to the last name 
+	in the name dictionary.
+***************************/
+	_HEADER LAST,4,"LAST"
 	_PUSH
 	ADD	TOS,UP,#LASTN
 	_NEXT
@@ -1303,26 +1085,23 @@ LAST:
 	system constants 
 ***********************/
 
-//	USER_BEGIN ( -- a )
-//  where user area begin in RAM
+/********************************
+	USER-BEGIN ( -- a )
+  where user area begin in RAM
+********************************/
+	_HEADER USER_BEGIN,10,"USER-BEGIN"
 	.word _LAST
-_USER_BGN: .byte 10
-	.ascii "USER_BEGIN"
-	.p2align 2
-USER_BEGIN:
 	_PUSH 
 	ldr TOS,USR_BGN_ADR 
 	_NEXT 
 USR_BGN_ADR:
 .word  DTOP 
 
-//  USER_END ( -- a )
-//  where user area end in RAM 
-	.word _USER_BGN
-_USER_END: .byte 8 
-	.ascii "USER_END" 
-	.p2align 2 
-USER_END:
+/*********************************
+  USER_END ( -- a )
+  where user area end in RAM 
+******************************/
+	_HEADER USER_END,8,"USER-END"
 	_PUSH 
 	ldr TOS,USER_END_ADR 
 	_NEXT 
@@ -1334,14 +1113,12 @@ USER_END_ADR:
   Common functions
 ***********************/
 
-//    WITHIN	( u ul uh -- t )
-// 	Return true if u is within the range of ul and uh.
-
-	.word	_USER_END 
-_WITHI:	.byte   6
-	.ascii "WITHIN"
-	.p2align 2 	
-WITHI:
+/********************************
+    WITHIN	( u ul uh -- t )
+ 	Return true if u is within 
+	the range of ul and uh.
+********************************/
+	_HEADER WITHI,6,"WITHIN"
 	_NEST
 	_ADR	OVER
 	_ADR	SUBB
@@ -1353,14 +1130,12 @@ WITHI:
 
 //  Divide
 
-//    UM/MOD	( udl udh u -- ur uq )
-// 	Unsigned divide of a double by a single. Return mod and quotient.
-
-	.word	_WITHI
-_UMMOD:	.byte   6
-	.ascii "UM/MOD"
-	.p2align 2 	
-UMMOD:
+/*************************************
+    UM/MOD	( udl udh u -- ur uq )
+ 	Unsigned divide of a double by a 
+	single. Return mod and quotient.
+**************************************/
+	_HEADER UMMOD,6,"UM/MOD"
 	MOV	T3,#1
 	LDR	WP,[DSP],#4
 	LDR	T2,[DSP]
@@ -1384,14 +1159,13 @@ UMMOD2:
 	STR	WP,[DSP]
 	_NEXT
 
-//    M/MOD	( d n -- r q )
-// 	Signed floored divide of double by single. Return mod and quotient.
-
-	.word	_UMMOD
-_MSMOD:	.byte  5
-	.ascii "M/MOD"
-	.p2align 2 	
-MSMOD:	
+/****************************
+    M/MOD	( d n -- r q )
+ 	Signed floored divide 
+	of double by single. 
+	Return mod and quotient.
+****************************/
+	_HEADER MSMOD,5,"M/MOD"
 	_NEST
 	_ADR	DUPP
 	_ADR	ZLESS
@@ -1420,14 +1194,13 @@ MMOD2:
 MMOD3:   
 	_UNNEST
 
-//    /MOD	( n n -- r q )
-// 	Signed divide. Return mod and quotient.
-
+/****************************
+   /MOD	( n n -- r q )
+	Signed divide. Return
+	mod and quotient.
+****************************/
+	_HEADER SLMOD,4,"/MOD"
 	.word	_MSMOD
-_SLMOD:	.byte   4
-	.ascii "/MOD"
-	.p2align 2 	
-SLMOD:
 	_NEST
 	_ADR	OVER
 	_ADR	ZLESS
@@ -1435,41 +1208,36 @@ SLMOD:
 	_ADR	MSMOD
 	_UNNEST
 
-//    MOD	 ( n n -- r )
-// 	Signed divide. Return mod only.
-
-	.word	_SLMOD
-_MODD:	.byte  3
-	.ascii "MOD"
-	.p2align 2 	
-MODD:
+/**************************
+    MOD	 ( n n -- r )
+ 	Signed divide. Return
+	mod only.
+**************************/
+	_HEADER MODD,3,"MOD"
 	_NEST
 	_ADR	SLMOD
 	_ADR	DROP
 	_UNNEST
 
-//    /	   ( n n -- q )
-// 	Signed divide. Return quotient only.
-
-	.word	_MODD
-_SLASH:	.byte  1
-	.ascii "/"
-	.p2align 2 	
-SLASH:
+/*************************
+    /	   ( n n -- q )
+ 	Signed divide. Return
+	quotient only.
+**************************/
+	_HEADER SLASH,1,"/"
 	_NEST
 	_ADR	SLMOD
 	_ADR	SWAP
 	_ADR	DROP
 	_UNNEST
 
-//    */MOD	( n1 n2 n3 -- r q )
-// 	Multiply n1 and n2, then divide by n3. Return mod and quotient.
-
-	.word	_SLASH
-_SSMOD:	.byte  5
-	.ascii "*/MOD"
-	.p2align 2 	
-SSMOD:
+//******************************
+//  */MOD	( n1 n2 n3 -- r q )
+/* 	Multiply n1 and n2, then 
+	divide by n3. Return 
+	mod and quotient.
+******************************/
+	_HEADER SSMOD,5,"*/MOD"
 	_NEST
 	_ADR	TOR
 	_ADR	MSTAR
@@ -1477,44 +1245,40 @@ SSMOD:
 	_ADR	MSMOD
 	_UNNEST
 
-//    */	  ( n1 n2 n3 -- q )
-// 	Multiply n1 by n2, then divide by n3. Return quotient only.
-
-	.word	_SSMOD
-_STASL:	.byte  2
-	.ascii "*/"
-	.p2align 2 	
-STASL:
+//*******************************
+//  */ ( n1 n2 n3 -- q )
+/* 	Multiply n1 by n2, then 
+	divide by n3. Return quotient
+	only.
+*******************************/
+	_HEADER STASL,2,"*/"
 	_NEST
 	_ADR	SSMOD
 	_ADR	SWAP
 	_ADR	DROP
 	_UNNEST
 
-// **************************************************************************
-//  Miscellaneous
+/*******************
+  Miscellaneous
+*******************/
 
-//    ALIGNED	( b -- a )
-// 	Align address to the cell boundary.
-
-	.word	_STASL
-_ALGND:	.byte   7
-	.ascii "ALIGNED"
-	.p2align 2 	
-ALGND:
+/*************************
+    ALIGNED	( b -- a )
+ 	Align address to the 
+	cell boundary.
+**************************/
+	_HEADER ALGND,7,"ALIGNED"
 	ADD	TOS,TOS,#3
 	MVN	WP,#3
 	AND	TOS,TOS,WP
 	_NEXT
 
-//    >CHAR	( c -- c )
-// 	Filter non-printing characters.
-
-	.word	_ALGND
-_TCHAR:	.byte  5
-	.ascii ">CHAR"
-	.p2align 2 	
-TCHAR:
+/****************************
+    >CHAR	( c -- c )
+ 	Filter non-printing 
+	characters.
+****************************/
+	_HEADER TCHAR,5,">CHAR"
 	_NEST
 	_DOLIT  0x7F
 	_ADR	ANDD
@@ -1529,28 +1293,24 @@ TCHAR:
 TCHA1:
 	  _UNNEST
 
-//    DEPTH	( -- n )
-// 	Return the depth of the data stack.
-
-	.word	_TCHAR
-_DEPTH:	.byte  5
-	.ascii "DEPTH"
-	.p2align 2 	
-DEPTH:
+/************************
+    DEPTH	( -- n )
+ 	Return the depth of
+	the data stack.
+***********************/
+	_HEADER DEPTH,5,"DEPTH"
 	_MOV32 T2,SPP 
 	SUB	T2,T2,DSP
 	_PUSH
 	ASR	TOS,T2,#2
 	_NEXT
 
-//    PICK	( ... +n -- ... w )
-// 	Copy the nth stack item to tos.
-
-	.word	_DEPTH
-_PICK:	.byte  4
-	.ascii "PICK"
-	.p2align 2 	
-PICK:
+/*****************************
+    PICK	( ... +n -- ... w )
+ 	Copy the nth stack item 
+	to tos.
+******************************/
+	_HEADER PICK,4,"PICK"
 	_NEST
 	_ADR	ONEP
 	_ADR	CELLS
@@ -1559,56 +1319,50 @@ PICK:
 	_ADR	AT
 	_UNNEST
 
-// **************************************************************************
-//  Memory access
+/*********************
+  Memory access
+*********************/
 
-//    HERE	( -- a )
-// 	Return the top of the code dictionary.
-
-	.word	_PICK
-_HERE:	.byte  4
-	.ascii "HERE"
-	.p2align 2 	
-HERE:
+/*************************
+    HERE	( -- a )
+ 	Return the top of
+	the code dictionary.
+*************************/
+	_HEADER HERE,4,"HERE"
 	_NEST
 	_ADR	CPP
 	_ADR	AT
 	_UNNEST
-	
-//    PAD	 ( -- a )
-// 	Return the address of a temporary buffer.
 
-	.word	_HERE
-_PAD:	.byte  3
-	.ascii "PAD"
-	.p2align 2 	
-PAD:
+/***************************	
+    PAD	 ( -- a )
+ 	Return the address of 
+	a temporary buffer.
+***************************/
+	_HEADER PAD,3,"PAD"
 	_NEST
 	_ADR	HERE
 	_DOLIT 80
 	_ADR PLUS 
 	_UNNEST
 
-//    TIB	 ( -- a )
-// 	Return the address of the terminal input buffer.
-
-	.word	_PAD
-_TIB:	.byte  3
-	.ascii "TIB"
-	.p2align 2 	
-TIB:
+/***********************
+    TIB	 ( -- a )
+ 	Return the address 
+	of the terminal 
+	input buffer.
+************************/
+	_HEADER TIB,3,"TIB"
 	_PUSH
 	ldr TOS,[UP,#TIBUF]
 	_NEXT
 
-//    @EXECUTE	( a -- )
-// 	Execute vector stored in address a.
-
-	.word	_TIB
-_ATEXE:	.byte   8
-	.ascii "@EXECUTE"
-	.p2align 2 	
-ATEXE: 
+/*************************
+    @EXECUTE	( a -- )
+ 	Execute vector stored
+	in address a.
+*************************/
+	_HEADER ATEXE,8,"@EXECUTE"
 	MOVS	WP,TOS
 	_POP
 	LDR	WP,[WP]
@@ -1617,14 +1371,11 @@ ATEXE:
 	BXNE	WP
 	_NEXT
 
-//    CMOVE	( b1 b2 u -- )
-// 	Copy u bytes from b1 to b2.
-
-	.word	_ATEXE
-_CMOVE:	.byte   5
-	.ascii "CMOVE"
-	.p2align 2 	
-CMOVE:
+/*******************************
+    CMOVE	( b1 b2 u -- )
+ 	Copy u bytes from b1 to b2.
+********************************/
+	_HEADER CMOVE,5,"CMOVE"
 	LDR	T2,[DSP],#4
 	LDR	T3,[DSP],#4
 	B CMOV1
@@ -1640,14 +1391,11 @@ CMOV2:
 	_POP
 	_NEXT
 
-//    MOVE	( a1 a2 u -- )
-// 	Copy u words from a1 to a2.
-
-	.word	_CMOVE
-_MOVE:	.byte   4
-	.ascii "MOVE"
-	.p2align 2 	
-MOVE:
+/***************************
+    MOVE	( a1 a2 u -- )
+ 	Copy u words from a1 to a2.
+*******************************/
+	_HEADER MOVE,4,"MOVE"
 	AND	TOS,TOS,#-4
 	LDR	T2,[DSP],#4
 	LDR	T3,[DSP],#4
@@ -1664,14 +1412,12 @@ MOVE2:
 	_POP
 	_NEXT
 
-//    FILL	( b u c -- )
-// 	Fill u bytes of character c to area beginning at b.
-
-	.word	_MOVE
-_FILL:	.byte   4
-	.ascii "FILL"
-	.p2align 2 	
-FILL:
+/**************************
+    FILL	( b u c -- )
+ 	Fill u bytes of character
+	c to area beginning at b.
+******************************/
+	_HEADER FILL,4,"FILL"
 	LDMFD DSP!,{T0,T1} 
 	MOVS T0,T0 
 	BEQ FILL2
@@ -1683,14 +1429,13 @@ FILL2:
 	_POP
 	_NEXT
 
-//    PACK$	( b u a -- a )
-// 	Build a counted word with u characters from b. Null fill.
-
-	.word	_FILL
-_PACKS:	.byte  5
-	.ascii "PACK$$"
-	.p2align 2 	
-PACKS:
+/*****************************
+    PACK$	( b u a -- a )
+ 	Build a counted word with
+	u characters from b. 
+	Null fill.
+*****************************/
+	_HEADER PACKS,5,"PACK$"
 	_NEST
 	_ADR	ALGND
 	_ADR	DUPP
@@ -1712,17 +1457,16 @@ PACKS:
 	_ADR	RFROM
 	_UNNEST   			// move string
 
-// **************************************************************************
-//  Numeric output, single precision
+/***********************************
+  Numeric output, single precision
+***********************************/
 
-//    DIGIT	( u -- c )
-// 	Convert digit u to a character.
-
-	.word	_PACKS
-_DIGIT:	.byte  5
-	.ascii "DIGIT"
-	.p2align 2 	
-DIGIT:
+/**************************
+    DIGIT	( u -- c )
+ 	Convert digit u to 
+	a character.
+***************************/
+	_HEADER DIGIT,5,"DIGIT"
 	_NEST
 	_DOLIT 9
 	_ADR	OVER
@@ -1734,14 +1478,12 @@ DIGIT:
 	_ADR	PLUS 
 	_UNNEST
 
-//    EXTRACT	( n base -- n c )
-// 	Extract the least significant digit from n.
-
-	.word	_DIGIT
-_EXTRC:	.byte  7
-	.ascii "EXTRACT"
-	.p2align 2 	
-EXTRC:
+/*********************************
+    EXTRACT	( n base -- n c )
+ 	Extract the least significant
+	digit from n.
+**********************************/
+	_HEADER EXTRC,7,"EXTRACT"
 	_NEST
 	_DOLIT 0
 	_ADR	SWAP
@@ -1750,28 +1492,24 @@ EXTRC:
 	_ADR	DIGIT
 	_UNNEST
 
-//    <#	  ( -- )
-// 	Initiate the numeric output process.
-
-	.word	_EXTRC
-_BDIGS:	.byte  2
-	.ascii "<#"
-	.p2align 2 	
-BDIGS:
+/***************************
+    <#	  ( -- )
+ 	Initiate the numeric
+	output process.
+****************************/
+	_HEADER BDIGS,2,"<#"
 	_NEST
 	_ADR	PAD
 	_ADR	HLD
 	_ADR	STORE
 	_UNNEST
 
-//    HOLD	( c -- )
-// 	Insert a character into the numeric output string.
-
-	.word	_BDIGS
-_HOLD:	.byte  4
-	.ascii "HOLD"
-	.p2align 2 	
-HOLD:
+/*********************************
+    HOLD	( c -- )
+ 	Insert a character into the 
+	numeric output string.
+**********************************/
+	_HEADER HOLD,4,"HOLD"
 	_NEST
 	_ADR	HLD
 	_ADR	AT
@@ -1782,14 +1520,14 @@ HOLD:
 	_ADR	CSTOR
 	_UNNEST
 
-//    #	   ( u -- u )
-// 	Extract one digit from u and append the digit to output string.
-
-	.word	_HOLD
-_DIG:	.byte  1
-	.ascii "#"
-	.p2align 2 	
-DIG:
+/***********************
+    #	   ( u -- u )
+ 	Extract one digit 
+	from u and append 
+	the digit to output 
+	string.
+*************************/
+	_HEADER DIG,1,"#"
 	_NEST
 	_ADR	BASE
 	_ADR	AT
@@ -1797,14 +1535,13 @@ DIG:
 	_ADR	HOLD
 	_UNNEST
 
-//    #S	  ( u -- 0 )
-// 	Convert u until all digits are added to the output string.
-
-	.word	_DIG
-_DIGS:	.byte  2
-	.ascii "#S"
-	.p2align 2 	
-DIGS:
+/***************************
+    #S	  ( u -- 0 )
+ 	Convert u until all 
+	digits are added to 
+	the output string.
+***************************/
+	_HEADER DIGS,2,"#S"
 	_NEST
 DIGS1:
     _ADR	DIG
@@ -1814,14 +1551,13 @@ DIGS1:
 DIGS2:
 	  _UNNEST
 
-//    SIGN	( n -- )
-// 	Add a minus sign to the numeric output string.
-
-	.word	_DIGS
-_SIGN:	.byte  4
-	.ascii "SIGN"
-	.p2align 2 	
-SIGN:
+/*********************
+    SIGN	( n -- )
+ 	Add a minus sign
+	to the numeric
+	output string.
+*********************/
+	_HEADER SIGN,4,"SIGN"
 	_NEST
 	_ADR	ZLESS
 	_QBRAN	SIGN1
@@ -1830,14 +1566,12 @@ SIGN:
 SIGN1:
 	  _UNNEST
 
-//    #>	  ( w -- b u )
-// 	Prepare the output word to be TYPE'd.
-
-	.word	_SIGN
-_EDIGS:	.byte  2
-	.ascii "#>"
-	.p2align 2 	
-EDIGS:
+/*************************
+    #>  ( w -- b u )
+ 	Prepare the output 
+	word to be TYPE'd.
+************************/
+	_HEADER EDIGS,2,"#>"
 	_NEST
 	_ADR	DROP
 	_ADR	HLD
@@ -1847,13 +1581,13 @@ EDIGS:
 	_ADR	SUBB
 	_UNNEST
 
-//    str	 ( n -- b u )
-// 	Convert a signed integer to a numeric string.
-
-// 	.word	_EDIGS
-// _STRR	.byte  3
-// 	.ascii "str"
-// 	.p2align 2 	
+/**************************
+    str	 ( n -- b u )
+ 	Convert a signed 
+	integer to a numeric 
+	string.
+hidden word used by compiler
+***************************/
 STRR:
 	_NEST
 	_ADR	DUPP
@@ -1866,45 +1600,42 @@ STRR:
 	_ADR	EDIGS
 	_UNNEST
 
-//    HEX	 ( -- )
-// 	Use radix 16 as base for numeric conversions.
-
-	.word	_EDIGS
-_HEX:	.byte  3
-	.ascii "HEX"
-	.p2align 2 	
-HEX:
+/*************************
+    HEX	 ( -- )
+ 	Use radix 16 as 
+	base for numeric 
+	conversions.
+*************************/
+	_HEADER HEX,3,"HEX"
 	_NEST
 	_DOLIT 16
 	_ADR	BASE
 	_ADR	STORE
 	_UNNEST
 
-//    DECIMAL	( -- )
-// 	Use radix 10 as base for numeric conversions.
-
-	.word	_HEX
-_DECIM:	.byte  7
-	.ascii "DECIMAL"
-	.p2align 2 	
-DECIM:
+/************************
+    DECIMAL	( -- )
+ 	Use radix 10 as base
+	for numeric conversions.
+*************************/
+	_HEADER DECIM,7,"DECIMAL"
 	_NEST
 	_DOLIT 10
 	_ADR	BASE
 	_ADR	STORE
 	_UNNEST
 
-// **************************************************************************
-//  Numeric input, single precision
+/************************************
+  Numeric input, single precision
+***********************************/
 
-//    DIGIT?	( c base -- u t )
-// 	Convert a character to its numeric value. A flag indicates success.
-
-	.word	_DECIM
-_DIGTQ:	.byte  6
-	.ascii "DIGIT?"
-	.p2align 2 	
-DIGTQ:
+/***********************************
+    DIGIT?	( c base -- u t )
+ 	Convert a character to its 
+	numeric value. A flag 
+	indicates success.
+**********************************/
+	_HEADER DIGTQ,6,"DIGIT?"
 	_NEST
 	_ADR	TOR
 	_DOLIT 	'0'
@@ -1925,14 +1656,12 @@ DGTQ1:
 	_ADR	ULESS
 	_UNNEST
 
-//    NUMBER?	( a -- n T | a F )
-// 	Convert a number word to integer. Push a flag on tos.
-
-	.word	_DIGTQ
-_NUMBQ:	.byte  7
-	.ascii "NUMBER?"
-	.p2align 2 	
-NUMBQ:
+/**********************************
+    NUMBER?	( a -- n T | a F )
+ 	Convert a number word to 
+	integer. Push a flag on tos.
+**********************************/
+	_HEADER NUMBQ,7,"NUMBER?"
 	_NEST
 	_ADR	BASE
 	_ADR	AT
@@ -2006,44 +1735,28 @@ NUMQ6:
 	_ADR	STORE
 	_UNNEST
 
-// **************************************************************************
-//  Basic I/O
+/********************
+  console I/O
+********************/
 
-//    KEY	 ( -- c )
-// 	Wait for and return an input character.
-
-	.word	_NUMBQ
-_KEY:	.byte  3
-	.ascii "KEY"
-	.p2align 2 	
-KEY:
-	_NEST
-KEY1:
-	_ADR	QRX
-	_QBRAN	KEY1
-	_UNNEST
-
-//    SPACE	( -- )
-// 	Send the blank character to the output device.
-
-	.word	_KEY
-_SPACE:	.byte  5
-	.ascii "SPACE"
-	.p2align 2 	
-SPACE:
+/**********************
+    SPACE	( -- )
+ 	Send the blank 
+	character to 
+	the output device.
+************************/
+	_HEADER SPACE,5,"SPACE"
 	_NEST
 	_ADR	BLANK
 	_ADR	EMIT
 	_UNNEST
 
-//    SPACES	( +n -- )
-// 	Send n spaces to the output device.
-
-	.word	_SPACE
-_SPACS:	.byte  6
-	.ascii "SPACES"
-	.p2align 2 	
-SPACS:
+/***************************
+    SPACES	( +n -- )
+ 	Send n spaces to the 
+	output device.
+****************************/
+	_HEADER SPACS,6,"SPACES"
 	_NEST
 	_DOLIT	0
 	_ADR	MAX
@@ -2055,14 +1768,12 @@ CHAR2:
 	_DONXT	CHAR1
 	_UNNEST
 
-//    TYPE	( b u -- )
-// 	Output u characters from b.
-
-	.word	_SPACS
-_TYPEE:	.byte	4
-	.ascii "TYPE"
-	.p2align 2 	
-TYPEE:
+/***********************
+    TYPE	( b u -- )
+ 	Output u characters 
+	from b.
+************************/
+	_HEADER TYPEE,4,"TYPE"
 	_NEST
 	_ADR  TOR   // ( a+1 -- R: u )
 	_BRAN	TYPE2
@@ -2075,14 +1786,12 @@ TYPE2:
 	_ADR	DROP
 	_UNNEST
 
-//    CR	  ( -- )
-// 	Output a carriage return and a line feed.
-
-	.word	_TYPEE
-_CR:	.byte  2
-	.ascii "CR"
-	.p2align 2 	
-CR:
+/***************************
+    CR	  ( -- )
+ 	Output a carriage return
+	and a line feed.
+****************************/
+	_HEADER CR,2,"CR"
 	_NEST
 	_DOLIT	CRR
 	_ADR	EMIT
@@ -2090,14 +1799,12 @@ CR:
 	_ADR	EMIT
 	_UNNEST
 
-//    do_$	( -- a )
-// 	Return the address of a compiled string.
-//  adjust return address to skip over it.
-
-// 	.word	_CR
-// _DOSTR	.byte  COMPO+3
-// 	.ascii "do$$"
-// 	.p2align 2 	
+/******************************************
+  do_$	( -- a )
+  Return the address of a compiled string.
+  adjust return address to skip over it.
+hidden word used by compiler. 
+******************************************/
 DOSTR:
 	_NEST     
 /* compiled string address is 2 levels deep */
@@ -2113,52 +1820,48 @@ DOSTR:
 	_ADR	TOR     //  ( -- a2) is string address
 	_UNNEST
 
-//    $"|	( -- a )
-// 	Run time routine compiled by _". Return address of a compiled string.
-
-// 	.word	_DOSTR
-// _STRQP	.byte  COMPO+3
-// 	.ascii "$\"|"
-// 	.p2align 2 	
+/******************************************
+    $"|	( -- a )
+ 	Run time routine compiled by _". 
+	Return address of a compiled string.
+hidden word used by compiler
+*****************************************/
 STRQP:
 	_NEST
 	_ADR	DOSTR
 	_UNNEST			// force a call to dostr
 
-//    .$	( a -- )
-// 	Run time routine of ." . Output a compiled string.
-
-// 	.word	_STRQP
-// _DOTST	.byte  COMPO+2
-// 	.ascii ".$$"
-// 	.p2align 2 	
+/*******************************
+    .$	( a -- )
+ 	Run time routine of ." 
+	Output a compiled string.
+hidden word used by compiler
+*******************************/
 DOTST:
 	_NEST
 	_ADR	COUNT // ( -- a+1 c )
 	_ADR	TYPEE
 	_UNNEST
 
-//    ."|	( -- )
-// 	Run time routine of ." . Output a compiled string.
-
-// 	.word	_DOTST
-// _DOTQP	.byte  COMPO+3
-// 	.ascii ".""|"
-// 	.p2align 2 	
+/**********************
+    ."|	( -- )
+ 	Run time routine of ." 
+	Output a compiled string.
+hidden word used by compiler
+*****************************/
 DOTQP:
 	_NEST
 	_ADR	DOSTR
 	_ADR	DOTST
 	_UNNEST
 
-//    .R	  ( n +n -- )
-// 	Display an integer in a field of n columns, right justified.
-
-	.word	_CR
-_DOTR:	.byte  2
-	.ascii ".R"
-	.p2align 2 	
-DOTR:
+/******************************
+    .R	  ( n +n -- )
+ 	Display an integer in a 
+	field of n columns, 
+	right justified.
+*******************************/
+	_HEADER DOTR,2,".R"
 	_NEST
 	_ADR	TOR
 	_ADR	STRR
@@ -2169,14 +1872,13 @@ DOTR:
 	_ADR	TYPEE
 	_UNNEST
 
-//    U.R	 ( u +n -- )
-// 	Display an unsigned integer in n column, right justified.
-
-	.word	_DOTR
-_UDOTR:	.byte  3
-	.ascii "U.R"
-	.p2align 2 	
-UDOTR:
+/*************************
+    U.R	 ( u +n -- )
+ 	Display an unsigned 
+	integer in n column, 
+	right justified.
+***************************/
+	_HEADER UDOTR,3,"U.R"
 	_NEST
 	_ADR	TOR
 	_ADR	BDIGS
@@ -2189,14 +1891,12 @@ UDOTR:
 	_ADR	TYPEE
 	_UNNEST
 
-//    U.	  ( u -- )
-// 	Display an unsigned integer in free format.
-
-	.word	_UDOTR
-_UDOT:	.byte  2
-	.ascii "U."
-	.p2align 2 	
-UDOT:
+/************************
+    U.	  ( u -- )
+ 	Display an unsigned 
+	integer in free format.
+***************************/
+	_HEADER UDOT,2,"U."
 	_NEST
 	_ADR	BDIGS
 	_ADR	DIGS
@@ -2205,14 +1905,13 @@ UDOT:
 	_ADR	TYPEE
 	_UNNEST
 
-//    .	   ( w -- )
-// 	Display an integer in free format, preceeded by a space.
-
-	.word	_UDOT
-_DOT:	.byte  1
-	.ascii "."
-	.p2align 2 	
-DOT:
+/************************
+    .	   ( w -- )
+ 	Display an integer 
+	in free format, 
+	preceeded by a space.
+**************************/
+	_HEADER DOT,1,"."
 	_NEST
 	_ADR	BASE
 	_ADR	AT
@@ -2227,29 +1926,27 @@ DOT1:
 	_ADR	TYPEE
 	_UNNEST			// yes, display signed
 
-//    ?	   ( a -- )
-// 	Display the contents in a memory cell.
-
-	.word	_DOT
-_QUEST:	.byte  1
-	.ascii "?"
-	.p2align 2 	
-QUEST:
+/***********************
+    ?	   ( a -- )
+ 	Display the contents
+	in a memory cell.
+*************************/
+	_HEADER QUEST,1,"?"
 	_NEST
 	_ADR	AT
 	_ADR	DOT
 	_UNNEST
 
-// **************************************************************************
-//  Parsing
+/**************
+  Parsing
+***************/
 
-//    parse	( b u c -- b u delta //  string> )
-// 	Scan word delimited by c. Return found string and its offset.
-
-// 	.word	_QUEST
-// _PARS	.byte  5
-// 	.ascii "parse"
-// 	.p2align 2 	
+/*********************************************
+    parse	( b u c -- b u delta //  string> )
+ 	Scan word delimited by c. 
+	Return found string and its offset.
+hidden word used by PARSE
+**********************************************/
 PARS:
 	_NEST
 	_ADR	TEMP
@@ -2324,14 +2021,12 @@ PARS8:
 	_ADR	SUBB
 	_UNNEST
 
-//    PARSE	( c -- b u //  string> )
-// 	Scan input stream and return counted string delimited by c.
-
-	.word	_QUEST
-_PARSE:	.byte  5
-	.ascii "PARSE"
-	.p2align 2 	
-PARSE:
+/************************************
+    PARSE	( c -- b u //  string> )
+ 	Scan input stream and return 
+	counted string delimited by c.
+************************************/
+	_HEADER PARSE,5,"PARSE"
 	_NEST
 	_ADR	TOR
 	_ADR	TIB
@@ -2349,42 +2044,38 @@ PARSE:
 	_ADR	PSTOR
 	_UNNEST
 
-//    .(	  ( -- )
-// 	Output following string up to next ) .
-
-	.word	_PARSE
-_DOTPR:	.byte  IMEDD+2
-	.ascii ".("
-	.p2align 2 	
-DOTPR:
+/*******************************
+    .(	  ( -- )
+ 	Output following string 
+	up to next ) .
+******************************/
+	_HEADER DOTPR,2,".("
 	_NEST
 	_DOLIT	')'
 	_ADR	PARSE
 	_ADR	TYPEE
 	_UNNEST
 
-//    (	   ( -- )
-// 	Ignore following string up to next ) . A comment.
-
-	.word	_DOTPR
-_PAREN:	.byte  IMEDD+1
-	.ascii "("
-	.p2align 2 	
-PAREN:
+/************************
+    (	   ( -- )
+ 	Ignore following 
+	string up to next )
+	A comment.
+************************/
+	_HEADER PAREN,1,"("
 	_NEST
 	_DOLIT	')'
 	_ADR	PARSE
 	_ADR	DDROP
 	_UNNEST
 
-//    \	   ( -- )
-// 	Ignore following text till the end of line.
-
-	.word	_PAREN
-_BKSLA:	.byte  IMEDD+1
-	.byte	'\\'
-	.p2align 2 	
-BKSLA:
+/*******************
+    \	   ( -- )
+ 	Ignore following 
+	text till the 
+	end of line.
+********************/
+	_HEADER BKSLA,1,"\\"
 	_NEST
 	_ADR	NTIB
 	_ADR	AT
@@ -2392,14 +2083,12 @@ BKSLA:
 	_ADR	STORE
 	_UNNEST
 
-//    CHAR	( -- c )
-// 	Parse next word and return its first character.
-
-	.word	_BKSLA
-_CHAR:	.byte  4
-	.ascii "CHAR"
-	.p2align 2 	
-CHAR:
+/******************************
+    CHAR	( -- c )
+ 	Parse next word and
+	return its first character.
+*******************************/
+	_HEADER CHAR,4,"CHAR"
 	_NEST
 	_ADR	BLANK
 	_ADR	PARSE
@@ -2407,14 +2096,12 @@ CHAR:
 	_ADR	CAT
 	_UNNEST
 
-//    WORD	( c -- a //  string> )
-// 	Parse a word from input stream and copy it to code dictionary.
-
-	.word	_CHAR
-_WORDD:	.byte  4
-	.ascii "WORD"
-	.p2align 2 	
-WORDD:
+/**********************************
+    WORD	( c -- a //  string> )
+ 	Parse a word from input stream
+	and copy it to code dictionary.
+***********************************/
+	_HEADER WORDD,4,"WORD"
 	_NEST
 	_ADR	PARSE
 	_ADR	HERE
@@ -2422,30 +2109,28 @@ WORDD:
 	_ADR	PACKS
 	_UNNEST
 
-//    TOKEN	( -- a //  string> )
-// 	Parse a word from input stream and copy it to name dictionary.
-
-	.word	_WORDD
-_TOKEN:	.byte  5
-	.ascii "TOKEN"
-	.p2align 2 	
-TOKEN:
+/********************************
+    TOKEN	( -- a //  string> )
+ 	Parse a word from input 
+	stream and copy it to 
+	name dictionary.
+*********************************/
+	_HEADER TOKEN,5,"TOKEN"
 	_NEST
 	_ADR	BLANK
 	_ADR	WORDD
 	_UNNEST
 
-// **************************************************************************
-//  Dictionary search
+/**********************
+  Dictionary search
+***********************/
 
-//    NAME>	( na -- ca )
-// 	Return a code address given a name address.
-
-	.word	_TOKEN
-_NAMET:	.byte  5
-	.ascii "NAME>"
-	.p2align 2 	
-NAMET:
+/*************************
+    NAME>	( na -- ca )
+ 	Return a code address
+	given a name address.
+**************************/
+	_HEADER NAMET,5,"NAME>"
 	_NEST
 	_ADR	COUNT
 	_DOLIT	0x1F
@@ -2454,19 +2139,19 @@ NAMET:
 	_ADR	ALGND
 	_UNNEST
 
-//    SAME?	( a1 a2 u -- a1 a2 f | -0+ )
-// 	Compare u bytes in two strings. Return 0 if identical.
-//
-//  Picatout 2020-12-01, 
-//      Because of problem with .align directive that
-// 		doesn't fill with zero's I had to change the "SAME?" and "FIND" 
-// 		words  to do a byte by byte comparison. 
-//
-	.word	_NAMET
-_SAMEQ:	.byte  5
-	.ascii "SAME?"
-	.p2align 2	
-SAMEQ:
+/***************************************
+    SAME?	( a1 a2 u -- a1 a2 f | -0+ )
+ 	Compare u bytes in two strings. 
+	Return 0 if identical.
+
+  Picatout 2020-12-01, 
+    Because of problem with .align 
+	directive that doesn't fill 
+	with zero's I had to change 
+	the "SAME?" and "FIND" 
+ 	words  to do a byte by byte comparison. 
+****************************************/
+	_HEADER SAMEQ,5,"SAME?"
 	_NEST
 	_ADR	TOR
 	_BRAN	SAME2
@@ -2490,16 +2175,16 @@ SAME2:
 	_DOLIT	0
 	_UNNEST	// strings equal
 
-//    find	( a na -- ca na | a F )
-// 	Search a vocabulary for a string. Return ca and na if succeeded.
+/***********************************
+    FIND	( a na -- ca na | a F )
+ 	Search a vocabulary for a string.
+	Return ca and na if succeeded.
+hidden word used by NAME?
 
-//  Picatout 2020-12-01,  
-//		Modified from original. See comment for word "SAME?" 
-
-// 	.word	_SAMEQ
-// _FIND	.byte  4
-// 	.ascii "find"
-// 	.p2align 2 	
+  Picatout 2020-12-01,  
+	 Modified from original. 
+   See comment for word "SAME?" 
+************************************/
 FIND:
 	_NEST
 	_ADR	SWAP			// na a	
@@ -2553,30 +2238,27 @@ FIND5:
 	_ADR	SWAP			// ca na
 	_UNNEST			//  return with a match
 
-//    NAME?	( a -- ca na | a F )
-// 	Search all context vocabularies for a string.
-
-	.word	_SAMEQ
-_NAMEQ:	.byte  5
-	.ascii "NAME?"
-	.p2align 2 	
-NAMEQ:
+/********************************
+    NAME?	( a -- ca na | a F )
+ 	Search all context vocabularies 
+	for a string.
+***********************************/
+	_HEADER NAMEQ,5,"NAME?"
 	_NEST
 	_ADR	CNTXT
 	_ADR	AT
 	_ADR	FIND
 	_UNNEST
 
-// **************************************************************************
-//  Terminal input
+/********************
+  console input
+********************/
 
-//    	  ( bot eot cur -- bot eot cur )
-// 	Backup the cursor by one character.
-
-// 	.word	_NAMEQ
-// _BKSP	.byte  2
-// 	.ascii "^H"
-// 	.p2align 2 	
+/**************************************
+   BKSP  ( bot eot cur -- bot eot cur )
+   Move cursor left by one character.
+hidden word used by KTAP
+***************************************/
 BKSP:
 	_NEST
 	_ADR	TOR
@@ -2596,13 +2278,12 @@ BKSP:
 BACK1:
 	  _UNNEST
 
-//    TAP	 ( bot eot cur c -- bot eot cur )
-// 	Accept and echo the key stroke and bump the cursor.
-
-// 	.word	_BKSP
-// _TAP	.byte  3
-// 	.ascii "TAP"
-// 	.p2align 2 	
+/****************************************
+   TAP	 ( bot eot cur c -- bot eot cur )
+   Accept and echo the key stroke 
+   and bump the cursor.
+hidden word used by KTAP 
+****************************************/
 TAP:
 	_NEST
 	_ADR	DUPP
@@ -2612,13 +2293,11 @@ TAP:
 	_ADR	ONEP
 	_UNNEST
 
-//    kTAP	( bot eot cur c -- bot eot cur )
-// 	Process a key stroke, CR or backspace.
-
-// 	.word	_TAP
-// _KTAP	.byte  4
-// 	.ascii "kTAP"
-// 	.p2align 2 	
+/*******************************************
+    kTAP	( bot eot cur c -- bot eot cur )
+ 	Process a key stroke, CR or backspace.
+hidden word used by ACCEPT 
+*******************************************/
 KTAP:
 TTAP:
 	_NEST
@@ -2643,14 +2322,12 @@ KTAP2:
 	_ADR	DUPP
 	_UNNEST
 
-//    ACCEPT	( b u -- b u )
-// 	Accept characters to input buffer. Return with actual count.
-
-	.word	_NAMEQ
-_ACCEP:	.byte  6
-	.ascii "ACCEPT"
-	.p2align 2 	
-ACCEP:
+/************************************
+    ACCEPT	( b u -- b u )
+ 	Accept characters to input 
+	buffer. Return with actual count.
+*************************************/
+	_HEADER ACCEP,6,"ACCEPT"
 	_NEST
 	_ADR	OVER
 	_ADR	PLUS
@@ -2677,14 +2354,12 @@ ACCP4:
 	_ADR	SUBB
 	_UNNEST
 
-//    QUERY	( -- )
-// 	Accept input stream to terminal input buffer.
-
-	.word	_ACCEP
-_QUERY:	.byte  5
-	.ascii "QUERY"
-	.p2align 2 	
-QUERY:
+/*****************************
+    QUERY	( -- )
+ 	Accept input stream 
+	to terminal input buffer.
+******************************/
+	_HEADER QUERY,5,"QUERY"
 	_NEST
 	_ADR	TIB
 	_DOLIT 80
@@ -2697,17 +2372,16 @@ QUERY:
 	_ADR	STORE
 	_UNNEST
 
-// **************************************************************************
-//  Error handling
+/********************
+  Error handling
+********************/
 
-//    ABORT	( a -- )
-// 	Reset data stack and jump to QUIT.
-
-	.word	_QUERY
-_ABORT:	.byte  5
-	.ascii "ABORT"
-	.p2align 2 	
-ABORT:
+/*********************
+    ABORT	( a -- )
+ 	Reset data stack 
+	and jump to QUIT.
+**********************/
+	_HEADER ABORT,5,"ABORT"
 	_NEST
 ABORT1:
 	_ADR	SPACE
@@ -2719,13 +2393,12 @@ ABORT1:
 	_ADR	PRESE
 	_BRAN	QUIT
 
-//    _abort"	( f -- )
-// 	Run time routine of ABORT" . Abort with a message.
-
-// 	.word	_ABORT
-// _ABORQ	.byte  COMPO+6
-// 	.ascii "abort\""
-// 	.p2align 2 	
+/*******************************
+    _abort"	( f -- )
+ 	Run time routine of ABORT"
+	Abort with a message.
+hidden used by compiler 
+********************************/
 ABORQ:
 	_NEST
 	_ADR	DOSTR
@@ -2736,17 +2409,17 @@ ABORQ:
 	_ADR	DROP
 	_UNNEST			// drop error
 
-// **************************************************************************
-//  The text interpreter
+/************************
+  The text interpreter
+************************/
 
-//    $INTERPRET  ( a -- )
-// 	Interpret a word. If failed, try to convert it to an integer.
-
-	.word	_ABORT
-_INTER:	.byte  10
-	.ascii "$$INTERPRET"
-	.p2align 2 	
-INTER:
+/***************************
+    $INTERPRET  ( a -- )
+ 	Interpret a word. 
+	If failed, try to 
+	convert it to an integer.
+******************************/
+	_HEADER INTER,10,"$INTERPRET"
 	_NEST
 	_ADR	NAMEQ
 	_ADR	QDUP	// ?defined
@@ -2764,28 +2437,23 @@ INTE1:
 INTE2:
 	_ADR	ABORT	// error
 
-//    [	   ( -- )
-// 	Start the text interpreter.
-
-	.word	_INTER
-_LBRAC:	.byte  IMEDD+1
-	.ascii "["
-	.p2align 2 	
-LBRAC:
+/******************************
+    [	   ( -- )
+ 	Start the text interpreter.
+*******************************/
+	_HEADER LBRAC,1,"["
 	_NEST
 	_DOLIT	INTER
 	_ADR	TEVAL
 	_ADR	STORE
 	_UNNEST
 
-//    .OK	 ( -- )
-// 	Display "ok" only while interpreting.
-
-	.word	_LBRAC
-_DOTOK:	.byte  3
-	.ascii ".OK"
-	.p2align 2 	
-DOTOK:
+/**********************
+    .OK	 ( -- )
+ 	Display "ok" only 
+	while interpreting.
+************************/
+	_HEADER DOTOK,3,".OK"
 	_NEST
 	_DOLIT	INTER
 	_ADR	TEVAL
@@ -2797,28 +2465,24 @@ DOTO1:
 	_ADR	CR
 	_UNNEST
 
-//    ?STACK	( -- )
-// 	Abort if the data stack underflows.
-
-	.word	_DOTOK
-_QSTAC:	.byte  6
-	.ascii "?STACK"
-	.p2align 2 	
-QSTAC:
+/*************************
+    ?STACK	( -- )
+ 	Abort if the data 
+	stack underflows.
+************************/
+	_HEADER QSTAC,6,"?STACK"
 	_NEST
 	_ADR	DEPTH
 	_ADR	ZLESS	// check only for underflow
 	_ABORQ	9,"underflow"
 	_UNNEST
 
-//    EVAL	( -- )
-// 	Interpret the input stream.
-
-	.word	_QSTAC
-_EVAL:	.byte  4
-	.ascii "EVAL"
-	.p2align 2 	
-EVAL:
+/*******************
+    EVAL	( -- )
+ 	Interpret the 
+	input stream.
+*******************/
+	_HEADER EVAL,4,"EVAL"
 	_NEST
 EVAL1:
     _ADR	TOKEN
@@ -2834,27 +2498,24 @@ EVAL2:
 	_ADR	DOTOK
 	_UNNEST	// prompt
 
-//    PRESET	( -- )
-// 	Reset data stack pointer and the terminal input buffer.
-
-	.word	_EVAL
-_PRESE:	.byte  6
-	.ascii "PRESET"
-	.p2align 2 	
-PRESE:
+/**********************************
+    PRESET	( -- )
+ 	Reset data stack pointer 
+	and the terminal input buffer.
+**********************************/
+	_HEADER PRESE,6,"PRESET"
 	_NEST 
 	_DOLIT SPP 
 	_ADR SPSTOR 
 	_UNNEST 
 
-//    QUIT	( -- )
-// 	Reset return stack pointer and start text interpreter.
-
-	.word	_PRESE
-_QUIT:	.byte  4
-	.ascii "QUIT"
-	.p2align 2 	
-QUIT:
+/*********************
+    QUIT	( -- )
+ 	Reset return stack 
+	pointer and start 
+	text interpreter.
+***********************/
+	_HEADER QUIT,4,"QUIT"
 	_DOLIT RPP 
 	_ADR RPSTOR 
 QUIT1:
@@ -2864,11 +2525,12 @@ QUIT2:
 	_ADR	EVAL
 	_BRAN	QUIT2	// continue till error
 
-	.word _QUIT
-_FORGET: .byte 6 
-	.ascii "FORGET"
-	.p2align 2
-FORGET:
+/***************************
+	FORGET ( <string> -- )
+	forget all definition 
+	starting at <string>
+****************************/
+	_HEADER FORGET,6,"FORGET"
 	_NEST 
 	_ADR TOKEN 
 	_ADR DUPP 
@@ -2889,17 +2551,16 @@ FORGET:
 
 	.p2align 2 
 
-// **************************************************************************
-//  The compiler
+/*****************
+  The compiler
+******************/
 
-//    '	   ( -- ca )
-// 	Search context vocabularies for the next word in input stream.
-
-	.word	_FORGET
-_TICK:	.byte  1
-	.ascii "'"
-	.p2align 2 	
-TICK:
+/**************************************
+    '	   ( -- ca )
+ 	Search context vocabularies 
+	for the next word in input stream.
+***************************************/
+	_HEADER TICK,1,"'"
 	_NEST
 	_ADR	TOKEN
 	_ADR	NAMEQ	// ?defined
@@ -2908,26 +2569,23 @@ TICK:
 TICK1:	
 	_ADR ABORT	// no, error
 
-//    ALLOT	( n -- )
-// 	Allocate n bytes to the ram area.
-
-	.word	_TICK
-_ALLOT:	.byte  5
-	.ascii "ALLOT"
-	.p2align 2 	
-ALLOT:
+/***********************
+    ALLOT	( n -- )
+ 	Allocate n bytes to 
+	the ram area.
+************************/
+	_HEADER ALLOT,5,"ALLOT"
 	_NEST
 	_ADR	CPP
 	_ADR	PSTOR
 	_UNNEST			// adjust code pointer
 
-//    ,	   ( w -- )
-// 	Compile an integer into the code dictionary.
-
-	.word	_ALLOT
-_COMMA:	.byte  1,','
-	.p2align 2 	
-COMMA:
+/******************************
+    ,	   ( w -- )
+ 	Compile an integer 
+	into the code dictionary.
+******************************/
+	_HEADER COMMA,1,","
 	_NEST
 	_ADR	HERE
 	_ADR	DUPP
@@ -2937,27 +2595,25 @@ COMMA:
 	_ADR	STORE
 	_UNNEST	// adjust code pointer, compile
 	.p2align 2 
-//    [COMPILE]   ( -- //  string> )
-// 	Compile the next immediate word into code dictionary.
 
-	.word	_COMMA
-_BCOMP:	.byte  IMEDD+9
-	.ascii "[COMPILE]"
-	.p2align 2 	
-BCOMP:
+/************************************
+    [COMPILE]   ( -- //  string> )
+ 	Compile the next immediate word 
+	into code dictionary.
+*************************************/
+	_HEADER BCOMP,IMEDD+9,"[COMPILE]"
 	_NEST
 	_ADR	TICK
 	_ADR	COMMA
 	_UNNEST
 
-//    COMPILE	( -- )
-// 	Compile the next address in colon list to code dictionary.
-
-	.word	_BCOMP
-_COMPI:	.byte  COMPO+7
-	.ascii "COMPILE"
-	.p2align 2 	
-COMPI:
+/****************************
+    COMPILE	( -- )
+ 	Compile the next address 
+	in colon list to code 
+	dictionary.
+*******************************/
+	_HEADER COMPI,COMPO+7,"COMPILE"
 	_NEST
 	_ADR	RFROM
 	_ADR	DUPP 
@@ -2967,28 +2623,26 @@ COMPI:
 	_ADR	COMMA 
 	_ADR	CELLP 
 	_ADR	TOR 
-	_UNNEST			// adjust return address
+	_UNNEST	// adjust return address
 
-//    LITERAL	( w -- )
-// 	Compile tos to code dictionary as an integer literal.
-
-	.word	_COMPI
-_LITER:	.byte  IMEDD+7
-	.ascii "LITERAL"
-	.p2align 2 	
-LITER:
+/*************************
+    LITERAL	( w -- )
+ 	Compile tos to code 
+	dictionary as an 
+	integer literal.
+***************************/
+	_HEADER LITER,IMEDD+7,"LITERAL"
 	_NEST
 	_COMPI	DOLIT
 	_ADR	COMMA
 	_UNNEST
 
-//    $,"	( -- )
-// 	Compile a literal string up to next " .
-
-// 	.word	_LITER
-// _STRCQ	.byte  3
-// 	.ascii "$,\""
-// 	.p2align 2 	
+/********************
+    $,"	( -- )
+ 	Compile a literal 
+	string up to next " .
+hidden word 
+************************/
 STRCQ:
 	_NEST
 	_DOLIT -4
@@ -3006,78 +2660,70 @@ STRCQ:
 /*******************
 //  Structures
 *******************/
-//    FOR	 ( -- a )
-// 	Start a FOR-NEXT loop structure in a colon definition.
 
-	.word	_LITER
-_FOR:	.byte  COMPO+IMEDD+3
-	.ascii "FOR"
-	.p2align 2 	
-FOR:
+/*************************
+    FOR	 ( -- a )
+ 	Start a FOR-NEXT loop 
+	structure in a colon 
+	definition.
+**************************/
+	_HEADER FOR,3,"FOR"
 	_NEST
 	_COMPI	TOR
 	_ADR	HERE
 	_UNNEST
 
-//    BEGIN	( -- a )
-// 	Start an infinite or indefinite loop structure.
-
-	.word	_FOR
-_BEGIN:	.byte  COMPO+IMEDD+5
-	.ascii "BEGIN"
-	.p2align 2 	
-BEGIN:
+/**********************
+    BEGIN	( -- a )
+ 	Start an infinite 
+	or indefinite 
+	loop structure.
+************************/
+	_HEADER BEGIN,COMPO+IMEDD+5,"BEGIN"
 	_NEST
 	_ADR	HERE
 	_UNNEST
 	.p2align 2 
 
-//    NEXT	( a -- )
-// 	Terminate a FOR-NEXT loop structure.
-	.word	_BEGIN
-_FNEXT:	.byte  COMPO+IMEDD+4
-	.ascii "NEXT"
-	.p2align 2 	
-FNEXT:
+/********************
+    NEXT	( a -- )
+ 	Terminate a FOR-NEXT
+	loop structure.
+**************************/
+	_HEADER FNEXT,COMPO+IMEDD+4,"NEXT"	
 	_NEST
 	_COMPI	DONXT
 	_ADR	COMMA
 	_UNNEST
 
-//    UNTIL	( a -- )
-// 	Terminate a BEGIN-UNTIL indefinite loop structure.
-
-	.word	_FNEXT
-_UNTIL:	.byte  COMPO+IMEDD+5
-	.ascii "UNTIL"
-	.p2align 2 	
-UNTIL:
+/**********************
+    UNTIL	( a -- )
+ 	Terminate a BEGIN-UNTIL
+	indefinite loop structure.
+******************************/
+	_HEADER UNTIL,COMPO+IMEDD+5,"UNTIL"
 	_NEST
 	_COMPI	QBRAN
 	_ADR	COMMA
 	_UNNEST
 
-//    AGAIN	( a -- )
-// 	Terminate a BEGIN-AGAIN infinite loop structure.
-
-	.word	_UNTIL
-_AGAIN:	.byte  COMPO+IMEDD+5
-	.ascii "AGAIN"
-	.p2align 2 	
-AGAIN:
+/**********************
+    AGAIN	( a -- )
+ 	Terminate a BEGIN-AGAIN
+	infinite loop structure.
+*****************************/
+	_HEADER AGAIN,COMPO+IMEDD+5,"AGAIN"
 	_NEST
 	_COMPI	BRAN
 	_ADR	COMMA
 	_UNNEST
 
-//    IF	  ( -- A )
-// 	Begin a conditional branch structure.
-
-	.word	_AGAIN
-_IFF:	.byte  COMPO+IMEDD+2
-	.ascii "IF"
-	.p2align 2 	
-IFF:
+/************************
+    IF	  ( -- A )
+ 	Begin a conditional
+	branch structure.
+**************************/
+	_HEADER IFF,COMPO+IMEDD+2,"IF"
 	_NEST
 	_COMPI	QBRAN
 	_ADR	HERE
@@ -3086,14 +2732,12 @@ IFF:
 	_ADR	PSTOR
 	_UNNEST
 
-//    AHEAD	( -- A )
-// 	Compile a forward branch instruction.
-
-	.word	_IFF
-_AHEAD:	.byte  COMPO+IMEDD+5
-	.ascii "AHEAD"
-	.p2align 2 	
-AHEAD:
+/*************************
+    AHEAD	( -- A )
+ 	Compile a forward 
+	branch instruction.
+*************************/
+	_HEADER AHEAD,COMPO+IMEDD+5,"AHEAD"
 	_NEST
 	_COMPI	BRAN
 	_ADR	HERE
@@ -3102,14 +2746,12 @@ AHEAD:
 	_ADR	PSTOR
 	_UNNEST
 
-//    REPEAT	( A a -- )
-// 	Terminate a BEGIN-WHILE-REPEAT indefinite loop.
-
-	.word	_AHEAD
-_REPEA:	.byte  COMPO+IMEDD+6
-	.ascii "REPEAT"
-	.p2align 2 	
-REPEA:
+/**************************
+    REPEAT	( A a -- )
+ 	Terminate a BEGIN-WHILE-REPEAT
+	indefinite loop.
+**********************************/
+	_HEADER REPEA,COMPO+IMEDD+6,"REPEAT"
 	_NEST
 	_ADR	AGAIN
 	_ADR	HERE
@@ -3117,28 +2759,25 @@ REPEA:
 	_ADR	STORE
 	_UNNEST
 
-//    THEN	( A -- )
-// 	Terminate a conditional branch structure.
-
-	.word	_REPEA
-_THENN:	.byte  COMPO+IMEDD+4
-	.ascii "THEN"
-	.p2align 2 	
-THENN:
+/*********************
+    THEN	( A -- )
+ 	Terminate a conditional
+	branch structure.
+*****************************/
+	_HEADER THENN,COMPO+IMEDD+4,"THEN"
 	_NEST
 	_ADR	HERE
 	_ADR	SWAP
 	_ADR	STORE
 	_UNNEST
 
-//    AFT	 ( a -- a A )
-// 	Jump to THEN in a FOR-AFT-THEN-NEXT loop the first time through.
-
-	.word	_THENN
-_AFT:	.byte  COMPO+IMEDD+3
-	.ascii "AFT"
-	.p2align 2 	
-AFT:
+/***************************
+    AFT	 ( a -- a A )
+ 	Jump to THEN in a 
+	FOR-AFT-THEN-NEXT loop 
+	the first time through.
+*****************************/
+	_HEADER AFT,COMPO+IMEDD+3,"AFT"
 	_NEST
 	_ADR	DROP
 	_ADR	AHEAD
@@ -3146,83 +2785,75 @@ AFT:
 	_ADR	SWAP
 	_UNNEST
 
-//    ELSE	( A -- A )
-// 	Start the false clause in an IF-ELSE-THEN structure.
-
-	.word	_AFT
-_ELSEE:	.byte  COMPO+IMEDD+4
-	.ascii "ELSE"
-	.p2align 2 	
-ELSEE:
+/**********************
+    ELSE	( A -- A )
+ 	Start the false 
+	clause in an 
+	IF-ELSE-THEN structure.
+****************************/
+	_HEADER ELSEE,COMPO+IMEDD+4,"ELSE"
 	_NEST
 	_ADR	AHEAD
 	_ADR	SWAP
 	_ADR	THENN
 	_UNNEST
 
-//    WHILE	( a -- A a )
-// 	Conditional branch out of a BEGIN-WHILE-REPEAT loop.
-
-	.word	_ELSEE
-_WHILE:	.byte  COMPO+IMEDD+5
-	.ascii "WHILE"
-	.p2align 2 	
-WHILE:
+/**************************
+    WHILE	( a -- A a )
+ 	Conditional branch out 
+	of a BEGIN-WHILE-REPEAT loop.
+*********************************/
+	_HEADER WHILE,COMPO+IMEDD+5,"WHILE"
 	_NEST
 	_ADR	IFF
 	_ADR	SWAP
 	_UNNEST
 
-//    ABORT"	( -- //  string> )
-// 	Conditional abort with an error message.
-
-	.word	_WHILE
-_ABRTQ:	.byte  IMEDD+6
-	.ascii "ABORT\""
-	.p2align 2 	
-ABRTQ:
+/***********************************
+    ABORT"	( -- //  string> )
+ 	Conditional abort with an 
+	error message.
+***********************************/
+	_HEADER ABRTQ,IMEDD+6,"ABORT\""
 	_NEST
 	_COMPI	ABORQ
 	_ADR	STRCQ
 	_UNNEST
 
-//    $"	( -- //  string> )
-// 	Compile an inline word literal.
-
-	.word	_ABRTQ
-_STRQ:	.byte  IMEDD+COMPO+2
-	.ascii	"$\""
-	.p2align 2 	
-STRQ:
+/******************************
+    $"	( -- //  string> )
+ 	Compile an inline 
+	word literal.
+*****************************/
+	_HEADER STRQ,IMEDD+COMPO+2,"$\""
 	_NEST
 	_COMPI	STRQP
 	_ADR	STRCQ
 	_UNNEST
 
-//    ."	( -- //  string> )
-// 	Compile an inline word  literal to be typed out at run time.
-
-	.word	_STRQ
-_DOTQ:	.byte  IMEDD+COMPO+2
-	.ascii	".\""
-	.p2align 2 	
-DOTQ:
+/******************************
+    ."	( -- //  string> )
+ 	Compile an inline word
+	literal to be typed out 
+	at run time.
+*******************************/
+	_HEADER DOTQ,IMEDD+COMPO+2,".\""
 	_NEST
 	_COMPI	DOTQP
 	_ADR	STRCQ
 	_UNNEST
 
-// **************************************************************************
-//  Name compiler
+/*********************
+  Name compiler
+***********************/
 
-//    ?UNIQUE	( a -- a )
-// 	Display a warning message if the word already exists.
-
-	.word	_DOTQ
-_UNIQU:	.byte  7
-	.ascii "?UNIQUE"
-	.p2align 2 	
-UNIQU:
+/**************************
+    ?UNIQUE	( a -- a )
+ 	Display a warning 
+	message if the word 
+	already exists.
+**************************/
+	_HEADER UNIQU,7,"?UNIQUE"
 	_NEST
 	_ADR	DUPP
 	_ADR	NAMEQ			// ?name exists
@@ -3235,13 +2866,12 @@ UNIQ1:
 	_ADR	DROP
 	_UNNEST
 
-//    $,n	 ( na -- )
-// 	Build a new dictionary name using the data at na.
-
-// 	.word	_UNIQU
-// _SNAME	.byte  3
-// 	.ascii "$,n"
-// 	.p2align 2 	
+/***********************
+    $,n	 ( na -- )
+ 	Build a new dictionary 
+	name using the data at na.
+hidden word 
+*******************************/
 SNAME:
 	_NEST
 	_ADR	DUPP			//  na na
@@ -3266,14 +2896,13 @@ SNAM1:
 	.ascii " name? "
 	_ADR	ABORT
 
-//    $COMPILE	( a -- )
-// 	Compile next word to code dictionary as a token or literal.
-
-	.word	_UNIQU
-_SCOMP:	.byte  8
-	.ascii "$COMPILE"
-	.p2align 2 	
-SCOMP:
+/************************
+    $COMPILE	( a -- )
+ 	Compile next word to 
+	code dictionary as 
+	a token or literal.
+**************************/
+	_HEADER SCOMP,8,"$COMPILE"
 	_NEST
 	_ADR	NAMEQ
 	_ADR	QDUP	// defined?
@@ -3296,9 +2925,11 @@ SCOM3: // compilation abort
 	_ADR COLON_ABORT 
 	_ADR	ABORT			// error
 
-// before aborting a compilation 
-// reset HERE and LAST
-// to previous values. 
+/********************************
+ before aborting a compilation 
+ reset HERE and LAST
+ to previous values. 
+*******************************/
 COLON_ABORT:
 	_NEST 
 	_ADR LAST 
@@ -3312,14 +2943,13 @@ COLON_ABORT:
 	_ADR STORE 
 	_UNNEST 
 
-//    OVERT	( -- )
-// 	Link a new word into the current vocabulary.
-
-	.word	_SCOMP
-_OVERT:	.byte  5
-	.ascii "OVERT"
-	.p2align 2 	
-OVERT:
+/*********************
+    OVERT	( -- )
+ 	Link a new word 
+	into the current 
+	vocabulary.
+**********************/
+	_HEADER OVERT,5,"OVERT"
 	_NEST
 	_ADR	LAST
 	_ADR	AT
@@ -3327,14 +2957,12 @@ OVERT:
 	_ADR	STORE
 	_UNNEST
 
-//    ; 	   ( -- )
-// 	Terminate a colon definition.
-
-	.word	_OVERT
-_SEMIS:	.byte  IMEDD+COMPO+1
-	.ascii ";"
-	.p2align 2 	
-SEMIS:
+/**********************
+    ;  ( -- )
+ 	Terminate a colon
+	definition.
+***********************/
+	_HEADER SEMIS,IMEDD+COMPO+1,";"
 	_NEST
 	_DOLIT	UNNEST
 	_ADR	CALLC
@@ -3342,27 +2970,24 @@ SEMIS:
 	_ADR	OVERT
 	_UNNEST
 
-//    ]	   ( -- )
-// 	Start compiling the words in the input stream.
-
-	.word	_SEMIS
-_RBRAC:	.byte  1
-	.ascii "]"
-	.p2align 2 	
-RBRAC:
+/******************
+    ]	   ( -- )
+ 	Start compiling 
+	the words in 
+	the input stream.
+*********************/
+	_HEADER RBRAC,1,"]"
 	_NEST
 	_DOLIT	SCOMP
 	_ADR	TEVAL
 	_ADR	STORE
 	_UNNEST
 
-//    BL.W	( ca -- )
-// 	compile ca.
-
-// 	.word	_RBRAC
-// _CALLC	.byte  5
-// 	.ascii "call,"
-// 	.p2align 2 	
+/*********************
+    BL.W	( ca -- )
+ 	compile ca.
+hidden word used by compiler
+*****************************/
 CALLC:
 	_NEST
 	_DOLIT 1 
@@ -3371,14 +2996,13 @@ CALLC:
 	_UNNEST 
 
 
-// 	:	( -- //  string> )
-// 	Start a new colon definition using next word as its name.
-
-	.word	_RBRAC
-_COLON:	.byte  1
-	.ascii ":"
-	.p2align 2 	
-COLON:
+/*************************
+ 	:	( -- //  string> )
+ 	Start a new colon 
+	definition using 
+	next word as its name.
+**************************/
+	_HEADER COLON,1,":"
 	_NEST
 	_ADR	TOKEN
 	_ADR	SNAME
@@ -3386,14 +3010,12 @@ COLON:
 	_ADR	RBRAC
 	_UNNEST
 
-//    IMMEDIATE   ( -- )
-// 	Make the last compiled word an immediate word.
-
-	.word	_COLON
-_IMMED:	.byte  9
-	.ascii "IMMEDIATE"
-	.p2align 2 	
-IMMED:
+/*************************
+    IMMEDIATE   ( -- )
+ 	Make the last compiled 
+	word an immediate word.
+***************************/
+	_HEADER IMMED,9,"IMMEDIATE"
 	_NEST
 	_DOLIT	IMEDD
 	_ADR	LAST
@@ -3405,17 +3027,15 @@ IMMED:
 	_ADR	STORE
 	_UNNEST
 
-// **************************************************************************
-//  Defining words
+/******************
+  Defining words
+******************/
 
-//    CONSTANT	( u -- //  string> )
-// 	Compile a new constant.
-
-	.word	_IMMED
-_CONST:	.byte  8
-	.ascii "CONSTANT"
-	.p2align 2 	
-CONST:
+/***********************************
+    CONSTANT	( u -- //  string> )
+ 	Compile a new constant.
+************************************/
+	_HEADER CONST,8,"CONSTANT"
 	_NEST 
 	_ADR	TOKEN
 	_ADR	SNAME
@@ -3429,9 +3049,12 @@ CONST:
 	_UNNEST
 
 	.p2align 2 
-// doDOES> ( -- a )
-// runtime action of DOES> 
-// leave parameter field address on stack 
+/****************************************
+ doDOES> ( -- a )
+ runtime action of DOES> 
+ leave parameter field address on stack 
+hidden word used by compiler 
+***************************************/
 DODOES:
 	_NEST 
 	_ADR	RFROM
@@ -3445,13 +3068,11 @@ DODOES:
 	_UNNEST 
 
 	.p2align 2
-//  DOES> ( -- )
-//  compile time action 
-	.word _CONST   
-_DOES: .byte IMEDD+COMPO+5 
-	.ascii "DOES>"
-	.p2align 2
-DOES: 
+/**********************
+  DOES> ( -- )
+  compile time action
+*************************/
+	_HEADER DOES,IMEDD+COMPO+5,"DOES>"
 	_NEST 
 	_DOLIT DODOES 
 	_ADR CALLC 
@@ -3463,14 +3084,12 @@ DOES:
 	_UNNEST 
 
 
-
-//  DEFER@ ( "name" -- a )
-//  return value of code field of defered function. 
-	.word _DOES 
-_DEFERAT: .byte 6 
-	.ascii "DEFER@"
-	.p2align 2 
-DEFERAT: 
+/****************************
+  DEFER@ ( "name" -- a )
+  return value of code field 
+  of defered function. 
+******************************/
+	_HEADER DEFERAT,6,"DEFER@"
 	_NEST 
 	_ADR TICK
 	_ADR CELLP 
@@ -3478,13 +3097,11 @@ DEFERAT:
 	_ADR ONEM 
 	_UNNEST 
 
-// DEFER! ( "name1" "name2" -- )
-// assign an action to a defered word 
-	.word _DEFERAT 
-_DEFERSTO: .byte 6 
-	.ascii "DEFER!" 
-	.p2align 2 
-DEFERSTO:
+/*********************************
+ DEFER! ( "name1" "name2" -- )
+ assign an action to a defered word 
+************************************/
+	_HEADER DEFERSTO,6,"DEFER!"
 	_NEST 
 	_ADR TICK 
 	_ADR ONEP 
@@ -3493,13 +3110,11 @@ DEFERSTO:
 	_ADR STORE 
 	_UNNEST
 
-//  DEFER ( "name" -- )
-//  create a defered definition
-	.word _DEFERSTO  
-_DEFER: .byte 5 
-	.ascii "DEFER"
-	.p2align 2
-DEFER:
+/****************************
+  DEFER ( "name" -- )
+  create a defered definition
+*****************************/
+	_HEADER DEFER,5,"DEFER"
 	_NEST 
 	_ADR CREAT 
 	_DOLIT UNNEST 
@@ -3517,14 +3132,12 @@ DEFER_NOP:
 	_ADR NOP 
 	_UNNEST 
 
-//    CREATE	( -- //  string> )
-// 	Compile a new array entry without allocating code space.
-
-	.word	_DEFER 
-_CREAT:	.byte  6
-	.ascii "CREATE"
-	.p2align 2 	
-CREAT:
+/******************************
+    CREATE	( -- //  string> )
+ 	Compile a new array entry 
+	without allocating code space.
+***********************************/
+	_HEADER CREAT,6,"CREATE"
 	_NEST 
 	_ADR	TOKEN
 	_ADR	SNAME
@@ -3534,14 +3147,12 @@ CREAT:
 	_ADR	CALLC
 	_UNNEST
 
-//    VARIABLE	( -- //  string> )
-// 	Compile a new variable initialized to 0.
-
-	.word	_CREAT
-_VARIA:	.byte  8
-	.ascii "VARIABLE"
-	.p2align 2 	
-VARIA:
+/*******************************
+    VARIABLE	( -- //  string> )
+ 	Compile a new variable 
+	initialized to 0.
+***********************************/
+	_HEADER VARIA,8,"VARIABLE"
 	_NEST
 	_ADR	CREAT
 	_DOLIT	0
@@ -3550,16 +3161,16 @@ VARIA:
 	_ADR	CALLC  
 	_UNNEST
 
-// **************************************************************************
-//  Tools
+/***********
+  Tools
+***********/
 
-//    dm+	 ( a u -- a )
-// 	Dump u bytes from , leaving a+u on the stack.
-
-// 	.word	_VARIA 
-// _DMP	.byte  3
-// 	.ascii "dm+"
-// 	.p2align 2 	
+/*************************
+    dm+	 ( a u -- a )
+ 	Dump u bytes from , 
+	leaving a+u on the stack.
+hidden word used by DUMP 
+****************************/
 DMP:
 	_NEST
 	_ADR	OVER
@@ -3582,11 +3193,11 @@ PDUM2:
 //    DUMP	( a u -- )
 // 	Dump u bytes from a, in a formatted manner.
 
-	.word	_VARIA
-_DUMP:	.byte  4
-	.ascii "DUMP"
-	.p2align 2 	
-DUMP:
+/**********************
+	DUMP ( a n -- )
+	hex dump memory 
+*********************/
+	_HEADER DUMP,4,"DUMP"
 	_NEST
 	_ADR	BASE
 	_ADR	AT
@@ -3615,15 +3226,12 @@ DUMP3:
 	_ADR	STORE			// restore radix
 	_UNNEST
 
-//    .S	  ( ... -- ... )
-// 	Display the contents of the data stack.
-
-	.word	_DUMP
-_DOTS:
-	.byte  2
-	.ascii ".S"
-	.p2align 2 	
-DOTS:
+/**********************
+   .S	  ( ... -- ... )
+ 	Display the contents 
+	of the data stack.
+*************************/
+	_HEADER DOTS,2,".S"
 	_NEST
 	_ADR	SPACE
 	_ADR	DEPTH			// stack depth
@@ -3638,14 +3246,12 @@ DOTS2:
 	_ADR	SPACE
 	_UNNEST
 
-//    >NAME	( ca -- na | F )
-// 	Convert code address to a name address.
-
-	.word	_DOTS
-_TNAME:	.byte  5
-	.ascii ">NAME"
-	.p2align 2 	
-TNAME:
+/*****************************
+    >NAME	( ca -- na | F )
+ 	Convert code address 
+	to a name address.
+*****************************/
+	_HEADER TNAME,5,">NAME"
 	_NEST
 	_ADR	TOR			//  
 	_ADR	CNTXT			//  va
@@ -3666,14 +3272,11 @@ TNAM2:
 	_ADR	DROP			//  0|na --
 	_UNNEST			// 0
 
-//    .ID	 ( na -- )
-// 	Display the name at address.
-
-	.word	_TNAME
-_DOTID:	.byte  3
-	.ascii ".ID"
-	.p2align 2 	
-DOTID:
+/********************************
+    .ID	 ( na -- )
+ 	Display the name at address.
+********************************/
+	_HEADER DOTID,3,".ID"
 	_NEST
 	_ADR	QDUP			// if zero no name
 	_QBRAN	DOTI1
@@ -3688,14 +3291,11 @@ DOTI1:
 
 	.equ WANT_SEE, 0  // set to 1 if you want SEE 
 .if WANT_SEE 
-//    SEE	 ( -- //  string> )
-// 	A simple decompiler.
-
-	.word	_DOTID
-_SEE:	.byte  3
-	.ascii "SEE"
-	.p2align 2 	
-SEE:
+/*******************************
+    SEE	 ( -- //  string> )
+ 	A simple decompiler.
+*******************************/
+	_HEADER SEE,3,"SEE"
 	_NEST
 	_ADR	TICK	//  ca --, starting address
 	_ADR	CR	
@@ -3709,15 +3309,12 @@ SEE1:
 	_ADR	DROP
 	_UNNEST
 
-// 	DECOMPILE ( a -- )
-// 	Convert code in a.  Display name of command or as data.
-
-	.word	_SEE
-_DECOM:	.byte  9
-	.ascii "DECOMPILE"
-	.p2align 2 
-	
-DECOMP:	
+/*************************
+ 	DECOMPILE ( a -- )
+ 	Convert code in a.  
+	Display name of command or as data.
+*************************************/
+	_HEADER DECOMP,9,"DECOMPILE"
 	_NEST
 	_ADR	DUPP			//  a a
 // 	_ADR	TOR			//  a
@@ -3758,18 +3355,14 @@ DECOM2:
 // 	_ADR	RFROM
 	_ADR	DROP
 	_UNNEST
-
-//    WORDS	( -- )
-// 	Display the names in the context vocabulary.
-
-	.word	_DECOM
-.else 
-	.word _DOTID 
 .endif 
-_WORDS:	.byte  5
-	.ascii "WORDS"
-	.p2align 2 	
-WORDS:
+
+/*********************
+    WORDS	( -- )
+ 	Display the names 
+	in the context vocabulary.
+*******************************/
+	_HEADER WORDS,5,"WORDS"
 	_NEST
 	_ADR	CR
 	_ADR	CNTXT
@@ -3786,30 +3379,27 @@ WORS1:
 WORS2:
 	_UNNEST
 
-// **************************************************************************
-//  cold start
+/****************
+  cold start
+*****************/
 
-//    VER	 ( -- n )
-// 	Return the version number of this implementation.
-
-// 	.word	_WORDS
-// _VERSN	.byte  3
-// 	.ascii "VER"
-// 	.p2align 2 	
+/**********************************
+    VER	 ( -- n )
+ 	Return the version 
+	number of this implementation.
+hidden word used by COLD
+**********************************/
 VERSN:
 	_NEST
 	_DOLIT	VER*256+EXT
 	_UNNEST
 
-//    hi	  ( -- )
-// 	Display the sign-on message of eForth.
-
-	.word	_WORDS
-_HI:	.byte  2
-	.ascii "HI"
-	.p2align 2
-
-HI:
+/*********************
+    hi	  ( -- )
+ 	Display the sign-on 
+	message.
+***********************/
+	_HEADER HI,2,"HI"
 	_NEST
 	_ADR	CR	// initialize I/O
 	_DOTQP	17, "beyond Jupiter, v" 
@@ -3830,10 +3420,13 @@ HI:
 	_ADR	CR
 	_UNNEST			// restore radix
 
-//    COLD	( -- )
-// 	The high level cold start sequence.
-
-	.word	_HI
+/********************
+    COLD	( -- )
+ 	The high level cold 
+	start sequence.
+**************************/
+	.word	LINK 
+	LINK = . 
 _LASTN:	.byte  4
 	.ascii "COLD"
 	.p2align 2	
@@ -3861,3 +3454,4 @@ CTOP:
 
 
   .end 
+

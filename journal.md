@@ -1,3 +1,14 @@
+2021-05-05
+
+* Continué le travail de remodelage du système pour l'adapté à la commutation de console.
+
+2021-05-04
+
+* Restructuré interface utilisateur. 
+    * les modules **tvout.s** et **ps2_kbd.s** définissent l'interface locale utilisant un moniteur **NTSC** et un clavier **PS2**.
+    * Le module **ser-term.s** définie l'interface utilisateur via un émulateur de terminal sur PC.
+    * Le mot **CONSOLE** permet de commuter entre les 2 interfaces: **SERIAL CONSOLE** pour la console à partir du PC  et **LOCAL CONSOLE** pour NTSC+PS2.
+
 2021-05-03
 
 * Travail sur ps2_kdb.s, modification du code et débogage.
