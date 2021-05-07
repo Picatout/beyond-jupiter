@@ -1,3 +1,8 @@
+2021-05-06
+
+* Débogage de la console. 
+
+
 2021-05-05
 
 * Continué le travail de remodelage du système pour l'adapté à la commutation de console.

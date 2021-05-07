@@ -79,7 +79,8 @@ SC_RWINDOW = 0x27
 SC_MENU = 0x5d 
  
  
-//virtual key codes   
+//virtual key codes 
+VK_CTRL_C = 3  
 VK_BACK =	8
 VK_TAB =	9
 VK_ESC =	27

@@ -54,8 +54,8 @@ sc_ascii:
    .byte 0x7c,'*'
    .byte 0x79,'+'
    .byte 0x29,' '
-   .byte SC_ENTER,'\r'
-   .byte SC_BKSP,8
+   .byte SC_ENTER,CRR 
+   .byte SC_BKSP,BKSPP 
    .byte SC_TAB,9
    .byte SC_ESC,27
    .byte SC_LALT,VK_LALT 
@@ -189,6 +189,7 @@ extended:
    
 // CTRL-n  keycodes 
 controls:
+   .byte 'c', VK_CTRL_C 
    .byte SC_LGUI,VK_LGUI
    .byte SC_RCTRL,VK_RCTRL
    .byte SC_RGUI,VK_RGUI

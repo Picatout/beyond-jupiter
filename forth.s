@@ -3436,6 +3436,7 @@ COLD:
 	_NEXT
 	.p2align 2 
 COLD1:
+	_ADR KBD_RST 
 	_DOLIT  0 
 	_ADR ULED // turn off user LED 
 	_DOLIT	UZERO

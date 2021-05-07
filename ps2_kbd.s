@@ -395,6 +395,8 @@ table_scan:
     _CALL table_scan 
     mov TOS,T0
     _CALL do_modifiers
+    cmp TOS,#VK_CTRL_C 
+    beq user_reboot 
     _PUSH 
     mov TOS,#-1
 inkey_exit:     
@@ -415,6 +417,7 @@ do_modifiers:
     tst T0,#KBD_F_ALT  
     bne altchar_down 
     tst T0,#KBD_F_CTRL
+    bne ctrl_down 
     b 9f 
 shift_down:
     mov T0,TOS 

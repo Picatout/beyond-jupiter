@@ -539,19 +539,19 @@ CHAR_FONT: // ( c -- c-adr )
 9:  _UNNEST  
 CTRL_KEY:
     _ADR DUPP 
-    _DOLIT 8 
+    _DOLIT BKSPP  
     _ADR EQUAL 
     _QBRAN 1f
-    _ADR DELBACK
-8:  _ADR TDROP 
+    _ADR BACK_SPACE 
+8:  _ADR TPOP 
     _UNNEST  
 1:  _ADR DUPP 
-    _DOLIT 13
+    _DOLIT CRR 
     _ADR EQUAL 
     _QBRAN 1f 
     _ADR CAR_RET
     _BRAN 8b
-1:  _DOLIT 10 
+1:  _DOLIT LF 
     _ADR EQUAL 
     _QBRAN 9b 
     _ADR LN_FEED
@@ -583,11 +583,10 @@ LN_FEED:
   _UNNEST  
 
 /*****************************
-  DELBACK 
-  delete character left to 
-  cursor 
+  BACK_SPACE  
+  move cursor left 1 character
 *****************************/
-DELBACK: 
+BACK_SPACE: 
   _NEST 
   _ADR COLUMN 
   _ADR AT 
@@ -596,15 +595,8 @@ DELBACK:
   _ADR ONEM
   _ADR COLUMN 
   _ADR STORE
-  _DOLIT 32 
-  _ADR TV_EMIT 
-  _ADR COLUMN 
-  _ADR DUPP 
-  _ADR AT 
-  _ADR ONEM 
-  _ADR SWAP 
-  _ADR STORE 
 9: _UNNEST    
+
 
 // CURPOS ( line col -- )
 // set text cursor position 
