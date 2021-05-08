@@ -261,7 +261,7 @@ tv_isr_exit:
 
 // COLUMN ( -- a )
 // cursor column variable 
-  _HEADER COLUMN,6,"COLUMN"
+  _HEADER CURSOR_COL,6,"COLUMN"
   _PUSH 
   ADD TOS,UP,#COL 
   _NEXT 
@@ -516,7 +516,7 @@ CHAR_FONT: // ( c -- c-adr )
     _QBRAN 1f
     _BRAN CTRL_KEY
 1:  _ADR CHAR_FONT 
-    _ADR COLUMN 
+    _ADR CURSOR_COL 
     _ADR AT
     _ADR COLX  // x coord 
     _ADR CURSOR_ROW 
@@ -536,15 +536,17 @@ CHAR_FONT: // ( c -- c-adr )
     _DONXT 1b
     _ADR TDROP  
     _ADR RIGHT
-9:  _UNNEST  
+9:  _ADR DRAW_CURSOR 
+    _UNNEST  
 CTRL_KEY:
+    _ADR ERASE_CURSOR
     _ADR DUPP 
     _DOLIT BKSPP  
     _ADR EQUAL 
     _QBRAN 1f
     _ADR BACK_SPACE 
-8:  _ADR TPOP 
-    _UNNEST  
+8:  _ADR DROP 
+    _BRAN 9b 
 1:  _ADR DUPP 
     _DOLIT CRR 
     _ADR EQUAL 
@@ -555,32 +557,39 @@ CTRL_KEY:
     _ADR EQUAL 
     _QBRAN 9b 
     _ADR LN_FEED
-    _UNNEST 
+    _BRAN 9b  
 
 /*******************************
   CAR_RET 
   carriage return
 *******************************/
 CAR_RET:
-   mov T0,#0 
-   str T0,[UP,#COL] 
-   _NEXT 
+   _NEST
+   _DOLIT 0 
+   _ADR CURSOR_COL 
+   _ADR STORE 
+   _UNNEST   
 
 /*************************
   LN_FEED 
   send cursor to next line 
 **************************/
 LN_FEED:
-  ldr T0,[UP,#ROW]
-  cmp T0,#24
-  beq 2f 
-  add T0,#1 
-  str T0,[UP,#ROW]
-  _NEXT 
-2:_CALL_COLWORD 3f 
-3: 
-  _ADR SCROLLUP 
-  _UNNEST  
+    _NEST 
+    _ADR CURSOR_ROW 
+    _ADR AT 
+    _ADR DUPP 
+    _DOLIT 24 
+    _ADR XORR 
+    _QBRAN 1f
+    _ADR ONEP 
+    _ADR CURSOR_ROW 
+    _ADR STORE 
+    _UNNEST    
+1:  _ADR DROP 
+    _ADR SCROLLUP 
+    _UNNEST  
+
 
 /*****************************
   BACK_SPACE  
@@ -588,19 +597,65 @@ LN_FEED:
 *****************************/
 BACK_SPACE: 
   _NEST 
-  _ADR COLUMN 
+  _ADR CURSOR_COL 
   _ADR AT 
   _ADR QDUP 
   _QBRAN 9f
   _ADR ONEM
-  _ADR COLUMN 
+  _ADR CURSOR_COL 
   _ADR STORE
+  _ADR DRAW_CURSOR
 9: _UNNEST    
 
 
-// CURPOS ( line col -- )
+/*******************************
+  DRAW_CURSOR ( -- )
+********************************/
+    _HEADER DRAW_CURSOR,11,"DRAW-CURSOR"
+//DRAW_CURSOR:
+    _NEST 
+    _DOLIT 0xFF
+0:  _ADR CURSOR_ROW
+    _ADR AT  
+    _ADR ONEP 
+    _ADR ROWY 
+    _DOLIT BPR
+    _ADR STAR
+    _DOLIT BPR  
+    _ADR SUBB 
+    _ADR CURSOR_COL
+    _ADR AT 
+    _ADR COLX 
+    _ADR TWOSL  
+    _ADR PLUS
+    _ADR VIDBUFF
+    _ADR PLUS
+    _DOLIT 2
+    _ADR TOR  
+1:  _ADR DDUP 
+    _ADR CSTOR 
+    _ADR ONEP 
+    _DONXT 1b
+2:  _ADR DDROP // drop 3 elements 
+    _UNNEST  
+
+/*************************
+    ERASE_CURSOR 
+*************************/
+    _HEADER ERASE_CURSOR,12,"ERASE-CURSOR"
+//ERASE_CURSOR:
+    _NEST 
+    _ADR BACKCOLOR 
+    _ADR AT 
+    _ADR DUPP  
+    _DOLIT 4 
+    _ADR LSHIFT 
+    _ADR ORR 
+    _BRAN 0b
+
+// TV-AT ( line col -- )
 // set text cursor position 
-    _HEADER CURPOS,6,"CURPOS"
+    _HEADER TV_AT,5,"TV-AT"
     cmp TOS,#53
     bmi 1f 
     mov TOS,#52

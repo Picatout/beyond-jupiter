@@ -1,3 +1,11 @@
+2021-05-08 
+
+*  Ajout de commandes dans **ser-term.s**
+    * **SER-CLS**
+    * **SER-AT**
+    * **ANSI-PARAM**
+    * **ESC[**
+
 2021-05-06
 
 * Débogage de la console. 

@@ -220,6 +220,6 @@
 	// from a code word   
 	.macro _CALL_COLWORD target 
     STMFD	RSP!,{IP}
-    ldr IP,=\target  
-   	b INEXT 
+    ldr IP,=\target
+	b INEXT   
 	.endm 

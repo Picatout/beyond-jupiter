@@ -541,13 +541,14 @@ kbd_clear_queue:
     _CALL wait_code 
     cmp r0,KBD_CMD_RESEND
     beq 1b 
-    mov T0,#100
+    mov T0,#500 
     str T0,[UP,#CD_TIMER]
-2:  ldr T0,[UP,#CD_TIMER]
+2:  _CALL keycode
+    cbnz T0,3f
+    ldr T0,[UP,#CD_TIMER]
     cmp T0,#0 
     bne 2b 
-2:  _CALL wait_code 
-    _PUSH 
+3:  _PUSH 
     mov TOS,T0  
     _NEXT 
 

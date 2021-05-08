@@ -1090,7 +1090,6 @@ CRRNT:
   where user area begin in RAM
 ********************************/
 	_HEADER USER_BEGIN,10,"USER-BEGIN"
-	.word _LAST
 	_PUSH 
 	ldr TOS,USR_BGN_ADR 
 	_NEXT 
@@ -1200,7 +1199,6 @@ MMOD3:
 	mod and quotient.
 ****************************/
 	_HEADER SLMOD,4,"/MOD"
-	.word	_MSMOD
 	_NEST
 	_ADR	OVER
 	_ADR	ZLESS
@@ -2667,7 +2665,7 @@ STRCQ:
 	structure in a colon 
 	definition.
 **************************/
-	_HEADER FOR,3,"FOR"
+	_HEADER FOR,COMPO+IMEDD+3,"FOR"
 	_NEST
 	_COMPI	TOR
 	_ADR	HERE
