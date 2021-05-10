@@ -1394,15 +1394,25 @@ CMOV2:
  	Copy u words from a1 to a2.
 *******************************/
 	_HEADER MOVE,4,"MOVE"
-	AND	TOS,TOS,#-4
-	LDR	T2,[DSP],#4
-	LDR	T3,[DSP],#4
-	B MOVE1
+	MOV T0,#4 
+	ADD TOS,#3 
+	BIC TOS,#3
+	LDR	T1,[DSP],#4 // dest
+	LDR	T2,[DSP],#4 // src 
+	CMP T2,T1 
+	BPL MOVE1
+	MOV T0,#-4 
+	ADD T1,TOS
+	ADD T2,TOS 
+	B MOVE3
 MOVE0:
-	LDR	WP,[T3],#4
-	STR	WP,[T2],#4
+	LDR	WP,[T2]
+	STR	WP,[T1]
+MOVE3: 
+	ADD T1,T0 
+	ADD T2,T0 
 MOVE1:
-	MOVS	TOS,TOS
+	MOVS TOS,TOS
 	BEQ	MOVE2
 	SUB	TOS,TOS,#4
 	B MOVE0

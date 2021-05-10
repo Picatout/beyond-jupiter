@@ -219,7 +219,7 @@
 	// calling a colon word 
 	// from a code word   
 	.macro _CALL_COLWORD target 
-    STMFD	RSP!,{IP}
-    ldr IP,=\target
-	b INEXT   
+    ldr WP,=\target 
+	orr WP,#1
+	b \target  
 	.endm 

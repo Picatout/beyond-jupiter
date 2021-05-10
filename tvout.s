@@ -406,24 +406,62 @@ plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
   _ADR FILL 
   _UNNEST 
 
-// SCROLLUP ( -- )
-// scroll up tv screen 1 char height 
-  _HEADER SCROLLUP,8,"SCROLLUP"
-  _NEST 
-  _ADR VIDBUFF 
-  _ADR DUPP 
-  _DOLIT BPR*CHAR_HEIGHT 
-  _ADR DUPP 
-  _ADR TOR 
-  _ADR PLUS 
-  _ADR SWAP 
-  _DOLIT VIDEO_BUFFER_SIZE 
-  _ADR RFROM  
-  _ADR SUBB 
-  _ADR MOVE
-  _DOLIT 24 
-  _ADR CLRLINE 
-  _UNNEST 
+/**********************************
+ SCROLLUP ( -- )
+ scroll up tv screen 1 char height 
+**********************************/
+    _HEADER SCROLLUP,8,"SCROLLUP"
+    _NEST 
+    _ADR VIDBUFF 
+    _ADR DUPP 
+    _DOLIT BPR*CHAR_HEIGHT 
+    _ADR DUPP 
+    _ADR TOR 
+    _ADR PLUS 
+    _ADR SWAP 
+    _DOLIT VIDEO_BUFFER_SIZE 
+    _ADR RFROM  
+    _ADR SUBB 
+    _ADR MOVE
+    _DOLIT 24 
+    _ADR CLRLINE 
+    _UNNEST 
+
+/***********************************
+    SCROLLDOWN ( -- )
+    scroll down tv screen 1 char 
+***********************************/
+    _HEADER SCROLLDOWN,10,"SCROLLDOWN"
+    _NEST 
+    _ADR VIDBUFF
+    _ADR DUPP 
+    _DOLIT BPR*CHAR_HEIGHT 
+    _ADR PLUS 
+    _DOLIT VIDEO_BUFFER_SIZE 
+    _DOLIT BPR*CHAR_HEIGHT 
+    _ADR SUBB  
+    _ADR MOVE
+    _DOLIT 0 
+    _ADR CLRLINE
+    _UNNEST 
+
+
+/*****************************
+    TV-CRLF 
+    carriage return line feed 
+*****************************/
+    _HEADER TV_CRLF,7,"TV-CRLF"
+    ldr WP,=SCROLLUP 
+    orr WP,#1
+    eor T0,T0 
+    str T0,[UP,#COL]
+    ldr T0,[UP,#ROW]
+    cmp T0,#24 
+    beq SCROLLUP  
+    add T0,#1 
+    str T0,[UP,#ROW]
+    _NEXT 
+
 
 //  RIGHT ( -- )
 // move cursor 1 char. right 
@@ -431,26 +469,27 @@ plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
   ldr T0,[UP,#COL]
   add T0,#1
   cmp T0,#53
-  bpl TVCR  
+  bpl TV_CRLF  
   str T0,[UP,#COL]
   _NEXT 
 
-
-// TV-CR 
-// carriage return line feed 
-  _HEADER TVCR,5,"TV-CR"
-  eor T0,T0 
-  str T0,[UP,#COL]
-  ldr T0,[UP,#ROW]
-  cmp T0,#24
-  beq 2f 
-  add T0,#1 
-  str T0,[UP,#ROW]
-  _NEXT 
-2:_CALL_COLWORD 3f 
-3: 
-  _ADR SCROLLUP 
-  _UNNEST  
+/**************************
+    LEFT ( -- )
+    move text cursor 
+    1 character left 
+**************************/
+    _HEADER LEFT,4,"LEFT"
+    ldr T0,[UP,#COL]
+    cbz T0,1f 
+    sub T0,#1 
+    str T0,[UP,#COL]
+1:  ldr T0,[UP,#ROW]
+    cbz T0,9f
+    sub T0,#1
+    str T0,[UP,#ROW]
+    mov T0,#52 
+    str T0,[UP,#COL]
+9:  _NEXT 
 
 
 // extract font pixel 
@@ -536,10 +575,10 @@ CHAR_FONT: // ( c -- c-adr )
     _DONXT 1b
     _ADR TDROP  
     _ADR RIGHT
-9:  _ADR DRAW_CURSOR 
+9:  _ADR SHOW_CURSOR 
     _UNNEST  
 CTRL_KEY:
-    _ADR ERASE_CURSOR
+    _ADR HIDE_CURSOR
     _ADR DUPP 
     _DOLIT BKSPP  
     _ADR EQUAL 
@@ -597,22 +636,16 @@ LN_FEED:
 *****************************/
 BACK_SPACE: 
   _NEST 
-  _ADR CURSOR_COL 
-  _ADR AT 
-  _ADR QDUP 
-  _QBRAN 9f
-  _ADR ONEM
-  _ADR CURSOR_COL 
-  _ADR STORE
-  _ADR DRAW_CURSOR
+  _ADR LEFT 
+  _ADR SHOW_CURSOR
 9: _UNNEST    
 
 
 /*******************************
-  DRAW_CURSOR ( -- )
+  SHOW_CURSOR ( -- )
 ********************************/
-    _HEADER DRAW_CURSOR,11,"DRAW-CURSOR"
-//DRAW_CURSOR:
+    _HEADER SHOW_CURSOR,11,"SHOW-CURSOR"
+//SHOW_CURSOR:
     _NEST 
     _DOLIT 0xFF
 0:  _ADR CURSOR_ROW
@@ -640,10 +673,10 @@ BACK_SPACE:
     _UNNEST  
 
 /*************************
-    ERASE_CURSOR 
+    HIDE_CURSOR 
 *************************/
-    _HEADER ERASE_CURSOR,12,"ERASE-CURSOR"
-//ERASE_CURSOR:
+    _HEADER HIDE_CURSOR,11,"HIDE-CURSOR"
+//HIDE_CURSOR:
     _NEST 
     _ADR BACKCOLOR 
     _ADR AT 

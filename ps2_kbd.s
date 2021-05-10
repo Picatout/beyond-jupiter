@@ -618,9 +618,8 @@ kbd_clear_queue:
     and T0,T1 
     strb T0,[UP,#KBD_FLAGS]
     and TOS,T0,#KBD_F_CAPS   
-    _CALL_COLWORD 1f
-1:  _ADR KBD_LED       
-    _UNNEST
+    _CALL_COLWORD KBD_LED
+
 
 /************************
  WAIT-KEY ( -- c )
