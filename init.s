@@ -227,8 +227,12 @@ systick_exit:
   bx lr
 
 user_reboot:
-  _NEST 
-  _PUSH 
+   _CALL forth_init 
+  ldr IP,=ur
+  b INEXT  
+ur:
+  _ADR PRESE
+  _ADR CR   
 	_DOLIT user_reboot_msg
 	_ADR COUNT 
   _ADR TYPEE 
@@ -236,8 +240,8 @@ user_reboot:
 
 	.p2align 2 
 user_reboot_msg:
-	.byte 13 
-	.ascii "\ruser reboot!"
+	.byte 12
+	.ascii "user reboot!"
 	.p2align 2 
 
 reset_mcu:
@@ -252,8 +256,6 @@ reset_mcu:
 	str r1,[r0,#SCB_AIRCR]
 	b . 
 
- 
-
 /**************************************
   reset_handler execute at MCU reset
 ***************************************/
@@ -267,7 +269,8 @@ reset_handler:
 	bl	init_devices	 	/* RCC, GPIOs, USART */
 	bl  ser_init
 	bl	tv_init
-  bl  kbd_init  
+  bl  kbd_init
+  bl  flash_spi_init   
 	bl forth_init 
 	b COLD 
 
@@ -564,8 +567,8 @@ UZERO:
 	.word 0      /* TICKS */
     .word 0     /* CD_TIMER */
 	.word HI  /*'BOOT */
-	.word SER_QKEY /* query for character */
-  .word SER_EMIT  /* char output device */
+	.word PS2_QKEY /* query for character */
+  .word TV_EMIT  /* char output device */
   .word BASEE 	/*BASE */
 	.word 0			/*tmp */
 	.word 0			/*SPAN */

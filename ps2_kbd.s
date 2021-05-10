@@ -210,9 +210,8 @@ send_parity:
 send_stop:
 //    str r2,[r3,#GPIO_BSRR]
 // release data pin 
-    mvn r0,#(3<<(2*KBD_DATA_PIN))
     ldr r1,[r3,#GPIO_MODER]
-    and r1,r0 
+    bic r1,#(3<<(2*KBD_DATA_PIN)) 
     str r1,[r3,#GPIO_MODER]
     b 9f
 rx_ack_bit:
@@ -305,6 +304,16 @@ async_jump: // tbb table for async keys
     PS2 data on PA12 
 **********************************/
     _GBL_FUNC kbd_init 
+//  clock and data pins as INPUT_FLOAT 
+    _MOV32 r3,GPIOA_BASE_ADR 
+    mov r0,r3 
+    mov r1,#KBD_CLOCK_PIN
+    mov r2,#INPUT_FLOAT 
+    _CALL gpio_config
+    mov r0,r3 
+    mov r1,#KBD_DATA_PIN
+    mov r2,#INPUT_FLOAT 
+    _CALL gpio_config
 // interrupt triggered on falling edge 
    _MOV32 r2,EXTI_BASE_ADR
    mov r0,#(1<<KBD_CLOCK_PIN)
@@ -508,14 +517,30 @@ kbd_send:
     mov r1,#KBD_CLOCK_PIN 
     mov r2,#INPUT_FLOAT
     _CALL gpio_config
-// wait send completed 
+// wait send completed
+//  expire after 10 msec 
+    mov r0,#10
+    str r0,[UP,#CD_TIMER]
+1:  ldr r0,[UP,#CD_TIMER]
+    cbz r0, 4f 
 2:  ldrb r0,[UP,#KBD_FLAGS]
     tst r0,#KBD_TX
-    bne 2b 
+    bne 1b 
 // enable video interrupt     
-    mov r0,#TIM3_IRQ
+4:  mov r0,#TIM3_IRQ
     _CALL nvic_enable_irq
-    pop {r1,r2,r3}
+    ldrb r0,[UP,#KBD_FLAGS]
+    bic r1,r0,#KBD_TX
+    strb r1,[UP,#KBD_FLAGS]
+    and r0,#KBD_TX
+    cbz r0, 5f
+    ldr r1,[r3,#GPIO_MODER]
+    bic r1,r1,#(3<<(2*KBD_DATA_PIN))
+    str r1,[r3,#GPIO_MODER]
+    eor r0,r0 
+    strb r0,[UP,#KBD_BITCNTR]     
+    mvn r0,r0   
+5:  pop {r1,r2,r3}
     _RET 
 
  
@@ -537,6 +562,7 @@ kbd_clear_queue:
     _HEADER KBD_RST,7,"KBD-RST"
 1:  mov T0,#KBD_CMD_RESET 
     _CALL kbd_send
+    cbnz T0,3f // keyboard not dectected
     _CALL kbd_clear_queue
     _CALL wait_code 
     cmp r0,KBD_CMD_RESEND
@@ -560,7 +586,7 @@ kbd_clear_queue:
     _HEADER KBD_LED,7,"KBD-LED"
 1:  _CALL kbd_clear_queue
      mov T0,#KBD_CMD_LED 
-    _CALL kbd_send
+    _CALL kbd_send 
 2:  _CALL wait_code 
     cmp T0,#KBD_CMD_RESEND
     beq 1b

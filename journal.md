@@ -1,3 +1,9 @@
+2021-05-09
+
+* Travail sur interface utilisateur. Ajout de la détection d'interface par défaut sur PA8. 
+    * PA8 low  LOCAL CONSOLE 
+    * PA8 high SERIAL CONSOLE 
+
 2021-05-08 
 
 *  Ajout de commandes dans **ser-term.s**

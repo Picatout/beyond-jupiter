@@ -3418,6 +3418,43 @@ VERSN:
 	_ADR	CR
 	_UNNEST			// restore radix
 
+/**********************
+ check if PS2 keyboard 
+ present.
+**********************/
+PS2_QUERY:
+	_NEST 
+	_ADR KBD_RST
+	_DOLIT BAT_OK 
+	_ADR XORR  
+	_QBRAN 9f  
+// no ps2 keyboard 
+// swith to serial console
+	_ADR CR 
+	_DOTQP 25,"no PS2 keyboard detected."
+	_ADR SERIAL 
+	_ADR CONSOLE 
+9:	_UNNEST 
+
+/*************************
+   check PA8 to 
+   select console 
+   PA8 -> low  LOCAL 
+   PA8 -> high SERIAL 
+*************************/
+IF_SENSE:
+	_NEST 
+	_ADR LOCAL 
+	_DOLIT (GPIOA_BASE_ADR+GPIO_IDR) 
+	_ADR AT 
+	_DOLIT (1<<8)
+	_ADR ANDD 
+	_QBRAN 9f 
+	_ADR ONEP 
+9:  _ADR CONSOLE 
+	_UNNEST 
+
+
 /********************
     COLD	( -- )
  	The high level cold 
@@ -3434,7 +3471,6 @@ COLD:
 	_NEXT
 	.p2align 2 
 COLD1:
-	_ADR KBD_RST 
 	_DOLIT  0 
 	_ADR ULED // turn off user LED 
 	_DOLIT	UZERO
@@ -3442,6 +3478,8 @@ COLD1:
 	_DOLIT	ULAST-UZERO
 	_ADR	MOVE 			// initialize user area
 	_ADR	PRESE			// initialize stack and TIB
+	_ADR	IF_SENSE 
+	_ADR 	PS2_QUERY  
 	_ADR	TBOOT
 	_ADR	ATEXE			// application boot
 	_ADR	OVERT
