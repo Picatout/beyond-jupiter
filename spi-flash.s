@@ -58,6 +58,14 @@ flash_spi_init:
     ldr r1,[r0,#RCC_APB2ENR]
     orr r1,#(1<<12) // SPI1EN 
     str r1,[r0,#RCC_APB2ENR]
+    _MOV32 r0, SPI1_BASE_ADR 
+    mov r1,#(1<<2)+(1<<8)+(1<<9) //MSTR+SS+SSI 
+    strh r1,[r0,#SPI_CR1]
+    ldr r1,[r3,#GPIO_AFRL]
+    eor r0,r0 
+    movt r0,#0x555<<4
+    orr r0,r1 
+    str r0,[r3,#GPIO_AFRL]
     _RET 
 
 
@@ -66,6 +74,10 @@ flash_spi_init:
     drive F_SC low 
 *********************/
     _HEADER CHIPSEL,8,"CHIP-SEL"
+    _MOV32 r0,SPI1_BASE_ADR 
+    ldr r1,[r0,#SPI_CR1]
+    orr r1,#(1<<6) //SPE 
+    str r1,[r0,#SPI_CR1]
     _MOV32 r0,GPIOA_BASE_ADR
     mov r1,#PIN_F_SC 
     mov r2,#0 
@@ -74,14 +86,69 @@ flash_spi_init:
 
 
 /*********************
-    _CHIP-DSEL 
+    CHIP-DSEL 
     drive F_SC high 
 *********************/
     _HEADER CHIPDSEL,9,"CHIP-DSEL"
+    _MOV32 r0,SPI1_BASE_ADR 
+    ldrh r1,[r0,#SPI_CR1]
+    bic r1,#(1<<6) //SPE 
+    strh r1,[r0,#SPI_CR1]
     _MOV32 r0,GPIOA_BASE_ADR
     mov r1,#PIN_F_SC 
     mov r2,#1 
     _CALL gpio_out 
     _NEXT 
 
+
+/****************************
+    READ-BYTE ( -- )
+    read flash byte 
+***************************/
+    _HEADER READ_BYTE,9,"READ-BYTE"
+    _MOV32 T0,SPI1_BASE_ADR 
+    _PUSH 
+0:  ldrh T1,[T0,#SPI_SR]
+    tst T1,#(1<<1) //TXE
+    beq 0b 
+    eor T1,T1 
+    strb T1,[T0,#SPI_DR]
+1:  ldr T1,[T0,#SPI_SR]
+    tst T1,#(1<<0) // RXNE 
+    beq 1b     
+    ldrb TOS,[T0,#SPI_DR]
+    _NEXT 
+
+/*********************************
+    WRITE-BYTE  ( c -- )
+    write flash byte 
+*************************/
+    _HEADER WRITE_BYTE,10,"WRITE-BYTE"
+    _MOV32 T0,SPI1_BASE_ADR 
+0:  ldrh T1,[T0,#SPI_SR]
+    tst T1,#(1<<1) //TXE
+    beq 0b 
+    strb TOS,[T0,#SPI_DR]
+1:  ldrh T1,[T0,#SPI_SR]
+    tst T1,#(1<<0) // RXNE 
+    beq 1b 
+    ldrh T1,[T0,#SPI_DR]
+    _POP 
+    _NEXT 
+
+/********************************
+    FLASH-RDSR ( n -- c )
+    read status register  
+********************************/
+    _HEADER FLASH_RDSR,10,"FLASH-RDSR"
+    _NEST 
+    _ADR CHIPSEL 
+    _DOLIT sr_cmd 
+    _ADR PLUS 
+    _ADR CAT
+    _ADR WRITE_BYTE
+    _ADR READ_BYTE 
+    _ADR CHIPDSEL 
+    _UNNEST 
+sr_cmd: .byte 5,0x35,0x15      
 
