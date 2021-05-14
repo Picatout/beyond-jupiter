@@ -74,7 +74,7 @@ ser_init:
   str r1,[r0,#USART_CR1] /*enable usart*/
 /* set interrupt priority */
   mov r0,#USART1_IRQ 
-  mov r1,#1 
+  mov r1,#7
   _CALL nvic_set_priority
 /* enable interrupt in NVIC */
   mov r0,#USART1_IRQ 

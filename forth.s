@@ -2704,6 +2704,15 @@ STRCQ:
 	_ADR	COMMA
 	_UNNEST
 
+/***************************
+	I ( -- n )
+	stack for loop counter 
+***************************/
+	_HEADER I,1+COMPO,"I"
+	_PUSH 
+	ldr TOS,[RSP]
+	_NEXT 
+
 /**********************
     UNTIL	( a -- )
  	Terminate a BEGIN-UNTIL

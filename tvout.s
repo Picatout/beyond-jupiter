@@ -40,7 +40,7 @@
   .equ LEFT_MARGIN, (750) 
   .equ VIDEO_FIRST_LINE, 40
   .equ VIDEO_LAST_LINE, (VIDEO_FIRST_LINE+VRES)
-  .equ VIDEO_DELAY,(FCLK/1000000*14-1) // 14µSec
+  .equ VIDEO_DELAY,(FCLK/1000000*12-1) // 14µSec
   .equ VIDEO_END, (FCLK/1000000*62-1) // 62µSec
 
 // video state 
@@ -205,20 +205,25 @@ state_video_out:
    mul T1,T3 
    add T0,T1  
    _MOV32 T1,GPIOA_BASE_ADR 
-2: ldrb T2,[T0]
-   lsr T2,#4 
-   str T2,[T1,#GPIO_ODR]
-   nop.w
+   push {r4,r5} 
+   mvn r4,#(15)
+2: ldrb r5,[T0]
+   ldrh T2,[T1,#GPIO_ODR]
+   and T2,r4
+   lsr r5,#4  
+   orr T2,r5 
+   strh T2,[T1,#GPIO_ODR]
+   and T2,r4 
+   ldrb r5,[T0],#1
+   and r5,#15
+   orr T2,r5 
    nop.w 
-   ldrb T2,[T0],#1
-   and T2,#15 
-   str T2,[T1,#GPIO_ODR]
-   nop.w
-   nop.w  
+   strh T2,[T1,#GPIO_ODR]
    subs T3,#1
    bne 2b  
-   mov T2,#(15<<16) 
-   str T2,[T1,#GPIO_BSRR]
+   mov r4,#(15<<16) 
+   str r4,[T1,#GPIO_BSRR]
+   pop {r4,r5}
    b tv_isr_exit 
 state_post_video:
    mov T2,#262

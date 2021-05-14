@@ -268,7 +268,7 @@ reset_handler:
 	bl	remap 
 	bl	init_devices	 	/* RCC, GPIOs, USART */
 	bl  ser_init
-	bl	tv_init
+ 	bl	tv_init
   bl  kbd_init
   bl  flash_spi_init   
 	bl forth_init 
