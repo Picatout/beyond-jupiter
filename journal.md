@@ -1,3 +1,11 @@
+2021-06-16
+
+* déboguage spi-flash.s
+
+* Création mots **WC** et **MARK** 
+
+* **MARK** est à déboggé. 
+
 2021-05-15
 
 *  Transféré interface clavier sur PC14:15 pour résoudre conflit avec video output.

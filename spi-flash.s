@@ -58,6 +58,9 @@ flash_spi_init:
     mov r1,#PIN_MISO
     mov r2,#INPUT_AFO  
     _CALL gpio_config
+// PA5:7 at max speed 
+    mov r0,#0xCCAA
+    strh r0,[r3,#GPIO_OSPEEDR]    
     _MOV32 r0,RCC_BASE_ADR
     ldr r1,[r0,#RCC_APB2ENR]
     orr r1,#(1<<12) // SPI1EN 
@@ -224,8 +227,6 @@ sr_cmd: .byte 5,0x35,0x15
     _DOLIT 3 
     _ADR WR_BYTE 
     _ADR SEND_ADR
-    _ADR RD_BYTE 
-    _ADR DROP   
     _ADR TOR   
     _BRAN 2f
 1:  _ADR RD_BYTE
@@ -253,6 +254,8 @@ sr_cmd: .byte 5,0x35,0x15
     _BRAN 2f 
 1:  _ADR DUPP 
     _ADR CAT 
+    _ADR DUPP 
+    _ADR DOTH
     _ADR WR_BYTE 
     _ADR ONEP
 2:  _DONXT 1b 

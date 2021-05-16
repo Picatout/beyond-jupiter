@@ -1935,6 +1935,23 @@ DOT1:
 	_UNNEST			// yes, display signed
 
 /***********************
+	.H ( w -- )
+	display integer 
+	in hexadecimal 
+*********************/
+	_HEADER DOTH,2,".H"
+	_NEST 
+	_ADR BASE
+	_ADR AT 
+	_ADR SWAP
+	_ADR HEX
+	_ADR UDOT 
+	_ADR BASE
+	_ADR STORE  
+	_UNNEST 
+
+
+/***********************
     ?	   ( a -- )
  	Display the contents
 	in a memory cell.
@@ -3395,6 +3412,43 @@ WORS1:
 	_BRAN	WORS1
 WORS2:
 	_UNNEST
+
+/*****************************
+	WC ( - n )
+	count words in dictionary 
+******************************/
+	_HEADER WC,2,"WC"
+	_NEST 
+	_DOLIT 0 
+	_ADR LAST
+1:	_ADR AT
+	_ADR QDUP
+	_QBRAN 9f
+	_ADR SWAP
+	_ADR ONEP
+	_ADR SWAP
+	_ADR CELLM
+	_BRAN 1b
+9:	_UNNEST 
+
+/*************************
+	MARK <string> ( -- )
+    create forget point 
+	in dictionary 
+*************************/	
+	_HEADER MARK,4,"MARK"
+	_NEST
+	_ADR CREAT 
+	_ADR DOES 
+	_DOLIT 8
+	_ADR SUBB
+	_ADR TNAME
+	_ADR CELLM
+	_ADR AT  
+	_ADR LAST 
+	_ADR STORE 
+	_ADR OVERT
+	_UNNEST 
 
 /****************
   cold start
