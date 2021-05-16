@@ -132,7 +132,7 @@
    .equ INPUT_FLOAT,(FLOAT<<4)+INP
    .equ INPUT_PD,(PULLDOWN<<4)+INP
    .equ INPUT_PU,(PULLUP<<4)+INP 
-
+   .EQU INPUT_AFO,AFO
     /* USART1 registers */
     .equ USART1_BASE_ADR, 0x40011000
     /* USARTx registers offset */

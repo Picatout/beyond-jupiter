@@ -1,3 +1,15 @@
+2021-05-15
+
+*  Transféré interface clavier sur PC14:15 pour résoudre conflit avec video output.
+
+* Travail sur spi-flash.s
+
+2021-05-14
+
+* bogues à corrigés:
+    * spi-flash.s ne fonctione pas. 
+    * conflis entre video_output et ps2 keyboard.
+    
 2021-05-13 
 
 * Travail sur spi-flash.s 

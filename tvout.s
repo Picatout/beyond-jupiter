@@ -40,7 +40,7 @@
   .equ LEFT_MARGIN, (750) 
   .equ VIDEO_FIRST_LINE, 40
   .equ VIDEO_LAST_LINE, (VIDEO_FIRST_LINE+VRES)
-  .equ VIDEO_DELAY,(FCLK/1000000*12-1) // 14µSec
+  .equ VIDEO_DELAY,(FCLK/1000000*14-1) // 14µSec
   .equ VIDEO_END, (FCLK/1000000*62-1) // 62µSec
 
 // video state 
@@ -51,6 +51,14 @@
 // field 
    .equ ODD_FIELD,0 
    .equ EVEN_FIELD,-1
+
+  // video DAC port 
+  .equ VID_GPIO, GPIOB_BASE_ADR 
+  // video output DAC bits 
+  .equ VB0, 12 
+  .equ VB1, 13 
+  .equ VB2, 14 
+  .equ VB3, 15 
 
 /*******************************************************
 NOTES:
@@ -64,17 +72,18 @@ NOTES:
   synchronization signal.
 **************************************/ 
   _GBL_FUNC tv_init
-// configure PA0:3 as OUTPUT_OD 
-  _MOV32 r0,GPIOA_BASE_ADR 
+// configure PB12:15 as OUTPUT_PP 
+  _MOV32 r0,VID_GPIO
   ldr r1,[r0,#GPIO_MODER]
-  mov r2,#0x55
+  _MOV32 r2,0x55000000
+//  eor r2,r2 
+//  movt r2,#0x55<<8 
   orr r1,r2
   str r1,[r0,#GPIO_MODER]
   eor r1,r1 
   str r1,[r0,#GPIO_ODR]  
 // configure PB1 as OUTPUT_AFPP 
 // this is TIM3_CC4 output compare 
-  add r0,#0x400 // GPIOB_BASE_ADR
   mov r1,#1 // pin 1 
   mov r2,#OUTPUT_AFPP // mode+type  
   _CALL gpio_config 
@@ -83,7 +92,7 @@ NOTES:
   _CALL gpio_speed 
 //  mov r2,#(2<<4) // alternate function 2 on BP1==TIM3_CH4 
   ldr r1,[r0,#GPIO_AFRL]
-  orr r1,#(2<<4) // r2 
+  orr r1,#(2<<4) // AF2 
   str r1,[r0,#GPIO_AFRL]
 // enable peripheral clock 
   _MOV32 r2,RCC_BASE_ADR 
@@ -204,26 +213,26 @@ state_video_out:
    mov T3,#160
    mul T1,T3 
    add T0,T1  
-   _MOV32 T1,GPIOA_BASE_ADR 
-   push {r4,r5} 
-   mvn r4,#(15)
-2: ldrb r5,[T0]
-   ldrh T2,[T1,#GPIO_ODR]
-   and T2,r4
-   lsr r5,#4  
-   orr T2,r5 
+   _MOV32 T1,VID_GPIO 
+// T0 video buffer ptr 
+// T1 VID_GPIO  
+// T2 temp 
+// T3 byte counter 
+2: ldrb T2,[T0],#1 
+   lsl T2,#8 
    strh T2,[T1,#GPIO_ODR]
-   and T2,r4 
-   ldrb r5,[T0],#1
-   and r5,#15
-   orr T2,r5 
    nop.w 
+   nop.w
+   nop.w 
+   nop.w 
+   lsl T2,#4  
    strh T2,[T1,#GPIO_ODR]
+   nop.w
+   nop.w  
    subs T3,#1
    bne 2b  
-   mov r4,#(15<<16) 
-   str r4,[T1,#GPIO_BSRR]
-   pop {r4,r5}
+   mov T2,#(15<<16) 
+   str T2,[T1,#GPIO_BSRR]
    b tv_isr_exit 
 state_post_video:
    mov T2,#262
@@ -488,6 +497,7 @@ plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
     cbz T0,1f 
     sub T0,#1 
     str T0,[UP,#COL]
+    _NEXT 
 1:  ldr T0,[UP,#ROW]
     cbz T0,9f
     sub T0,#1
@@ -587,7 +597,7 @@ CTRL_KEY:
     _ADR DUPP 
     _DOLIT BKSPP  
     _ADR EQUAL 
-    _QBRAN 1f
+    _QBRAN 1f 
     _ADR BACK_SPACE 
 8:  _ADR DROP 
     _BRAN 9b 

@@ -64,8 +64,9 @@ flags
     .equ KBD_BITCNTR,KBD_STRUCT 
     .equ KBD_PARITY,KBD_STRUCT+3 
 
-    .equ KBD_DATA_PIN, 12 
-    .equ KBD_CLOCK_PIN, 11
+    .equ KBD_DATA_PIN, 14 
+    .equ KBD_CLOCK_PIN, 15
+    .equ KBD_GPIO,GPIOC_BASE_ADR 
 
 /**********************************
     kbd_isr
@@ -78,7 +79,7 @@ flags
     _MOV32 r2,EXTI_BASE_ADR
     mov r0,#(1<<KBD_CLOCK_PIN) 
     str r0,[r2,#EXTI_PR] // reset pending flag 
-    _MOV32 r3,GPIOA_BASE_ADR
+    _MOV32 r3,KBD_GPIO
     ldr r0,[UP,#KBD_FLAGS]
     tst r0,#KBD_TX 
     bne send_bit  
@@ -173,7 +174,7 @@ store_code:
     r0 bit shifter 
     r1 bit counter 
     r2 output bit 
-    r3 GPIOA_BASE_ADR 
+    r3 KBD_GPIO 
 */
 send_bit:
     ldrb r1,[UP,#KBD_BITCNTR]
@@ -305,7 +306,7 @@ async_jump: // tbb table for async keys
 **********************************/
     _GBL_FUNC kbd_init 
 //  clock and data pins as INPUT_FLOAT 
-    _MOV32 r3,GPIOA_BASE_ADR 
+    _MOV32 r3,KBD_GPIO 
     mov r0,r3 
     mov r1,#KBD_CLOCK_PIN
     mov r2,#INPUT_FLOAT 
@@ -314,10 +315,14 @@ async_jump: // tbb table for async keys
     mov r1,#KBD_DATA_PIN
     mov r2,#INPUT_FLOAT 
     _CALL gpio_config
+// map EXTI15 on PC15 i.e. kbd clock pin 
+    _MOV32 r2,SYSCFG_BASE_ADR
+    mov r0,#(2<<12)
+    strh r0,[r2,#SYSCFG_EXTICR4]    
 // interrupt triggered on falling edge 
    _MOV32 r2,EXTI_BASE_ADR
    mov r0,#(1<<KBD_CLOCK_PIN)
-   str r0,[r2,#EXTI_IMR] // enable EXTI11 
+   str r0,[r2,#EXTI_IMR] // enable EXTI15 
    str r0,[r2,#EXTI_FTSR] // on falling edge 
    eor r0,r0 
    str r0,[UP,#KBD_QHEAD]
@@ -468,7 +473,7 @@ do_capslock:
     r0  byte to send 
  use: 
     r1,r2 temp 
-    r3 GPIOA_BASE_ADR 
+    r3 KBD_GPIO 
 ***************************/
 kbd_send:
     push {r0,r1,r2,r3}
@@ -481,7 +486,7 @@ kbd_send:
     mov r0,#TIM3_IRQ 
     _CALL nvic_disable_irq
 // take control of keyboard clock line  
-    _MOV32 r3,GPIOA_BASE_ADR
+    _MOV32 r3,KBD_GPIO
     mov r0,r3 
     mov r1,#KBD_CLOCK_PIN 
     mov r2,#OUTPUT_OD

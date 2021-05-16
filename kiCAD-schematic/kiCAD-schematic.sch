@@ -412,60 +412,52 @@ Text GLabel 8250 5200 0    50   Input ~ 0
 VB1
 Text GLabel 8250 5500 0    50   Input ~ 0
 VB0
-Text GLabel 5150 3350 0    50   Input ~ 0
+Text GLabel 6450 4750 2    50   Input ~ 0
 VB0
-Wire Wire Line
-	5150 3350 5250 3350
-Text GLabel 4950 3450 0    50   Input ~ 0
+Text GLabel 6450 4650 2    50   Input ~ 0
 VB1
-Wire Wire Line
-	4950 3450 5250 3450
-Text GLabel 5150 3550 0    50   Input ~ 0
+Text GLabel 6450 4550 2    50   Input ~ 0
 VB2
-Wire Wire Line
-	5150 3550 5250 3550
-Text GLabel 4950 3650 0    50   Input ~ 0
+Text GLabel 6450 4450 2    50   Input ~ 0
 VB3
-Wire Wire Line
-	4950 3650 5250 3650
 $Comp
 L Device:R R1
 U 1 1 6002405D
-P 7150 3800
-F 0 "R1" H 7220 3846 50  0000 L CNN
-F 1 "10K" H 7220 3755 50  0000 L CNN
-F 2 "" V 7080 3800 50  0001 C CNN
-F 3 "~" H 7150 3800 50  0001 C CNN
-	1    7150 3800
-	-1   0    0    -1  
+P 4550 2900
+F 0 "R1" H 4620 2946 50  0000 L CNN
+F 1 "10K" H 4620 2855 50  0000 L CNN
+F 2 "" V 4480 2900 50  0001 C CNN
+F 3 "~" H 4550 2900 50  0001 C CNN
+	1    4550 2900
+	1    0    0    -1  
 $EndComp
 $Comp
 L Device:R R2
 U 1 1 600245BA
-P 7450 3900
-F 0 "R2" H 7520 3946 50  0000 L CNN
-F 1 "10K" H 7520 3855 50  0000 L CNN
-F 2 "" V 7380 3900 50  0001 C CNN
-F 3 "~" H 7450 3900 50  0001 C CNN
-	1    7450 3900
-	-1   0    0    -1  
+P 4250 3000
+F 0 "R2" H 4320 3046 50  0000 L CNN
+F 1 "10K" H 4320 2955 50  0000 L CNN
+F 2 "" V 4180 3000 50  0001 C CNN
+F 3 "~" H 4250 3000 50  0001 C CNN
+	1    4250 3000
+	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	7450 4050 6450 4050
+	4250 3150 5250 3150
 Wire Wire Line
-	7150 3950 6450 3950
+	4550 3050 5250 3050
 Wire Wire Line
-	7450 3750 7450 3650
+	4250 2850 4250 2750
 Wire Wire Line
-	7450 3650 7150 3650
-Text GLabel 7300 3650 1    50   Input ~ 0
+	4250 2750 4550 2750
+Text GLabel 4400 2750 1    50   Input ~ 0
 5V+
-Text GLabel 7650 4050 2    50   Input ~ 0
+Text GLabel 4050 3150 0    50   Input ~ 0
 clock
 Wire Wire Line
-	7650 4050 7450 4050
-Connection ~ 7450 4050
-Text GLabel 6850 3950 1    50   Input ~ 0
+	4050 3150 4250 3150
+Connection ~ 4250 3150
+Text GLabel 4850 3050 1    50   Input ~ 0
 data
 Text GLabel 6450 2850 2    50   Input ~ 0
 3v3+
@@ -744,4 +736,6 @@ F 3 "" H 8700 5800 50  0001 C CNN
 	1    8700 5800
 	1    0    0    -1  
 $EndComp
+Text Notes 3650 2850 0    79   ~ 0
+keyboard\n
 $EndSCHEMATC
