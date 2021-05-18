@@ -343,6 +343,11 @@ wait_sws:
   beq wait_sws
 /* now sysclock is 96 Mhz */
 
+/* enable FPU coprocessors CP10,CP11 */
+//  _MOV32 r0, CPACR 
+//  mov r1,#15<<20
+//  str r1,[r0]
+
 /* enable peripheral clock for GPIOA, GPIOC and USART1 */
   mov	r1, #0x9F		/* all GPIO clock */
   str	r1, [r0, #RCC_AHB1ENR]

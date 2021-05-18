@@ -142,6 +142,19 @@ flash_spi_init:
     _NEXT 
 
 /*************************
+    WR-DIS ( -- )
+    write disable 
+    reset WEL bit 
+*************************/
+    _HEADER WR_DIS,6,"WR-DIS"
+    _NEST 
+    _ADR CHIP_SEL 
+    _DOLIT 4
+    _ADR WR_BYTE
+    _ADR CHIP_DSEL
+    _UNNEST
+
+/*************************
     WR-ENBL ( -- )
     set WEL flag in SR0 
 ************************/
@@ -202,10 +215,10 @@ sr_cmd: .byte 5,0x35,0x15
 
 
 /****************************
-   ERASE-SEC ( a -- )
-   erase 4Ko sector 
+   ERASE-BLK ( a -- )
+   erase 4Ko block  
 ***************************/
-    _HEADER ERASE_SEC,9,"ERASE-SEC"
+    _HEADER ERASE_BLK,9,"ERASE-BLK"
     _NEST 
     _ADR WR_ENBL
     _ADR CHIP_SEL 
@@ -215,6 +228,23 @@ sr_cmd: .byte 5,0x35,0x15
     _ADR CHIP_DSEL 
     _ADR WAIT_DONE 
     _UNNEST 
+
+/******************************
+    ERASE-CHIP ( -- )
+    erase all data 
+******************************/
+    _HEADER ERASE_CHIP,10,"ERASE-CHIP"
+    _NEST 
+    _ADR WR_ENBL 
+    _ADR CHIP_SEL
+    _DOLIT 0x60
+    _DOLIT 0xC7 
+    _ADR WR_BYTE 
+    _ADR WR_BYTE 
+    _ADR CHIP_DSEL 
+    _ADR WAIT_DONE
+    _UNNEST 
+
 
 /******************************
     RD-BLK ( buff n a --  )

@@ -1,10 +1,14 @@
+20210-06-17 
+
+* Ajout de mots au vocabulaire.
+
+    * **DO**, **LOOP** et **+LOOP** 
+    
 2021-06-16
 
 * déboguage spi-flash.s
 
 * Création mots **WC** et **MARK** 
-
-* **MARK** est à déboggé. 
 
 2021-05-15
 

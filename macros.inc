@@ -120,7 +120,7 @@
 	BX LR 
 	.endm 
 
-	/* dictionary header  */
+	// dictionary header  
 	.macro _HEADER  label, nlen, name
 		.word LINK 
 		.equ LINK , . 

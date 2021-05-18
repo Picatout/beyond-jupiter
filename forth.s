@@ -33,7 +33,7 @@
 *
 ******************************************************/
 
-/*****************************************************************************
+/***********************************************************
 *	STM32eForth version 7.20
 *	Chen-Hanson Ting,  July 2014
 
@@ -74,22 +74,12 @@
 	.section .text, "ax", %progbits
 
 /***********************************
-//  Start of eForth system 
+  Start of eForth system 
 ***********************************/
 
 	.p2align 2 
 
-// PUSH TOS, to be used in colon definition 
-TPUSH:
-	_PUSH
-	_NEXT
-
-// POP TOS, to be used in colon defintion  
-TPOP:
-	_POP 
-	_NEXT
-
-// hi level word enter 
+// hi level word enter
 NEST: 
 	STMFD	RSP!,{IP}
 	ADD IP,WP,#3
@@ -97,7 +87,7 @@ NEST:
 INEXT: 
 	LDR WP,[IP],#4 
 	BX WP  
-UNNEST:
+UNNEST: // exit hi level word 
 	LDMFD RSP!,{IP}
 	LDR WP,[IP],#4 
 	BX WP  
@@ -139,8 +129,7 @@ TSTDOUT:
 	KEY? ( -- c T | F )
 	check if available character 
 ********************************************/
-	_HEADER QKEY,4,"KEY?"
-QRX: 
+	_HEADER QKEY,4,"KEY?" 
 	_NEST 
 	_ADR TSTDIN // ' STDIN 
 	_ADR ATEXE
@@ -154,7 +143,7 @@ QRX:
 	_NEST
 KEY1:
 	_ADR CAPS_LED 
-	_ADR	QRX
+	_ADR	QKEY 
 	_QBRAN	KEY1
 	_UNNEST
 
@@ -163,7 +152,6 @@ KEY1:
 	transmit a character to console 
 **********************************************/
 	_HEADER EMIT,4,"EMIT"
-TECHO:
 	_NEST 
 	_ADR TSTDOUT 
 	_ADR ATEXE 
@@ -2294,12 +2282,12 @@ BKSP:
 	_ADR	XORR
 	_QBRAN	BACK1
 	_DOLIT	BKSPP
-	_ADR	TECHO
+	_ADR	EMIT
 	_ADR	ONEM
 	_ADR	BLANK
-	_ADR	TECHO
+	_ADR	EMIT
 	_DOLIT	BKSPP
-	_ADR	TECHO
+	_ADR	EMIT
 BACK1:
 	  _UNNEST
 
@@ -2312,7 +2300,7 @@ hidden word used by KTAP
 TAP:
 	_NEST
 	_ADR	DUPP
-	_ADR	TECHO
+	_ADR	EMIT
 	_ADR	OVER
 	_ADR	CSTOR
 	_ADR	ONEP
@@ -2683,7 +2671,7 @@ STRCQ:
 	_UNNEST 			// adjust the code pointer
 
 /*******************
-//  Structures
+   Structures
 *******************/
 
 /*************************
@@ -2697,6 +2685,68 @@ STRCQ:
 	_COMPI	TOR
 	_ADR	HERE
 	_UNNEST
+
+/********************************
+	DO ( limit start -- )
+	initialise a DO...LOOP 
+	or DO...+LOOP 
+********************************/
+	_HEADER DO,COMPO+IMEDD+2,"DO"
+	_NEST
+	_COMPI SWAP
+	_COMPI TOR 
+	_COMPI TOR 
+	_ADR HERE 
+	_UNNEST 
+
+DOPLOOP: // ( n -- R: counter limit )
+	ldmfd RSP!,{T0,T1}
+	add T0,TOS 
+	stmfd RSP!,{T0,T1}
+	cmp T0,T1 
+	bmi 9f 
+	add RSP,#8
+	add IP,#4
+	_NEXT 
+9:  ldr IP,[IP]
+	_NEXT 
+	
+/***************************
+	+LOOP ( a -- )
+	increment counter 
+	end loop if countr>limit
+****************************/
+	_HEADER PLOOP,COMPO+IMEDD+5,"+LOOP"
+	_NEST 
+	_COMPI DOPLOOP 
+	_ADR COMMA
+	_UNNEST 
+
+DOLOOP: // ( -- R: counter limit )
+	ldr T0,[RSP]
+	add T0,#1
+	str T0,[RSP]
+	ldr T1,[RSP,#4]
+	cmp T0,T1 
+	bmi 9f
+	add RSP,#8  // counter and limit  
+	add IP,IP,#4 // skip loop address 
+	_NEXT 
+9:  ldr IP,[IP]
+	_NEXT 
+
+
+/********************************
+	LOOP ( a -- )
+	increment counter 
+	end loop if >= limit 
+*********************************/
+	_HEADER LOOP,COMPO+IMEDD+4,"LOOP"
+	_NEST 
+	_COMPI DOLOOP
+	_ADR COMMA 
+	_UNNEST 
+
 
 /**********************
     BEGIN	( -- a )
@@ -3439,7 +3489,10 @@ WORS2:
 	_HEADER MARK,4,"MARK"
 	_NEST
 	_ADR CREAT 
-	_ADR DOES 
+	_ADR DODOES 
+	_UNNEST
+	_NEST  
+	_ADR RFROM 
 	_DOLIT 8
 	_ADR SUBB
 	_ADR TNAME
@@ -3495,9 +3548,16 @@ VERSN:
  check if PS2 keyboard 
  present.
 **********************/
-PS2_QUERY:
+PS2_QUERY: 
 	_NEST 
-	_ADR KBD_RST
+	_DOLIT 400 
+	_ADR PAUSE
+	_ADR PS2_QKEY
+	_QBRAN 1f
+	_DOLIT BAT_OK 
+	_ADR XORR 
+	_QBRAN 9f 
+1:	_ADR KBD_RST
 	_DOLIT BAT_OK 
 	_ADR XORR  
 	_QBRAN 9f  
@@ -3551,7 +3611,8 @@ COLD1:
 	_DOLIT	ULAST-UZERO
 	_ADR	MOVE 			// initialize user area
 	_ADR	PRESE			// initialize stack and TIB
-	_ADR	IF_SENSE 
+	_ADR	IF_SENSE
+	_ADR	WR_DIS          // disable WEL bit in U3 spi flash  
 	_ADR 	PS2_QUERY  
 	_ADR	TBOOT
 	_ADR	ATEXE			// application boot

@@ -175,7 +175,17 @@
    .equ SCB_AFSR,0x3c
    // key to to write in SCB_AIRCR 
    .equ SCB_VECTKEY,0x5fa 
-   
+
+   // coprocessor control space 
+   .equ CPACR, 0xE000ED88
+   .equ FPC_BASE_ADR, xE000EF34
+   .equ FPCCR, 0 
+   .EQU FPCAR, 4 
+   .EQU FPDSCR,8
+   .equ MVFR0, 0xC 
+   .EQU MVFR1, 0x10
+   .EQU MVFR2, 0x14
+
    /* NVIC block */
    .equ NVIC_BASE_ADR, 0xE000E000
    .equ NVIC_ISER0, 0x100
