@@ -1,4 +1,10 @@
-20210-06-17 
+2021-06-19
+
+* Ajout de **VLIST** et **UPPER** 
+
+* Maintenant mots insensible à la casse. 
+
+2021-06-17 
 
 * Ajout de mots au vocabulaire.
 

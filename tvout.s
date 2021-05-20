@@ -543,8 +543,6 @@ CHAR_ROW:
     _ADR INCR_X 
     _ADR RFROM 
     _ADR NEXT_PIXEL
-    //_DOLIT 1 
-    //_ADR LSHIFT 
     _DONXT 1b
     _ADR TDROP 
     _UNNEST 

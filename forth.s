@@ -1655,7 +1655,7 @@ DGTQ1:
 /**********************************
     NUMBER?	( a -- n T | a F )
  	Convert a number word to 
-	integer. Push a flag on tos.
+	integer. Push a flag on TOS.
 **********************************/
 	_HEADER NUMBQ,7,"NUMBER?"
 	_NEST
@@ -2132,6 +2132,7 @@ PARS8:
 	_NEST
 	_ADR	BLANK
 	_ADR	WORDD
+	_ADR	UPPER 
 	_UNNEST
 
 /**********************
@@ -2266,6 +2267,38 @@ FIND5:
 /********************
   console input
 ********************/
+
+/***********************
+	UPPER (cstring -- cstring )
+	convert to upper case in situ
+*******************************/
+	_HEADER UPPER,5,"UPPER"
+	_NEST 
+	_ADR DUPP 
+	_ADR TOR 
+	_ADR COUNT
+	_DOLIT 0x1f
+	_ADR ANDD
+	_ADR TOR 
+	_BRAN 3f
+1:  _ADR DUPP 
+	_ADR COUNT 
+	_ADR DUPP 
+	_DOLIT 'a'-1
+	_ADR GREAT
+	_QBRAN 2f 
+	_ADR DUPP 
+	_DOLIT 'z'+1 
+	_ADR LESS 
+	_QBRAN 2f 
+	_DOLIT 0x5f  
+	_ADR ANDD
+2:	_ADR ROT
+	_ADR CSTOR
+3:  _DONXT 1b
+	_ADR DROP 
+	_ADR RFROM
+	_UNNEST 
 
 /**************************************
    BKSP  ( bot eot cur -- bot eot cur )
@@ -2444,7 +2477,7 @@ ABORQ:
 	_ADR	EXECU
 	_UNNEST			// execute defined word
 INTE1:
-	_ADR	NUMBQ
+	_ADR	NUMBER 
 	_QBRAN	INTE2
 	_UNNEST
 INTE2:
@@ -2780,6 +2813,15 @@ DOLOOP: // ( -- R: counter limit )
 	ldr TOS,[RSP]
 	_NEXT 
 
+/****************************
+	J ( -- n )
+	stack outer loop counter 
+****************************/
+	_HEADER J,1,"J"
+	_PUSH 
+	ldr TOS,[RSP,#4]
+	_NEXT 
+
 /**********************
     UNTIL	( a -- )
  	Terminate a BEGIN-UNTIL
@@ -3001,7 +3043,7 @@ SCOM1:
 	_ADR	CALLC			// it's not immediate, compile
 	_UNNEST	
 SCOM2:
-	_ADR	NUMBQ
+	_ADR	NUMBER 
 	_QBRAN	SCOM3
 	_ADR	LITER
 	_UNNEST			// compile number as integer
@@ -3440,6 +3482,19 @@ DECOM2:
 	_ADR	DROP
 	_UNNEST
 .endif 
+
+/**********************
+	VLIST ( -- )
+	WORDS alias 
+	+ display words count 
+**********************/
+	_HEADER VLIST,5,"VLIST"
+	_NEST 
+	_ADR WORDS
+	_ADR CR 
+	_ADR WC
+	_ADR DOT    
+	_UNNEST 
 
 /*********************
     WORDS	( -- )

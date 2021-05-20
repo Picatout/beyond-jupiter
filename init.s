@@ -267,6 +267,7 @@ reset_handler:
 	mov sp,r0  
 	bl	remap 
 	bl	init_devices	 	/* RCC, GPIOs, USART */
+  bl  fpu_init 
 	bl  ser_init
  	bl	tv_init
   bl  kbd_init
@@ -343,10 +344,6 @@ wait_sws:
   beq wait_sws
 /* now sysclock is 96 Mhz */
 
-/* enable FPU coprocessors CP10,CP11 */
-//  _MOV32 r0, CPACR 
-//  mov r1,#15<<20
-//  str r1,[r0]
 
 /* enable peripheral clock for GPIOA, GPIOC and USART1 */
   mov	r1, #0x9F		/* all GPIO clock */
