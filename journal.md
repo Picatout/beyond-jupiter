@@ -1,3 +1,9 @@
+2021-05-24
+
+* Travail sur [float.s](float.s)
+
+* Factorisation de **BCD+** et ajout de **BCD1+**. 
+
 2021-05-23
 
 * Travail sur [float.s](float.s)
