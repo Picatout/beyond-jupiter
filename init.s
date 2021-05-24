@@ -267,7 +267,6 @@ reset_handler:
 	mov sp,r0  
 	bl	remap 
 	bl	init_devices	 	/* RCC, GPIOs, USART */
-  bl  fpu_init 
 	bl  ser_init
  	bl	tv_init
   bl  kbd_init
@@ -598,6 +597,7 @@ UZERO:
     .word 0 /* tv cursor column */ 
     .word 0 /* tv back color */
     .word 7 /* tv font color */
+    .space FP_WS_SIZE  /* floating point work space */ 
     .word 0,0 
 ULAST:
 

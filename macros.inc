@@ -105,6 +105,8 @@
   .equ COL,ROW+4 
   .equ BK_COLOR,COL+4 
   .equ PEN_COLOR,BK_COLOR+4
+  .equ FP_WS, PEN_COLOR+4  // floating point work space 
+  .equ FP_WS_SIZE, 19  // 19 bytes for floating point work space 
 
 /***********************************************
 * MACROS

@@ -1,16 +1,31 @@
-2021-06-19
+2021-05-23
+
+* Travail sur [float.s](float.s)
+
+* Déboger BCD+
+
+2021-05-22
+
+* Travail sur [float.s](float.s) référence [docs/Jupiter-Ace-ROM.asm](docs/Jupiter-Ace-ROM.asm) et 
+[docs/JA-Ace4000-Manual-First-US-Edition.pdf](JA-Ace4000-Manual-First-US-Edition.pdf) chapitre 15.
+
+2021-05-20
+
+* added [test-bars.f](test-bars.f)
+
+2021-05-19
 
 * Ajout de **VLIST** et **UPPER** 
 
 * Maintenant mots insensible à la casse. 
 
-2021-06-17 
+2021-05-17 
 
 * Ajout de mots au vocabulaire.
 
     * **DO**, **LOOP** et **+LOOP** 
     
-2021-06-16
+2021-05-16
 
 * déboguage spi-flash.s
 
