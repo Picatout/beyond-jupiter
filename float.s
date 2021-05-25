@@ -223,6 +223,66 @@ digit_prod:
     b BCD_1P 
 
 
+/*****************************************
+    BCD* ( bcd1 bcd2 -- prod_low prod_hi )
+    multiply 2 bcd numbers 
+    return 16 digits products 
+*****************************************/
+    _HEADER BCD_STAR,4,"BCD*"
+
+    _NEXT 
+
+/**********************************
+    BCD>BIN ( bcd sign -- binary )
+    convert bcd number to binary 
+**********************************/
+    _HEADER BCD_BIN,7,"BCD>BIN"
+    push {TOS}
+    _POP 
+    eor WP,WP 
+    mov T1,#10 
+    mov T3,#28 
+1:  mul WP,T1 
+    lsr T2,TOS,T3 
+    and T2,#15 
+    add WP,T2 
+    subs T3,#4 
+    bpl 1b
+    mov TOS,WP
+    pop {T0}
+    cbz T0,4f
+    rsb TOS,#0 
+4:  _NEXT 
+
+/**********************************
+    BIN>BCD ( int -- bcd sign )
+    convert bcd number to binary 
+**********************************/
+    _HEADER BIN_BCD,7,"BIN>BCD"
+    mov T0,TOS 
+    _PUSH
+    eor TOS,TOS // sign  
+    tst T0,#(1<<31)
+    beq 1f 
+    mvn TOS,TOS // negative 
+    rsb T0,#0 // 2's complement 
+1:  mov T1,#10
+    eor WP,WP 
+    eor T3,T3 
+2:  cbz T0,3f 
+    udiv T2,T0,T1    
+    push {T2}
+    mul T2,T1 
+    rsb T2,T0 
+    pop {T0}
+    lsl T2,T3 
+    orr WP,T2 
+    add T3,#4 
+    cmp T3,#32 
+    bne 2b 
+3:  str WP,[DSP]
+    _NEXT 
+
 /*******************************
     F+ ( f1 f2 -- f1+f2 )
     add 2 float 

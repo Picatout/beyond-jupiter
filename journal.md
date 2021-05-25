@@ -4,6 +4,10 @@
 
 * Factorisation de **BCD+** et ajout de **BCD1+**. 
 
+* Ajout de **BCD-NEG** et **BCD-** .
+
+* Ajout de **BCD>BIN** et **BIN>BCD** 
+
 2021-05-23
 
 * Travail sur [float.s](float.s)
