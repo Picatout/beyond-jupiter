@@ -1,3 +1,14 @@
+2021-05-25
+
+* Création et checkout sur branche **test** pour travailler sur [float.s](float.s)
+
+* Travail sur [float.s](float.s)
+
+* Ajout de **U>** 
+
+* Ajout de **BIN** set set **BASE** to 2.
+
+
 2021-05-24
 
 * Travail sur [float.s](float.s)

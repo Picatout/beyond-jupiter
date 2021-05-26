@@ -806,6 +806,18 @@ BRAN:
 	MOVGE	TOS,#0
 	_NEXT 
 
+/**********************
+	U> ( u u -- t|f )
+    unsigned greater 
+**********************/
+	_HEADER UGREAT,2,"U>"
+	LDR WP,[DSP],#4 
+	CMP TOS,WP 
+	ITE CC  
+	MVNCC TOS,#0 
+	MOVCS TOS,#0
+	_NEXT 
+
 /***********************
     >	( w w -- t )
  	greater?
@@ -1609,6 +1621,19 @@ STRR:
 	_ADR	STORE
 	_UNNEST
 
+/**************************
+	BIN ( -- )
+	Use radix 2 as 
+	base for numeric 
+	conversion 
+**************************/
+	_HEADER BIN,3,"BIN"
+	_NEST 
+	_DOLIT 2 
+	_ADR BASE 
+	_ADR STORE
+	_UNNEST 
+
 /************************
     DECIMAL	( -- )
  	Use radix 10 as base
@@ -1652,35 +1677,86 @@ DGTQ1:
 	_ADR	ULESS
 	_UNNEST
 
+/*****************************
+	( a c -- a+ n c- )
+	a  string pointer 
+	c string length 
+	a+ updated pointer 
+	n  parsed integer 
+	c- character left in string   
+****************************/
+	.type PARSE_DIGITS, %function 
+PARSE_DIGITS:
+	mov T0,TOS // string length 
+	_POP // TOS <- a 
+	eor WP,WP  // integer accumulator  
+	ldr T2,[UP,#NBASE] // conversion base 
+1:	cbz T0, 8f 
+	ldrb T1,[TOS],#1
+	sub T1,#'0'
+	cmp T1,#10 
+	bmi 2f 
+	sub T1,#7
+2:  cmp T1,T2
+	bpl 7f 
+	mul WP,T2 
+	add WP,T1
+	sub T0,#1 
+	b 1b 
+7:  // not a valid character 
+	sub TOS,#1
+	add T0,#1 
+8:	_PUSH // -- a+
+	str WP,[DSP,#-4]! // -- a+ n 
+	mov TOS,T0  // -- a+ n c- 
+	_NEXT 
+
+
 /**********************************
-    NUMBER?	( a -- n T | a F )
- 	Convert a number word to 
+    INT?	( a -- n T | a F )
+ 	parse string for at 'a' for 
 	integer. Push a flag on TOS.
+	integer form:
+		[-]hex_digit+  | 
+		$[-]hex_digit+ |
+		%[-]bin_digit+ | 
+		[-]dec_digit+ 
 **********************************/
-	_HEADER NUMBQ,7,"NUMBER?"
+	_HEADER INTQ,4,"INT?"
 	_NEST
 	_ADR	BASE
 	_ADR	AT
 	_ADR	TOR
-	_DOLIT	0
-	_ADR	OVER
-	_ADR	COUNT
-	_ADR	OVER
-	_ADR	CAT
-	_DOLIT '$'
-	_ADR	EQUAL
-	_QBRAN	NUMQ1
+	_DOLIT	0      // a 0 
+	_ADR	OVER   // a 0 a 
+	_ADR	COUNT  // a 0 a+ c 
+	_ADR	OVER   // a 0 a+ c a+
+	_ADR	CAT    // a 0 a+ c char 
+	_DOLIT '$'     // a 0 a+ c char '$'
+	_ADR	EQUAL  // a 0 a+ c f 
+	_QBRAN	0f    
 	_ADR	HEX
-	_ADR	SWAP
+	_ADR	SWAP  // a 0 c a+ 
 	_ADR	ONEP
 	_ADR	SWAP
-	_ADR	ONEM
-NUMQ1:
+	_ADR	ONEM // a 0 a+ c 
+	_BRAN   1f
+0:  _ADR    OVER 
+	_ADR    CAT 
+	_DOLIT  '%'
+	_ADR	EQUAL 
+	_QBRAN  1f
+	_ADR	BIN 
+	_ADR	SWAP 
+	_ADR	ONEP 
+	_ADR	SWAP 
+	_ADR	ONEM 	 
+1:  // a 0 a+ c 
 	_ADR	OVER
 	_ADR	CAT
 	_DOLIT	'-'
 	_ADR	EQUAL
-	_ADR	TOR
+	_ADR	TOR   // save sign
 	_ADR	SWAP
 	_ADR	RAT
 	_ADR	SUBB
@@ -1688,45 +1764,21 @@ NUMQ1:
 	_ADR	RAT
 	_ADR	PLUS
 	_ADR	QDUP
-	_QBRAN	NUMQ6
-	_ADR	ONEM
-	_ADR	TOR
-NUMQ2:
-	_ADR	DUPP
-	_ADR	TOR
-	_ADR	CAT
-	_ADR	BASE
-	_ADR	AT
-	_ADR	DIGTQ
-	_QBRAN	NUMQ4
-	_ADR	SWAP
-	_ADR	BASE
-	_ADR	AT
-	_ADR	STAR
-	_ADR	PLUS
-	_ADR	RFROM
-	_ADR	ONEP
-	_DONXT	NUMQ2
-	_ADR	RAT
-	_ADR	SWAP
-	_ADR	DROP
-	_QBRAN	NUMQ3
+	_QBRAN	6f
+	_ADR	PARSE_DIGITS  // a 0 a+ c -- a 0 a+ n c- 
+	_ADR	ZEQUAL
+	_QBRAN  6f // digits left, not an integer 
+2:	_ADR	RFROM  // sign 
+	_QBRAN  3f   // positive integer 
 	_ADR	NEGAT
-NUMQ3:
-	_ADR	SWAP
-	_BRAN	NUMQ5
-NUMQ4:
+3:	_ADR	NROT  
+	_ADR	DDROP 
+	_DOLIT  -1
+	_BRAN	7f 
+6:  _ADR	DDROP 
 	_ADR	RFROM
-	_ADR	RFROM
-	_ADR	DDROP
-	_ADR	DDROP
-	_DOLIT	0
-NUMQ5:
-	_ADR	DUPP
-NUMQ6:
-	_ADR	RFROM
-	_ADR	DDROP
-	_ADR	RFROM
+	_ADR	DROP
+7:	_ADR	RFROM
 	_ADR	BASE
 	_ADR	STORE
 	_UNNEST
@@ -2267,6 +2319,24 @@ FIND5:
 /********************
   console input
 ********************/
+
+/****************************
+	ASCIZ ( a -- a+ )
+	convert counted string to 
+	null terminated string 
+	in pad.
+*****************************/
+	_HEADER ASCIZ,5,"ASCIZ" 
+	_NEST 
+	_ADR COUNT 
+	_ADR TOR 
+	_ADR DUPP 
+	_ADR RFROM
+	_ADR PLUS 
+	_DOLIT 0 
+	_ADR SWAP 
+	_ADR CSTOR  
+	_NEXT 
 
 /***********************
 	UPPER (cstring -- cstring )

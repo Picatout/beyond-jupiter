@@ -353,52 +353,47 @@ digit_prod:
     _UNNEST 
 
 /*******************************
-    IS_BASE10 ( c -- n t | c f )
+    digit? ( c -- n t | c f )
     check if character is base 10
-    digit. 
+    digit. 'n' is converted digit  
 *******************************/ 
-IS_BASE10:
+digitq:
     push {T0}
     mov T0,TOS 
     _PUSH 
-    eor TOS,TOS 
+    eor TOS,TOS  // f flag 
     subs T0,#'0' 
     bmi 2f 
     cmp T0,#10 
     bpl 2f 
-    str T0,[DSP] 
+    str T0,[DSP]
+    rsb TOS,#0 // t flag  
 2:  pop {T0}
-    _RET 
+    _RET  
 
 
 /*****************************
-    PARSE_PREDECIM ( a -- a+ n t | a f )
-    parse integer part of float32 
-*****************************/
-PARSE_PREDCIM:
-
-
-/*****************************
-   parse decimal part of float32 
+   parse decimals digit 
+   ( a -- a+ d  n | a 0 )
+   d digits converted to binary integer 
+   n number of digits parsed 
+   if no digit return ( a 0 )  
 *****************************/
 PARSE_DECIM:
-    eor T0,T0 // sign 
-    eor T1,T1 // u
-    mov T3,#10 // numeric base  
-    ldrb T2,[TOS],#1
-    stmfd RSP!,{T2} //count >R 
-    ldrb T2,[TOS]
-    cmp T2,'-'
-    bne 1f 
-    mvn T0,T0 // negative 
-    b 2f
-1:  subs T2,#'0'
+    _PUSH  // save 'a' 
+    eor T1,T1 // count
+    mov T2,#10 // numeric base  
+    eor WP,WP // accumulator
+1:  ldrb T0,[TOS]
+    cbz T0,4f 
+    subs T0,#'0'
     bmi 3f 
-    cmp T2,#10
+    cmp T0,#10
     bpl 3f 
-    mul T1,T3 
-    add T1,T2 
-// NEXT 
+    mul WP,T1 
+    add WP,T0
+    add TOS,#1
+    b 1b  
 2:  add TOS,#1 
     ldr T2,[RSP]
     subs T2,#1 
@@ -406,7 +401,7 @@ PARSE_DECIM:
 3:  add RSP,#4 
     stmfd DSP!,{T0,T1}
     _NEXT 
-
+4: // done   
 
 /*******************************
     FLOAT? ( a -- f -1 | a 0 )
@@ -418,7 +413,13 @@ _DOLIT 0
 _UNNEST     
     _ADR DUPP 
     _ADR TOR  // a >R 
-    _ADR PARSE_DECIM // get mantissa 
+    _ADR ASCIZ
+    _ADR DUPP 
+    _ADR CAT 
+    _DOLIT '-'
+    _ADR XORR 
+    _QBRAN 1f  
+    _ADR PARSE_DECIM // integer part 
     _ADR ROT 
     _ADR DUPP 
     _ADR CAT 
@@ -446,15 +447,15 @@ exponent: // get exponent
     _UNNEST 
 
 /********************************
-    NUMBER ( a -- n -1 | f -2 | a 0 )
+    NUMBER ( a -- int -1 | float -2 | a 0 )
     parse number, integer or float 
-    if not a number return 0 
-    if integer return n -1 
-    if float return f -2 
+    if not a number return ( a 0 ) 
+    if integer return ( int -1 ) 
+    if float return ( float -2 )
 **********************************/
     _HEADER NUMBER,6,"NUMBER"
     _NEST 
-    _ADR NUMBQ
+    _ADR INTQ
     _ADR QDUP 
     _QBRAN 2f 
     _UNNEST 
