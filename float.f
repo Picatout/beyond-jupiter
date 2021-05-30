@@ -51,20 +51,9 @@ VARIABLE FBASE \ floating point base
     $FFFFFFF AND OR 
     SFZ SFN ;
 
-: F. ( F# -- )
-\ print float in fixed point format  
-    @EXPONENT >R
-    DUP 
-    I 0< IF I ABS 0 DO # LOOP 46 HOLD 
-    ELSE 46 HOLD 
-    I IF I 0 DO 48 HOLD LOOP THEN  
-    THEN R> DROP 
-    #S SIGN #> TYPE SPACE 
-;
-
 : E. ( F# -- ) 
 \ print float in scientific notation 
-    SPACE 
+    SPACE
     @EXPONENT  
     OVER 0= IF 
         ." 0.0" 2DROP 
@@ -82,6 +71,27 @@ VARIABLE FBASE \ floating point base
             DUP 0< IF 
                 45 EMIT ABS THEN
             <# #S #> TYPE THEN 
-;       THEN 
+        THEN 
+;
+
+: F. ( F# -- )
+\ print float in fixed point format  
+    DUP @EXPONENT >R
+    I ABS 32 U> IF
+        R> 2DROP E.
+    ELSE
+        SPACE <#  
+        I 0< IF
+            I ABS 0 DO # LOOP 46 HOLD
+        ELSE
+            46 HOLD I IF
+                I 0 DO 48 HOLD LOOP 
+            THEN
+        THEN
+        R> DROP 
+        #S SWAP 8 LSHIFT SIGN #> TYPE
+    THEN 
+;
+
 
 FINIT 

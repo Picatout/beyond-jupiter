@@ -5445,7 +5445,7 @@ Disassembly of section .text:
  8003ab8:	08003a58 	stmdaeq	r0, {r3, r4, r6, r9, fp, ip, sp}
 
 08003abc <_LBRAC>:
- 8003abc:	bf005b01 	svclt	0x00005b01
+ 8003abc:	bf005b81 	svclt	0x00005b81
 
 08003ac0 <LBRAC>:
  8003ac0:	4750      	bx	sl

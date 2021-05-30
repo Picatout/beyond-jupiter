@@ -1,3 +1,7 @@
+2021-05-30
+
+* Travail sur [float.f](float.f) à partir de l'article paru dans FORTH dimensions vol. IV, #1
+
 2021-05-29
 
 * Travail sur [float.f](float.f) à partir de l'article paru dans FORTH dimensions vol. IV, #1

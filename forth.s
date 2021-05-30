@@ -2571,7 +2571,7 @@ INTE2:
     [	   ( -- )
  	Start the text interpreter.
 *******************************/
-	_HEADER LBRAC,1,"["
+	_HEADER LBRAC,IMEDD+1,"["
 	_NEST
 	_DOLIT	INTER
 	_ADR	TEVAL

@@ -8074,8 +8074,8 @@ ARM GAS  forth.s 			page 1
  2571              	    [	   ( -- )
  2572              	 	Start the text interpreter.
  2573              	*******************************/
- 2574 38b8 58380000 		_HEADER LBRAC,1,"["
- 2574      015B00BF 
+ 2574 38b8 58380000 		_HEADER LBRAC,IMEDD+1,"["
+ 2574      815B00BF 
  2575 38c0 504700BF 		_NEST
  2576 38c4 1F220000 		_DOLIT	INTER
  2576      64380000 
