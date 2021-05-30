@@ -1698,7 +1698,7 @@ PARSE_DIGITS:
 	bmi 2f 
 	sub T1,#7
 2:  cmp T1,T2
-	bpl 7f 
+	bcs 7f 
 	mul WP,T2 
 	add WP,T1
 	sub T0,#1 
@@ -1710,6 +1710,24 @@ PARSE_DIGITS:
 	str WP,[DSP,#-4]! // -- a+ n 
 	mov TOS,T0  // -- a+ n c- 
 	_NEXT 
+
+/************************************
+	DASH? ( a c -- a+ c- t | a c f )
+	check if *a is '-' 
+*************************************/
+	_HEADER DASHQ,5,"DASH?"
+	eor T2,T2  // flag 
+	ldr T0,[DSP] // T0 <- a 
+	str TOS,[DSP,#-4]! // a c c 
+	ldrb T1,[T0],#1
+	cmp T1,#'-'
+	bne 9f 
+	str T0,[DSP,#4] // a+ 
+	sub TOS,#1 
+	str TOS,[DSP] // a+ c- 
+	mvn T2,T2 // -1 
+9:	mov TOS,T2 // a+ c- -1 | a c 0 
+	_NEXT
 
 
 /**********************************
@@ -1741,47 +1759,42 @@ PARSE_DIGITS:
 	_ADR	SWAP
 	_ADR	ONEM // a 0 a+ c 
 	_BRAN   1f
-0:  _ADR    OVER 
-	_ADR    CAT 
-	_DOLIT  '%'
-	_ADR	EQUAL 
+0:  _ADR    OVER  // a 0 a+ c a+
+	_ADR    CAT   // a 0 a+ c char 
+	_DOLIT  '%'   // a 0 a+ c char '%'
+	_ADR	EQUAL  // a 0 a+ c f 
 	_QBRAN  1f
 	_ADR	BIN 
 	_ADR	SWAP 
 	_ADR	ONEP 
 	_ADR	SWAP 
-	_ADR	ONEM 	 
+	_ADR	ONEM
 1:  // a 0 a+ c 
-	_ADR	OVER
-	_ADR	CAT
-	_DOLIT	'-'
-	_ADR	EQUAL
-	_ADR	TOR   // save sign
-	_ADR	SWAP
-	_ADR	RAT
-	_ADR	SUBB
-	_ADR	SWAP
-	_ADR	RAT
-	_ADR	PLUS
+	_ADR	DASHQ
+	_ADR	TOR   // save sign -- a 0 a+ c- 
 	_ADR	QDUP
 	_QBRAN	6f
 	_ADR	PARSE_DIGITS  // a 0 a+ c -- a 0 a+ n c- 
 	_ADR	ZEQUAL
-	_QBRAN  6f // digits left, not an integer 
+	_QBRAN  5f // digits left, not an integer 
 2:	_ADR	RFROM  // sign 
 	_QBRAN  3f   // positive integer 
 	_ADR	NEGAT
-3:	_ADR	NROT  
-	_ADR	DDROP 
-	_DOLIT  -1
-	_BRAN	7f 
-6:  _ADR	DDROP 
-	_ADR	RFROM
-	_ADR	DROP
+3:	
+	_ADR	NROT  // a n 0 a+
+	_ADR	DDROP // a n 
+	_DOLIT  -1    // a n -1 
+	_ADR	ROT   // n -1 a 
+	_ADR	DROP 
+	_BRAN   7f  
+5:  _ADR    DROP  // -- a 0 a+   	 
+6:  _ADR	RFROM
+	_ADR	DDROP
 7:	_ADR	RFROM
 	_ADR	BASE
 	_ADR	STORE
 	_UNNEST
+
 
 /********************
   console I/O
@@ -1975,11 +1988,11 @@ DOT1:
 	_UNNEST			// yes, display signed
 
 /***********************
-	.H ( w -- )
+	H. ( w -- )
 	display integer 
 	in hexadecimal 
 *********************/
-	_HEADER DOTH,2,".H"
+	_HEADER HDOT,2,"H."
 	_NEST 
 	_ADR BASE
 	_ADR AT 
@@ -2127,7 +2140,7 @@ PARS8:
 	string up to next )
 	A comment.
 ************************/
-	_HEADER PAREN,1,"("
+	_HEADER PAREN,IMEDD+1,"("
 	_NEST
 	_DOLIT	')'
 	_ADR	PARSE
@@ -2140,7 +2153,7 @@ PARS8:
 	text till the 
 	end of line.
 ********************/
-	_HEADER BKSLA,1,"\\"
+	_HEADER BKSLA,IMEDD+1,"\\"
 	_NEST
 	_ADR	NTIB
 	_ADR	AT
@@ -3422,6 +3435,28 @@ DUMP3:
 	_ADR	BASE
 	_ADR	STORE			// restore radix
 	_UNNEST
+
+/***********************
+	TRACE ( -- )
+**********************/
+	_HEADER TRACE,5,"TRACE"
+	_NEST 
+	_ADR CR 
+	_ADR BASE 
+	_ADR AT 
+	_ADR TOR
+	_ADR DECIM
+	_DOLIT '>' 
+	_DOLIT 'S'
+	_ADR EMIT 
+	_ADR EMIT  
+	_ADR DOTS
+	_ADR RFROM 
+	_ADR BASE 
+	_ADR STORE  
+	_ADR CR 
+	_UNNEST 
+
 
 /**********************
    .S	  ( ... -- ... )

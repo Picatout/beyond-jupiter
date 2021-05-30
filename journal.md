@@ -1,3 +1,14 @@
+2021-05-29
+
+* Travail sur [float.f](float.f) à partir de l'article paru dans FORTH dimensions vol. IV, #1
+2021-05-27
+
+* Travail sur [float.s](float.s)
+
+2021-05-26
+
+* Travail sur [float.s](float.s)
+
 2021-05-25
 
 * Création et checkout sur branche **test** pour travailler sur [float.s](float.s)
@@ -8,6 +19,9 @@
 
 * Ajout de **BIN** set set **BASE** to 2.
 
+* Renommé  **NUMBER?** **INT?** 
+
+* Retravaillé  **INT?**  pour utiliser **PARSE_DIGITS** comme facteur commun entre **FLOAT?** et **INT?** 
 
 2021-05-24
 

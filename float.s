@@ -41,6 +41,7 @@ Format:
     FNEGATE, INT, UFLOAT, F. 
 *******************************************************/    
 
+    MAX_MANTISSA = 0xffffff // biggest mantissa 
 
 /*****************************************************************************
     PREP_FP  
@@ -352,56 +353,133 @@ digit_prod:
 
     _UNNEST 
 
-/*******************************
-    digit? ( c -- n t | c f )
-    check if character is base 10
-    digit. 'n' is converted digit  
-*******************************/ 
-digitq:
-    push {T0}
-    mov T0,TOS 
-    _PUSH 
-    eor TOS,TOS  // f flag 
-    subs T0,#'0' 
-    bmi 2f 
-    cmp T0,#10 
-    bpl 2f 
-    str T0,[DSP]
-    rsb TOS,#0 // t flag  
-2:  pop {T0}
-    _RET  
+
+// accumulate digits 
+// ( n a+ c -- n+ a+ c- )
+ACCUM_DIGITS:
+    _NEST 
+    _ADR TOR 
+    _BRAN 4f 
+1:  _ADR COUNT 
+    _DOLIT 10  // n a+ char 10 
+    _ADR DIGTQ
+    _QBRAN 6f
+    _ADR ROT 
+    _DOLIT 10 
+    _ADR STAR 
+    _ADR PLUS 
+    _ADR SWAP // n a+  
+4:  _ADR RFROM  
+    _ADR DUPP 
+    _QBRAN 9f 
+    _ADR ONEM 
+    _ADR TOR
+    _BRAN 1b 
+6:  _ADR DROP 
+    _ADR ONEM
+    _ADR RFROM
+    _ADR DUPP  
+    _QBRAN 9f 
+    _ADR ONEP      
+9:  _UNNEST 
+
+// parse mantissa
+//  ( a c -- dcnt m a+ c- ) 
+MANTISSA:
+    _NEST
+    _ADR OVER 
+    _ADR TOR  
+    _DOLIT 0 
+    _ADR NROT 
+    _ADR ACCUM_DIGITS
+    _ADR SWAP  // m c- a+ 
+    _ADR DUPP  
+    _ADR RFROM // m c- a+ a+ a 
+    _ADR  SUBB // m c- a+ dcnt 
+    _ADR NROT // m dcnt c- a+ 
+    _ADR SWAP // m dcnt a+ c-
+    _ADR TOR  // m dcnt a+ R: c- 
+    _ADR SWAP // m a+ dcnt 
+    _ADR NROT // dcnt m a+ 
+    _ADR RFROM // dcnt m a+ c-  
+    _UNNEST 
+
+//parse exponent
+// ( a c -- e esign a+ c- ) 
+EXPONENT:
+    _NEST 
+    _ADR DASHQ 
+    _ADR TOR  // a c R: esign 
+    _DOLIT 0 
+    _ADR NROT 
+    _ADR ACCUM_DIGITS 
+    _ADR RFROM 
+    _ADR NROT // e esign a+ c- 
+    _UNNEST 
+
+// build float
+//  ( dcnt m e esign msign -- float ) 
+FORMAT_FLOAT:
+    _NEST 
+    _DOLIT (1<<31)
+    _ADR ANDD 
+    _ADR SWAP 
+    _DOLIT (1<<30)
+    _ADR XORR  
+    _ADR ORR  // dcnt m e sign 
+    _ADR ROT  // dcnt e sign m 
+    _ADR DUPP 
+    _QBRAN 2f // mantissa = 0 
+    _ADR TOR // dcnt e sign R:  mantissa 
+    _ADR NROT 
+    _ADR PLUS // sign e R: mantissa  
+    _DOLIT 64 
+    _ADR PLUS 
+    _DOLIT 24 
+    _ADR LSHIFT 
+    _ADR RFROM 
+    _ADR BOUND_MANTISSA
+    _ADR ORR 
+    _BRAN 9f
+2:  _ADR TOR // 
+    _ADR DDROP 
+    _ADR DROP 
+    _ADR RFROM 
+9:  _UNNEST 
 
 
-/*****************************
-   parse decimals digit 
-   ( a -- a+ d  n | a 0 )
-   d digits converted to binary integer 
-   n number of digits parsed 
-   if no digit return ( a 0 )  
-*****************************/
-PARSE_DECIM:
-    _PUSH  // save 'a' 
-    eor T1,T1 // count
-    mov T2,#10 // numeric base  
-    eor WP,WP // accumulator
-1:  ldrb T0,[TOS]
-    cbz T0,4f 
-    subs T0,#'0'
-    bmi 3f 
-    cmp T0,#10
-    bpl 3f 
-    mul WP,T1 
-    add WP,T0
-    add TOS,#1
-    b 1b  
-2:  add TOS,#1 
-    ldr T2,[RSP]
-    subs T2,#1 
-    bne 0b 
-3:  add RSP,#4 
-    stmfd DSP!,{T0,T1}
-    _NEXT 
-4: // done   
+// bound mantissa
+//  0xfffff < m <= MAX_MANTISSA
+//  ( e m1 -- e m2 )
+BOUND_MANTISSA:
+    _NEST
+    _ADR DUPP 
+    _DOLIT MAX_MANTISSA
+    _ADR UGREAT  
+    _QBRAN SCALE_UP
+// to much digits 
+// scale down  
+1:  _ADR DUPP 
+    _DOLIT MAX_MANTISSA 
+    _ADR UGREAT 
+    _QBRAN 2f 
+    _DOLIT 10 
+    _ADR SLASH 
+    _BRAN 1b
+2:  _UNNEST 
+SCALE_UP:
+    _ADR DUPP 
+    _DOLIT 0xff0000
+    _ADR ANDD 
+    _ADR INVER
+    _QBRAN 9f
+    _DOLIT 10 
+    _ADR STAR 
+    _ADR SWAP 
+    _ADR ONEM
+    _BRAN 1b 
+9:  _UNNEST 
+
 
 /*******************************
     FLOAT? ( a -- f -1 | a 0 )
@@ -409,42 +487,74 @@ PARSE_DECIM:
 *******************************/
     _HEADER FLOATQ,6,"FLOAT?"
     _NEST
-_DOLIT 0 
-_UNNEST     
-    _ADR DUPP 
-    _ADR TOR  // a >R 
-    _ADR ASCIZ
-    _ADR DUPP 
-    _ADR CAT 
-    _DOLIT '-'
+    _ADR BASE 
+    _ADR AT 
+    _ADR TOR
+    _ADR DECIM 
+    _DOLIT 0
+    _ADR OVER   // a 0 a  
+    _ADR COUNT  // a 0 a+ c 
+    _ADR DASHQ  // negative sign? 
+    _ADR TOR   // a 0 a+ c- R: base msign   
+    _ADR MANTISSA // a 0 dcnt m a+ c- 
+    _ADR OVER 
+    _ADR CAT
+    _ADR DUPP  
+    _DOLIT '.' 
     _ADR XORR 
-    _QBRAN 1f  
-    _ADR PARSE_DECIM // integer part 
-    _ADR ROT 
-    _ADR DUPP 
+    _QBRAN 1f 
+    _DOLIT 'E' 
+    _ADR XORR 
+    _QBRAN 2f
+// format error 
+0:  _ADR _DDROP // -- a 0 dcnt m 
+    _ADR _DDROP // -- a 0
+    _ADR RFROM 
+    _ADR DROP 
+    _BRAN 9f  
+1:  _ADR DROP
+    _ADR ONEM
+    _ADR SWAP 
+    _ADR ONEP 
+    _ADR SWAP
+_ADR TRACE 
+    _ADR ACCUM_DIGITS // a 0 dcnt m a+ c-
+_ADR TRACE 
+    _ADR OVER 
     _ADR CAT 
     _ADR DUPP 
-    _DOLIT '.'
-    _ADR XORR   
-    _QBRAN fraction   
-try_e:
-    _DOLIT 'E'
-    _ADR XORR 
-    _QBRAN exponent 
-not_float:
-    _ADR TDROP // drop 3 elements
-    _ADR RFROM   
+    _DOLIT '.' 
+    _ADR EQUAL 
+    _QBRAN 2f
+    _ADR DROP 
     _DOLIT 0 
-    _UNNEST 
-fraction:
-    _ADR DROP
-1:  _ADR ONEP // m s a+ --
-    _ADR PARSE_DECIM // get fraction
-    
-    _UNNEST 
-exponent: // get exponent 
-
-    _UNNEST 
+    _BRAN 3f 
+2:  _DOLIT 'E'
+    _ADR XORR 
+    _QBRAN 2f
+    _ADR DUPP 
+    _ADR ZEQUAL 
+    _QBRAN 0b 
+    _DOLIT 0
+    _ADR ROT 
+    _BRAN 3f  
+2:  _ADR EXPONENT // a 0 dcnt m e esign a+ c- 
+    _QBRAN 3f   // if not char left ok 
+    _ADR DDROP 
+    _BRAN 0b
+3: _ADR TRACE   
+    _ADR DROP // a 0 dcnt m e esign 
+    _ADR RFROM // a 0 dcnt m e esign msign 
+_ADR TRACE 
+    _ADR FORMAT_FLOAT
+_ADR TRACE 
+    _ADR NROT 
+    _ADR DDROP 
+    _DOLIT -2 
+9:  _ADR RFROM 
+    _ADR BASE 
+    _ADR STORE     
+    _UNNEST    
 
 /********************************
     NUMBER ( a -- int -1 | float -2 | a 0 )

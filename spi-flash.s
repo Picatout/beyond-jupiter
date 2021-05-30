@@ -285,7 +285,7 @@ sr_cmd: .byte 5,0x35,0x15
 1:  _ADR DUPP 
     _ADR CAT 
     _ADR DUPP 
-    _ADR DOTH
+    _ADR HDOT
     _ADR WR_BYTE 
     _ADR ONEP
 2:  _DONXT 1b 
