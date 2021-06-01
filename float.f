@@ -43,12 +43,12 @@ VARIABLE FBASE \ floating point base
     FRESET SFZ SFN DUP $FF000000 AND 24 RSHIFT >R \ exponent 
     FNE IF $FF000000 OR ELSE $FFFFFF AND THEN R> ; \ sign extend mantissa 
 
-: !EXPONENT ( m e -- ; ovf ) 
+: !EXPONENT ( m e -- ; z n v ) 
 \ format float from mantissa and exponent 
-    DUP 255 > IF 4 FPSW C! THEN \ exponent overflow 
-    OVER $FFFFFF > IF 4 FPSW C! THEN \ mantissa overflow 
+    DUP ABS 255 > IF 4 FPSW C! THEN \ exponent overflow 
+    OVER ABS $FFFFFF > IF 4 FPSW C! THEN \ mantissa overflow 
     24 LSHIFT SWAP 
-    $FFFFFFF AND OR 
+    $FFFFFF AND OR 
     SFZ SFN ;
 
 : E. ( F# -- ) 
@@ -63,7 +63,7 @@ VARIABLE FBASE \ floating point base
             45 EMIT ABS THEN 
         <#
         BEGIN 
-        # DUP FBASE @ U< UNTIL
+        # DUP FBASE @ R> 1+ >R U< UNTIL
         46 HOLD # 
         #> TYPE 
         R> DUP 0= NOT IF 
@@ -80,7 +80,8 @@ VARIABLE FBASE \ floating point base
     I ABS 32 U> IF
         R> 2DROP E.
     ELSE
-        SPACE <#  
+        SPACE FNE IF ABS THEN 
+        <#  
         I 0< IF
             I ABS 0 DO # LOOP 46 HOLD
         ELSE
@@ -88,10 +89,23 @@ VARIABLE FBASE \ floating point base
                 I 0 DO 48 HOLD LOOP 
             THEN
         THEN
-        R> DROP 
+        R> DROP
         #S SWAP 8 LSHIFT SIGN #> TYPE
     THEN 
 ;
 
+: F* ( F#1 F#2 -- F#3 )
+    @EXPONENT >R 
+    SWAP @EXPONENT R> + >R
+    M* DUP 31 RSHIFT DUP >R -ROT    
+    R> IF DABS THEN 
+    BEGIN
+    2DUP $7FFFFF 0 UD> WHILE TRACE 
+    10 UD/
+    R> 1+ >R 
+    REPEAT
+    DROP SWAP IF NEGATE $FFFFFF AND THEN  
+    R> !EXPONENT 
+;
 
 FINIT 

@@ -563,6 +563,7 @@ BRAN:
 /***************************
     M*	 ( w w -- d )
  	signed multiply.
+	hold double result
 ***************************/
 	_HEADER MSTAR,2,"M*"
 	LDR	WP,[DSP]
@@ -732,6 +733,39 @@ BRAN:
 	STR	WP,[DSP]
 	ADC	TOS,TOS,T2
 	_NEXT
+
+/******************************
+	DABS ( d -- ud )
+	absolute value double 
+*****************************/
+	_HEADER DABS,4,"DABS"
+	tst TOS,#(1<<31)
+	beq 9f 
+	mvn TOS,TOS 
+	ldr WP,[DSP]
+	mvn WP,WP 
+	adds WP,#1
+	str WP,[DSP]
+	bcc 9f 
+	add TOS,#1 
+9:	_NEXT 
+
+/*****************************
+  UD> ( d1 d2 -- f )
+  unsigned compare double d1 > d2 
+******************************/
+	_HEADER UDGREAT,3,"UD>"
+	ldr WP,[DSP],#4  // d1 lo 
+	ldmfd DSP!,{T0,T1} // d2 hi,lo   
+	cmp T0,TOS 
+	bhi 1f
+	bmi 2f  
+	cmp T1,WP 
+	bls 2f 
+1:	mov TOS,#-1 
+	_NEXT 
+2:  mov TOS,#0 
+	_NEXT 
 
 /*****************************
     NOT	 ( w -- !w )
@@ -1192,6 +1226,99 @@ MMOD2:
 	_ADR	SWAP
 MMOD3:   
 	_UNNEST
+
+/****************************
+	D2* ( d -- d<<1 )
+	double * 2 
+***************************/
+	_HEADER D2STAR,3,"D2*"
+	ldr T0,[DSP]
+	lsls T0,#1
+	str T0,[DSP]
+	lsl TOS,#1
+	adc TOS,#0
+	_NEXT 
+
+
+/***************************
+	UD/  ( ud1 u - udq )
+    ud2 = ud1 / u
+	unsigned double division
+	quotient rounded 
+	to nearest integer 
+***************************/
+	_HEADER UDSLASH,3,"UD/"
+	push {IP}
+	ldr WP,[DSP],#4 
+	ldr T0,[DSP]   // ud1 = WP:T0
+	eor T2,T2 
+	eor T1,T1 // quotient T2:T1  
+	cbnz WP,1f    
+	udiv T1,T0,TOS
+	mul WP,T1,TOS
+	rsb WP,T0  
+	b 8f  
+1:	mov IP,#65 // divident shift counter 
+// scale divisor 	
+	clz T3,TOS 
+	push {T3}
+	lsl TOS,T3
+	rsb T3,#32 
+	push {T3}
+	sub IP,T3  
+//scale divident 
+	clz T3,WP
+	push {T3} 
+	sub IP,T3 
+1:  lsl WP,#1 
+	lsls T0,#1 
+	adc WP,#0 
+	subs T3,#1
+	bne 1b 
+	mov T3,#0
+1:	cbz T3,2f
+	lsls T3,#1 
+	sbc WP,TOS 
+	b 4f 
+2: 	cmp WP,TOS 
+	bcs 3f
+	eor T3,T3 
+	b 5f  
+3:	sub WP,TOS
+4:	mvn T3,#0   
+// put quotient bit in T2:T1 
+5: 	lsl T2,#1
+	lsls T1,#1
+	adc T2,#0  
+	lsls T3,#1 
+	adc T1,#0  	 
+// shift left divident 
+	lsls WP,#1
+	eor T3,T3 
+	rrx T3,T3  // carry 
+    lsls T0,#1
+	adc WP,#0
+    subs IP,#1 
+	bne 1b
+	pop {T3}
+	pop {T0}
+	sub T3,T0
+	add T3,#4
+	and T3,#0x18  
+	lsr WP,T3 
+	pop {T3}
+	lsr TOS,T3 
+8: // round quotient to nearest integer  
+	lsr TOS,#1 
+	cmp WP,TOS
+	bcc 9f
+	adds T1,#1
+	adc T2,#0 
+9:	str T1,[DSP]  // q lo 
+	mov TOS,T2  // q hi 		
+	pop {IP}
+	_NEXT 
+
 
 /****************************
    /MOD	( n n -- r q )

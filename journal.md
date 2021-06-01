@@ -1,4 +1,16 @@
+2021-05-01 
+
+* travail sur **UD/** 
+
 2021-05-30
+
+* Ajout de **UD/**  et __D2*__  
+
+* Travail sur [float.f](float.f) à partir de l'article paru dans FORTH dimensions vol. IV, #1
+
+2021-05-30
+
+* Ajout de **UD>**  et **DABS**  
 
 * Travail sur [float.f](float.f) à partir de l'article paru dans FORTH dimensions vol. IV, #1
 
