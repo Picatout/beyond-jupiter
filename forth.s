@@ -1240,6 +1240,15 @@ MMOD3:
 	_UNNEST
 
 /****************************
+	S>D ( n -- d )
+	convert single to double 
+*****************************/
+	_HEADER STOD,3,"S>D"
+	_PUSH 
+	ASR TOS,#31
+	_NEXT 
+
+/****************************
 	D2* ( d -- d<<1 )
 	double * 2 
 ***************************/
@@ -1251,6 +1260,16 @@ MMOD3:
 	adc TOS,#0
 	_NEXT 
 
+/****************************
+	D2/  ( d -- d>>1 )
+	double signed divide by 2 
+*****************************/
+	_HEADER D2SL,3,"D2/"
+	ldr T0,[DSP]
+	asrs TOS,#1
+	rrx T0,T0 
+	str T0,[DSP]
+	_NEXT 
 
 /***************************
 	D/MOD  ( d+ n+ - r+ qd+ )
@@ -2087,19 +2106,30 @@ DOT1:
 /*************************
    D. ( d -- )
    display double integer 
-**************************
+**************************/
+/*
 	_HEADER DDOT,2,"D."
 	_NEST 
-	_ADR OVER 
-	_DOLIT (1<<31)
-	_ADR ANDD 
 	_ADR DUPP 
 	_ADR TOR 
+	_ADR DUPP 
+	_DOLIT (1<<31)
+	_ADR ANDD 
 	_QBRAN 1f 
 	_ADR DABS 
-1:	_ADR BDIGS
-	
+1:	_ADR SWAP 
+	_DOLIT 0 
+	_ADR TOR 
+	_ADR STRR 
+	_ADR BDIGS
+	_ADR DIGS 
+	_ADR RFROM
+	_ADR SIGN 
+	_ADR EDIGS
+	_ADR SPACE 
+	_ADR TYPEE 
 	_UNNEST 
+*/
 
 /***********************
 	H. ( w -- )
