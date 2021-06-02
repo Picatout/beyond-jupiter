@@ -767,6 +767,18 @@ BRAN:
 2:  mov TOS,#0 
 	_NEXT 
 
+/******************************
+	D0= ( d -- f )
+	double 0= 
+*****************************/
+	_HEADER DZEQUAL,3,"D0="
+	mov T0,TOS
+	_POP 
+	orr TOS,T0 
+	beq 9f
+	mvn TOS,#0 
+9:	_NEXT 
+
 /*****************************
     NOT	 ( w -- !w )
  	1"s complement.
@@ -1241,83 +1253,41 @@ MMOD3:
 
 
 /***************************
-	UD/  ( ud1 u - udq )
-    ud2 = ud1 / u
+	D/MOD  ( d+ n+ - r+ qd+ )
 	unsigned double division
-	quotient rounded 
-	to nearest integer 
+	and modulo 
+	output:
+		qd+ = d+ / n+
+		r+ = qd+ - (d+ * n+ )
 ***************************/
-	_HEADER UDSLASH,3,"UD/"
-	push {IP}
-	ldr WP,[DSP],#4 
-	ldr T0,[DSP]   // ud1 = WP:T0
-	eor T2,T2 
-	eor T1,T1 // quotient T2:T1  
+	_HEADER DSLMOD,5,"D/MOD"
+	ldr WP,[DSP]  // d+ high 
+	ldr T0,[DSP,#4]   // d+ low, d+ = WP:T0, remainder WP
+	mov T2,#32 // shift counter  
+	eor T1,T1 // quotient T0:T1  
 	cbnz WP,1f    
-	udiv T1,T0,TOS
-	mul WP,T1,TOS
-	rsb WP,T0  
-	b 8f  
-1:	mov IP,#65 // divident shift counter 
-// scale divisor 	
-	clz T3,TOS 
-	push {T3}
-	lsl TOS,T3
-	rsb T3,#32 
-	push {T3}
-	sub IP,T3  
-//scale divident 
-	clz T3,WP
-	push {T3} 
-	sub IP,T3 
-1:  lsl WP,#1 
-	lsls T0,#1 
-	adc WP,#0 
-	subs T3,#1
-	bne 1b 
-	mov T3,#0
-1:	cbz T3,2f
-	lsls T3,#1 
-	sbc WP,TOS 
-	b 4f 
-2: 	cmp WP,TOS 
-	bcs 3f
-	eor T3,T3 
-	b 5f  
-3:	sub WP,TOS
-4:	mvn T3,#0   
-// put quotient bit in T2:T1 
-5: 	lsl T2,#1
-	lsls T1,#1
-	adc T2,#0  
-	lsls T3,#1 
-	adc T1,#0  	 
-// shift left divident 
-	lsls WP,#1
-	eor T3,T3 
-	rrx T3,T3  // carry 
-    lsls T0,#1
-	adc WP,#0
-    subs IP,#1 
-	bne 1b
-	pop {T3}
-	pop {T0}
-	sub T3,T0
-	add T3,#4
-	and T3,#0x18  
-	lsr WP,T3 
-	pop {T3}
-	lsr TOS,T3 
-8: // round quotient to nearest integer  
-	lsr TOS,#1 
-	cmp WP,TOS
-	bcc 9f
-	adds T1,#1
-	adc T2,#0 
-9:	str T1,[DSP]  // q lo 
-	mov TOS,T2  // q hi 		
-	pop {IP}
+	eor T2,T2 // nos shifting required 
+	mov WP,T0 
+	eor T0,T0 
+1:  cbz T2,2f   // shift divident for msb at WP:31 
+    tst WP,#(1<<31) 
+	bne 2f
+	adds T1,T1,T1 
+	adcs T0,T0,T0 
+	adc WP,WP,WP 
+	sub T2,#1 
+	b 1b 
+2:  udiv T3,WP,TOS
+	orr T1,T3   // append partial quotient 
+	mul T3,TOS
+	sub WP,T3 //remainder 
+	cbz T2,8f 
+	b 1b 
+8:	str WP,[DSP,#4] // remainder 
+	str T1,[DSP]  // q lo 
+	mov TOS,T0  // q hi 		
 	_NEXT 
+
 
 
 /****************************
@@ -2113,6 +2083,23 @@ DOT1:
 	_ADR	SPACE
 	_ADR	TYPEE
 	_UNNEST			// yes, display signed
+
+/*************************
+   D. ( d -- )
+   display double integer 
+**************************
+	_HEADER DDOT,2,"D."
+	_NEST 
+	_ADR OVER 
+	_DOLIT (1<<31)
+	_ADR ANDD 
+	_ADR DUPP 
+	_ADR TOR 
+	_QBRAN 1f 
+	_ADR DABS 
+1:	_ADR BDIGS
+	
+	_UNNEST 
 
 /***********************
 	H. ( w -- )
