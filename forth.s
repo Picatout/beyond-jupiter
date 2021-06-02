@@ -1603,16 +1603,14 @@ FILL2:
 	_UNNEST
 
 /*********************************
-    EXTRACT	( n base -- n c )
+    EXTRACT	( ud base -- ud c )
  	Extract the least significant
-	digit from n.
+	digit from positive double.
 **********************************/
 	_HEADER EXTRC,7,"EXTRACT"
 	_NEST
-	_DOLIT 0
-	_ADR	SWAP
-	_ADR	UMMOD
-	_ADR	SWAP
+	_ADR	DSLMOD
+	_ADR	ROT
 	_ADR	DIGIT
 	_UNNEST
 
@@ -1645,9 +1643,9 @@ FILL2:
 	_UNNEST
 
 /***********************
-    #	   ( u -- u )
+    #	   ( ud -- ud )
  	Extract one digit 
-	from u and append 
+	from ud and append 
 	the digit to output 
 	string.
 *************************/
@@ -1660,8 +1658,8 @@ FILL2:
 	_UNNEST
 
 /***************************
-    #S	  ( u -- 0 )
- 	Convert u until all 
+    #S	  ( ud -- 0 )
+ 	Convert ud until all 
 	digits are added to 
 	the output string.
 ***************************/
@@ -1669,11 +1667,13 @@ FILL2:
 	_NEST
 DIGS1:
     _ADR	DIG
-	_ADR	DUPP
+	_ADR	DDUP
+	_ADR    ORR 
 	_QBRAN 	DIGS2
 	_BRAN	DIGS1
 DIGS2:
-	  _UNNEST
+	 _ADR DROP 
+	 _UNNEST
 
 /*********************
     SIGN	( n -- )
@@ -1714,9 +1714,10 @@ hidden word used by compiler
 ***************************/
 STRR:
 	_NEST
+	_ADR 	STOD 
 	_ADR	DUPP
 	_ADR	TOR
-	_ADR	ABSS
+	_ADR	DABS
 	_ADR	BDIGS
 	_ADR	DIGS
 	_ADR	RFROM
@@ -2057,6 +2058,9 @@ DOTQP:
 ***************************/
 	_HEADER UDOTR,3,"U.R"
 	_NEST
+	_ADR	SWAP 
+	_ADR 	STOD 
+	_ADR	ROT 
 	_ADR	TOR
 	_ADR	BDIGS
 	_ADR	DIGS
@@ -2075,6 +2079,7 @@ DOTQP:
 ***************************/
 	_HEADER UDOT,2,"U."
 	_NEST
+	_ADR 	STOD 
 	_ADR	BDIGS
 	_ADR	DIGS
 	_ADR	EDIGS
@@ -2107,20 +2112,11 @@ DOT1:
    D. ( d -- )
    display double integer 
 **************************/
-/*
 	_HEADER DDOT,2,"D."
 	_NEST 
 	_ADR DUPP 
 	_ADR TOR 
-	_ADR DUPP 
-	_DOLIT (1<<31)
-	_ADR ANDD 
-	_QBRAN 1f 
 	_ADR DABS 
-1:	_ADR SWAP 
-	_DOLIT 0 
-	_ADR TOR 
-	_ADR STRR 
 	_ADR BDIGS
 	_ADR DIGS 
 	_ADR RFROM
@@ -2129,7 +2125,7 @@ DOT1:
 	_ADR SPACE 
 	_ADR TYPEE 
 	_UNNEST 
-*/
+
 
 /***********************
 	H. ( w -- )
@@ -3837,6 +3833,7 @@ VERSN:
 	_ADR	HEX	// save radix
 	_ADR	VERSN
 	_ADR	BDIGS
+	_DOLIT  0 
 	_ADR	DIG
 	_ADR	DIG
 	_DOLIT	'.'
