@@ -83,8 +83,8 @@
   .equ NTIBB, TOIN+4  // #TIB  characters in TIB 
   .equ TIBUF, NTIBB+4   // TIB buffer address 
   .equ EVAL, TIBUF+4  // eval|compile vector 
-  .equ HOLD, EVAL+4   // hold pointer 
-  .equ CTXT, HOLD+4  // context pointer 
+  .equ VHOLD, EVAL+4   // hold pointer 
+  .equ CTXT, VHOLD+4  // context pointer 
   .equ FORTH_CTOP, CTXT+4  // flash free dictionary address 
   .equ USER_CTOP, FORTH_CTOP+4  // ram free dictionary address
   .equ LASTN, USER_CTOP+4     // last word in dictionary link nfa 

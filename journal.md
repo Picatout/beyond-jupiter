@@ -1,4 +1,12 @@
-2021-05-01 
+2021-06-02
+
+* Ajouté **D.** , **D2/** , **S>D**, **&lt;&gt;**.
+
+* Modifié sortie numérique pour gérer entiers doubles. 
+
+* Travail sur **D/MOD**  et [float.f](float.f)
+
+2021-06-01 
 
 * travail sur **UD/** 
 

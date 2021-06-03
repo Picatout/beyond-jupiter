@@ -829,6 +829,19 @@ BRAN:
 	_NEXT
 
 /************************
+	<> ( w w -- f )
+	different?
+************************/
+	_HEADER DIFF,2,"<>"
+	mov T0,TOS 
+	_POP 
+	eor TOS,T0
+	clz T0,TOS 
+	lsl TOS,T0 
+	asr TOS,#31 
+	_NEXT 
+
+/************************
     U<	 ( w w -- t )
  	Unsigned less?
 *************************/
@@ -1082,7 +1095,7 @@ TEMP:
 *********************************/
 	_HEADER HLD,3,"HLD"
 	_PUSH
-	ADD	TOS,UP,#HOLD
+	ADD	TOS,UP,#VHOLD
 	_NEXT
 
 /**********************************
@@ -1307,6 +1320,29 @@ MMOD3:
 	mov TOS,T0  // q hi 		
 	_NEXT 
 
+
+/****************************
+	UD/  ( ud u -- udq )
+	divide unsigned double 
+	by unsigned single 
+	return double quotient
+	rounded to nearest integer 
+****************************/
+	_HEADER UDSLASH,3,"UD/"
+	_NEST 
+	_ADR DUPP 
+	_DOLIT 1 
+	_ADR RSHIFT 
+	_ADR TOR 
+	_ADR DSLMOD 
+	_ADR ROT 
+	_ADR RFROM 
+	_ADR GREAT 
+	_QBRAN 9f
+	_DOLIT 1 
+	_ADR STOD 
+	_ADR DPLUS 
+9:	_UNNEST 
 
 
 /****************************
@@ -3580,7 +3616,10 @@ DUMP3:
 	TRACE ( -- )
 **********************/
 	_HEADER TRACE,5,"TRACE"
-	_NEST 
+	_NEST
+	_ADR HLD
+	_ADR AT 
+	_ADR TOR  
 	_ADR CR 
 	_ADR BASE 
 	_ADR AT 
@@ -3591,10 +3630,13 @@ DUMP3:
 	_ADR EMIT 
 	_ADR EMIT  
 	_ADR DOTS
+	_ADR CR
 	_ADR RFROM 
 	_ADR BASE 
 	_ADR STORE  
-	_ADR CR 
+	_ADR RFROM 
+	_ADR HLD 
+	_ADR STORE  
 	_UNNEST 
 
 

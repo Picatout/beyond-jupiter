@@ -14,6 +14,8 @@
 
 FORGET FPSW 
 
+PRESET
+
 VARIABLE FPSW \ floating point state flags  
 VARIABLE FBASE \ floating point base 
 : FRESET ( -- ) \ reset state 
@@ -61,6 +63,7 @@ VARIABLE FBASE \ floating point base
         >R 
         FNE IF 
             45 EMIT ABS THEN 
+        S>D    
         <#
         BEGIN 
         # DUP FBASE @ R> 1+ >R U< UNTIL
@@ -70,7 +73,8 @@ VARIABLE FBASE \ floating point base
             ." E" 
             DUP 0< IF 
                 45 EMIT ABS THEN
-            <# #S #> TYPE THEN 
+            S>D     
+            <# #S DROP #> TYPE THEN 
         THEN 
 ;
 
@@ -80,32 +84,92 @@ VARIABLE FBASE \ floating point base
     I ABS 32 U> IF
         R> 2DROP E.
     ELSE
-        SPACE FNE IF ABS THEN 
-        <#  
+        SPACE 
+        FNE IF ABS THEN 
+        S>D  
+        <#   
         I 0< IF
-            I ABS 0 DO # LOOP 46 HOLD
-        ELSE
+           I ABS 0 DO # LOOP 46 HOLD
+        ELSE  
             46 HOLD I IF
                 I 0 DO 48 HOLD LOOP 
             THEN
-        THEN
-        R> DROP
+        THEN 
+        R> DROP  
         #S SWAP 8 LSHIFT SIGN #> TYPE
     THEN 
 ;
 
+
 : F* ( F#1 F#2 -- F#3 )
     @EXPONENT >R 
-    SWAP @EXPONENT R> + >R
-    M* DUP 31 RSHIFT DUP >R -ROT    
-    R> IF DABS THEN 
-    BEGIN
-    2DUP $7FFFFF 0 UD> WHILE TRACE 
-    10 UD/
-    R> 1+ >R 
-    REPEAT
+    SWAP @EXPONENT R> + >R   
+    M* DUP 31 RSHIFT DUP >R -ROT     
+    R> IF DABS THEN  
+    BEGIN 
+    2DUP $7FFFFF S>D UD> WHILE
+    10 D/MOD ROT DROP 
+    R> 1+ >R
+    REPEAT 
     DROP SWAP IF NEGATE $FFFFFF AND THEN  
-    R> !EXPONENT 
+    R> !EXPONENT  
 ;
+
+: F/ ( F#1 F#2 -- F#1/F#2 )
+    @EXPONENT >R 
+    SWAP @EXPONENT R> + >R 
+    SWAP / 
+    R> !EXPONENT  
+; 
+
+\ align 2 floats to same exponent 
+: ALIGN ( M1 E1 M2 M2 -- M1 M2 E )
+
+;
+
+\ add 2 floats 
+: F+ ( f#1 f#2 -- f#1+f#2 )
+
+;
+
+\ substract 2 floats
+: F- ( f#1 f#2 -- f#1-f#2 )
+
+;
+
+\ divide mantissa by 10
+\ decement exponent 
+: RSCALE ( F# -- F# )
+
+;
+
+\ multiply mantissa by 10
+\ decrement exponent 
+: LSCALE ( f# -- f# )
+
+;
+
+\ convert float to single 
+: F>S ( F# -- S )
+
+;
+
+\ convert float to double 
+: F>D ( F# -- D )
+
+;
+
+\ convert single to float 
+: S>F ( s -- f# )
+
+;
+
+\ convert double to float 
+: D>F ( d -- f# )
+
+;
+
+
+
 
 FINIT 
