@@ -1,3 +1,11 @@
+2021-06-03
+
+* Ajouté __D*__  pour multiplié double par simple.
+
+* renommé  **UD/** en **D/** 
+
+* Travail sur [float.f](float.f)
+
 2021-06-02
 
 * Ajouté **D.** , **D2/** , **S>D**, **&lt;&gt;**.

@@ -1322,13 +1322,13 @@ MMOD3:
 
 
 /****************************
-	UD/  ( ud u -- udq )
+	D/  ( ud u -- udq )
 	divide unsigned double 
 	by unsigned single 
 	return double quotient
 	rounded to nearest integer 
 ****************************/
-	_HEADER UDSLASH,3,"UD/"
+	_HEADER DSLASH,2,"D/"
 	_NEST 
 	_ADR DUPP 
 	_DOLIT 1 
@@ -1343,6 +1343,55 @@ MMOD3:
 	_ADR STOD 
 	_ADR DPLUS 
 9:	_UNNEST 
+
+
+/****************************
+	D* ( d s -- d )
+    multiply a double 
+	by a single 
+****************************/
+	_HEADER DSTAR,2,"D*"
+/*
+	_NEST 
+	_ADR NROT 
+	_ADR DUPP 
+	_ADR TOR 
+	_ADR DABS
+	_ADR SWAP  
+	_ADR ROT   
+	_ADR DUPP
+	_ADR TOR
+	_ADR MSTAR
+	_ADR ROT
+	_ADR RFROM 
+	_ADR STAR 
+	_ADR PLUS
+	_ADR RFROM 
+	_ADR ZLESS 
+	_QBRAN 9f
+	_ADR DNEGA   
+9:	_UNNEST 
+*/
+	ldr T0,[DSP],#4
+	ldr T1,[DSP]
+	str T0,[DSP] 
+	eor T3,T3 
+	tst T0,#(1<<31)
+	beq 1f 
+	// DNEGATE 
+	subs T1,T3,T1  
+	sbc T0,T3,T0 
+1:	smull  T2,T1,T1,TOS // partial product 
+	mul TOS,T0,TOS // second partial product 
+	add TOS,T1  // TOS:T2 product  
+	ldr r0,[DSP]
+	tst T0,#(1<<31)
+	beq 2f 
+	// DNEGATE product 
+	subs T2,T3,T2  
+	sbc TOS,T3,TOS 
+2:  str T2,[DSP]
+	_NEXT 
 
 
 /****************************

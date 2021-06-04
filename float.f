@@ -122,54 +122,123 @@ VARIABLE FBASE \ floating point base
     R> !EXPONENT  
 ; 
 
-\ align 2 floats to same exponent 
-: ALIGN ( M1 E1 M2 M2 -- M1 M2 E )
-
+\ align 2 floats to same exponent
+\ for addition or substraction 
+: ALIGN ( F#1 F#2 -- M1 M2 E )
+    @EXPONENT >R 
+    SWAP @EXPONENT ROT R>
+    BEGIN 
+        >R SWAP >R 
+        J I <> WHILE
+        J I > IF  \ J IS E2
+            SWAP FBASE C@ * SWAP R> 1+ SWAP R>
+        ELSE 
+            R> SWAP FBASE C@ * R> 1+
+        THEN 
+    REPEAT
+    R> R> DROP 
 ;
 
 \ add 2 floats 
 : F+ ( f#1 f#2 -- f#1+f#2 )
-
+    ALIGN 
+    >R + 
+    R> !EXPONENT
 ;
 
 \ substract 2 floats
 : F- ( f#1 f#2 -- f#1-f#2 )
-
+    ALIGN 
+    >R - 
+    R> !EXPONENT 
 ;
 
-\ divide mantissa by 10
-\ decement exponent 
+\ increment number 
+\ of digits displayed after '.' 
+\ when using F. 
 : RSCALE ( F# -- F# )
-
+    @EXPONENT  
+    1- 
+    SWAP FBASE C@ * 
+    SWAP !EXPONENT 
 ;
 
-\ multiply mantissa by 10
-\ decrement exponent 
+\ decrement number 
+\ digits diplayed after '.'
+\ when using F. 
 : LSCALE ( f# -- f# )
-
+    @EXPONENT 1+
+    SWAP FBASE C@ /
+    SWAP !EXPONENT 
 ;
 
 \ convert float to single 
 : F>S ( F# -- S )
-
+    @EXPONENT >R
+    BEGIN 
+        I WHILE 
+            I 0> IF 
+                FBASE C@ * R> 1- >R 
+            ELSE 
+                FBASE C@ / R> 1+ >R 
+            THEN
+    REPEAT
+    R> DROP      
 ;
 
 \ convert float to double 
 : F>D ( F# -- D )
-
+    @EXPONENT >R 
+    S>D 
+    BEGIN 
+        I WHILE 
+        I 0> IF 
+            FBASE C@ S>D D* R> 1- >R 
+        ELSE 
+            FBASE C@ D/ R> 1+ >R 
+        THEN 
+    REPEAT 
+    R> DROP  
 ;
 
 \ convert single to float 
 : S>F ( s -- f# )
-
+    DUP 0< IF 
+        ABS -1
+    ELSE 
+        0 
+    THEN 
+    SWAP 
+    0
+    BEGIN 
+        >R 
+        DUP $7FFFFF > WHILE 
+        FBASE C@ / 
+        R> 1+ 
+    REPEAT
+    SWAP 
+    IF NEGATE $FFFFFF AND THEN 
+    R> 24 LSHIFT OR  
 ;
 
 \ convert double to float 
 : D>F ( d -- f# )
-
+    DUP 0< IF 
+        DABS -1
+    ELSE 
+        0 
+    THEN 
+    -ROT 
+    0 
+    BEGIN 
+        >R 
+        2DUP $7FFFFF S>D UD> WHILE 
+        FBASE C@ D/ R> 1+ 
+    REPEAT
+    DROP 
+    SWAP IF NEGATE $FFFFFF AND THEN 
+    R> 24 LSHIFT OR
 ;
-
-
 
 
 FINIT 
