@@ -597,7 +597,6 @@ UZERO:
     .word 0 /* tv cursor column */ 
     .word 0 /* tv back color */
     .word 7 /* tv font color */
-    .space FP_WS_SIZE  /* floating point work space */ 
     .word 0,0 
 ULAST:
 

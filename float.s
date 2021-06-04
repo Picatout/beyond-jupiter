@@ -23,50 +23,19 @@
 
 /******************************************************
     Parsing float32 to IEEE-754 format is quite Complex
-    so the original Jupiter ACE Z80 code 
+    so I rather adapted  Forth dimensions Volume IV, #1
+    library proposed by Michael Jesch 
     is adapted to this ARM-7M architecture.
-    REF: docs/Jupiter-Ace-ROM.asm 
+    REF: docs/FD-V04N1.pdf 
 
-    based on BCD  (binary Coded Decimal)
 Format:
-    bit 23:0  6 BCD digits mantissa
-        mantissa range 0...999999 
-    bit 30:24 exponent offset by 127 for exponent (decimal value)
-        exponent range:  -127...127   128 value indicate out of range 
-    bit 31    mantissa sign 
+    bit 23:0  6 digits signed mantissa
+    bit 31:24 signed exponent 
 
-    ** Floating point words: 
-    REF: docs/JA-Ace4000-Manual-First-US-Edition.pdf, chapter 15
-    F+, F-, F*, F/, 
-    FNEGATE, INT, UFLOAT, F. 
 *******************************************************/    
 
-    MAX_MANTISSA = 0xffffff // biggest mantissa 
+    MANTISSA_MASK = 0xffffff // biggest mantissa 
 
-/*****************************************************************************
-    PREP_FP  
-    prepare floating point
-    work space 
-
-; ( f1, f2 -- m1, m2 )
-; -> from add/mult/div
-; Entered with two floating point numbers on the stack.
-; The exponents are stored in the first two bytes of FP_WS and the third byte
-; is loaded with the manipulated result sign.
-; the two exponent locations on the Data Stack are blanked leaving just the
-; binary coded mantissas.
-*******************************************************************************/
-PREP_FP:
-    ldr T0,[UP,#FP_WS] // float work space pointer 
-// clear first 16 bytes of 19 bytes array 
-    mov T1,#4 
-    eor T2,T2 
-1:  str T2,[T0],#4
-    subs T1,#1
-    bne 1b 
-    str T2,[UP,#TMP] // clear tmp variable (SPARE)
-
-    _RET 
 
 /***********************
   digit_add  
@@ -449,18 +418,18 @@ FORMAT_FLOAT:
 
 
 // bound mantissa
-//  0xfffff < m <= MAX_MANTISSA
+//  0xfffff < m <= MANTISSA_MASK
 //  ( e m1 -- e m2 )
 BOUND_MANTISSA:
     _NEST
     _ADR DUPP 
-    _DOLIT MAX_MANTISSA
+    _DOLIT MANTISSA_MASK
     _ADR UGREAT  
     _QBRAN SCALE_UP
 // to much digits 
 // scale down  
 1:  _ADR DUPP 
-    _DOLIT MAX_MANTISSA 
+    _DOLIT MANTISSA_MASK 
     _ADR UGREAT 
     _QBRAN 2f 
     _DOLIT 10 

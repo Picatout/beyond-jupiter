@@ -1,3 +1,7 @@
+2021-06-04
+
+* Travail sur [float.f](float.f)
+
 2021-06-03
 
 * Ajouté __D*__  pour multiplié double par simple.

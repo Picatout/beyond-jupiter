@@ -9,12 +9,14 @@
 \  'm' mantissa bits 
 \  's' sign bit 
 \  'e' exponent bits 
-\ mantissa 23 bits + sign 
-\ exponent 7 bits + sign 
-
-FORGET FPSW 
+\ mantissa 24 bits 2's complement signed  
+\ exponent 8 bits 2's complement signed  
 
 PRESET
+
+FLOAT \ forget float library if already loaded 
+
+MARK FLOAT \ float vocabulary bound 
 
 VARIABLE FPSW \ floating point state flags  
 VARIABLE FBASE \ floating point base 
@@ -53,29 +55,38 @@ VARIABLE FBASE \ floating point base
     $FFFFFF AND OR 
     SFZ SFN ;
 
-: E. ( F# -- ) 
 \ print float in scientific notation 
+\ d.fffffE[-]ee 
+: E. ( F# -- ) 
     SPACE
-    @EXPONENT  
-    OVER 0= IF 
-        ." 0.0" 2DROP 
-    ELSE  
-        >R 
-        FNE IF 
-            45 EMIT ABS THEN 
-        S>D    
+    DUP 0= IF 
+        ." 0.0"
+        DROP 
+    ELSE 
+        SPACE 
+        BASE @ >R
+        FBASE @ BASE !  
+        @EXPONENT
+        SWAP  
+        DUP >R  \ save mantissa copy 
+        FNE IF ABS THEN  
+        S>D 
         <#
         BEGIN 
-        # DUP FBASE @ R> 1+ >R U< UNTIL
-        46 HOLD # 
-        #> TYPE 
-        R> DUP 0= NOT IF 
-            ." E" 
+            # ROT 1+ -ROT    
+        OVER BASE @  U< UNTIL
+        [ CHAR . ] LITERAL HOLD 
+        #  R>  SIGN #> TYPE
+        ?DUP IF 
+            [ CHAR E ] LITERAL EMIT 
             DUP 0< IF 
-                45 EMIT ABS THEN
-            S>D     
-            <# #S DROP #> TYPE THEN 
+                ABS
+                [ CHAR - ] LITERAL EMIT 
+            THEN 
+            S>D  <# #S #> TYPE
         THEN 
+        R> BASE ! 
+    THEN 
 ;
 
 : F. ( F# -- )
@@ -131,9 +142,9 @@ VARIABLE FBASE \ floating point base
         >R SWAP >R 
         J I <> WHILE
         J I > IF  \ J IS E2
-            SWAP FBASE C@ * SWAP R> 1+ SWAP R>
+            SWAP FBASE @ * SWAP R> 1+ SWAP R>
         ELSE 
-            R> SWAP FBASE C@ * R> 1+
+            R> SWAP FBASE @ * R> 1+
         THEN 
     REPEAT
     R> R> DROP 
@@ -159,16 +170,16 @@ VARIABLE FBASE \ floating point base
 : RSCALE ( F# -- F# )
     @EXPONENT  
     1- 
-    SWAP FBASE C@ * 
+    SWAP FBASE @ * 
     SWAP !EXPONENT 
 ;
 
 \ decrement number 
-\ digits diplayed after '.'
+\ of digits diplayed after '.'
 \ when using F. 
 : LSCALE ( f# -- f# )
     @EXPONENT 1+
-    SWAP FBASE C@ /
+    SWAP FBASE @ /
     SWAP !EXPONENT 
 ;
 
@@ -178,9 +189,9 @@ VARIABLE FBASE \ floating point base
     BEGIN 
         I WHILE 
             I 0> IF 
-                FBASE C@ * R> 1- >R 
+                FBASE @ * R> 1- >R 
             ELSE 
-                FBASE C@ / R> 1+ >R 
+                FBASE @ / R> 1+ >R 
             THEN
     REPEAT
     R> DROP      
@@ -193,9 +204,9 @@ VARIABLE FBASE \ floating point base
     BEGIN 
         I WHILE 
         I 0> IF 
-            FBASE C@ S>D D* R> 1- >R 
+            FBASE @ S>D D* R> 1- >R 
         ELSE 
-            FBASE C@ D/ R> 1+ >R 
+            FBASE @ D/ R> 1+ >R 
         THEN 
     REPEAT 
     R> DROP  
@@ -213,7 +224,7 @@ VARIABLE FBASE \ floating point base
     BEGIN 
         >R 
         DUP $7FFFFF > WHILE 
-        FBASE C@ / 
+        FBASE @ / 
         R> 1+ 
     REPEAT
     SWAP 
@@ -233,7 +244,7 @@ VARIABLE FBASE \ floating point base
     BEGIN 
         >R 
         2DUP $7FFFFF S>D UD> WHILE 
-        FBASE C@ D/ R> 1+ 
+        FBASE @ D/ R> 1+ 
     REPEAT
     DROP 
     SWAP IF NEGATE $FFFFFF AND THEN 
