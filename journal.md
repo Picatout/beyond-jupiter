@@ -1,5 +1,7 @@
 2021-06-04
 
+* Ajout des mots **FABS**, **FNEGATE**, **FMIN**, **FMAX** , **F&gt;** et **F&lt;**. 
+
 * Travail sur [float.f](float.f)
 
 2021-06-03

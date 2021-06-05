@@ -76,7 +76,7 @@ VARIABLE FBASE \ floating point base
             # ROT 1+ -ROT    
         OVER BASE @  U< UNTIL
         [ CHAR . ] LITERAL HOLD 
-        #  R>  SIGN #> TYPE
+        #S  R>  SIGN #> TYPE
         ?DUP IF 
             [ CHAR E ] LITERAL EMIT 
             DUP 0< IF 
@@ -141,10 +141,10 @@ VARIABLE FBASE \ floating point base
     BEGIN 
         >R SWAP >R 
         J I <> WHILE
-        J I > IF  \ J IS E2
-            SWAP FBASE @ * SWAP R> 1+ SWAP R>
+        J I < IF  \ J IS E2
+            SWAP FBASE @ * SWAP R> 1- SWAP R>
         ELSE 
-            R> SWAP FBASE @ * R> 1+
+            R> SWAP FBASE @ * R> 1-
         THEN 
     REPEAT
     R> R> DROP 
@@ -250,6 +250,52 @@ VARIABLE FBASE \ floating point base
     SWAP IF NEGATE $FFFFFF AND THEN 
     R> 24 LSHIFT OR
 ;
+
+\  float absulute value 
+: FABS ( f# -- f# )
+    @EXPONENT 
+    SWAP ABS 
+    SWAP !EXPONENT 
+;
+
+\ float negate 
+: FNEGATE ( f# -- f# )
+    @EXPONENT 
+    SWAP 
+    NEGATE
+    SWAP  
+    !EXPONENT  
+;
+
+\ float min 
+: FMIN ( f#1 f#2  -- smallest float )
+    2DUP 
+    ALIGN 
+    DROP 
+    < IF DROP ELSE SWAP DROP THEN 
+;
+
+\ float max 
+: FMAX ( f#1 f#2 -- largest float )
+    2DUP 
+    ALIGN 
+    DROP 
+    < IF SWAP DROP ELSE DROP THEN 
+; 
+
+\ f#1 > f#2 
+: F> ( f#1 f#2 -- f )
+    ALIGN  
+    DROP 
+    > 
+; 
+
+\ f#1 < f#2 
+: F< ( f#1 f#2 -- f )
+    ALIGN  
+    DROP 
+    < 
+; 
 
 
 FINIT 
