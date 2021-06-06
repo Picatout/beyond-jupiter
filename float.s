@@ -25,7 +25,7 @@
     Parsing float32 to IEEE-754 format is quite Complex
     so I rather adapted  Forth dimensions Volume IV, #1
     library proposed by Michael Jesch 
-    is adapted to this ARM-7M architecture.
+    adapted to this ARM-7M architecture.
     REF: docs/FD-V04N1.pdf 
 
 Format:
@@ -35,223 +35,326 @@ Format:
 *******************************************************/    
 
     MANTISSA_MASK = 0xffffff // biggest mantissa 
-
-
-/***********************
-  digit_add  
- add 2 BCD digits 
- input:
-    T0  first digit
-    T1  second digit 
-    T2  carry 
- output:
-    T0  sump
-    T2  carry 
-***********************/ 
-    .type add_digit, %function
-digit_add:
-    add T0,T2 
-    add T0,T1 
-    cmp T0,#10
-    bmi 1f 
-    add T0,#6 
-1:  lsr T2,T0,#4 
-    and T0,#15
-    _RET 
-
-/*********************************
-    digit_sub 
-    substract T0-BORROW-T1 
-  input:
-        T0  first digit 
-        T1  second digit 
-        T2  borrow 
-  output:
-        T0  substraction 
-        T2  borrow 
-*********************************/
-digit_sub:
-    cbz T2,1f
-    subs T0,T2 
-    eor T2,T2 
-    bpl 1f 
-    add T0,#10  
-    mov T2,#1 
-1:  subs T0,T1 
-    bpl 3f
-    add T0,#10
-    and T0,#15 
-    mov T2,#1
-3:  _RET 
-
-/**********************************
-    digit_prod 
-    multiply 2 BCD digits 
-    input:
-        T0 first digit 
-        T1 second digit 
-    output:
-        T0  prod low digit 
-        T1  prod high digit 
-***********************************/
-digit_prod:
-    mul T0,T1 
-    mov T1,#10 
-    udiv T2,T0,T1 
-    mul T1,T1,T2 
-    sub T0,T1
-    mov T1,T2  
-    _RET 
-
-/****************************************
-    BCD+  ( bcd1 bcd2 carry -- sum carry )
-    sum=bcd1+bcd2+carry 
-    bcd are 8 digits packed in 32 bits   
-*****************************************/
-    _HEADER BCD_ADD,4,"BCD+"
-    eor T3,T3 // bit shift  
-    eor WP,WP // sum   
-    mov T2,TOS
-    _POP   
-1:  ldr T0,[DSP]
-    lsr T0,T3 
-    and T0,#15
-    lsr T1,TOS,T3 
-    and T1,#15
-    bl digit_add 
-    lsl T0,T3 
-    orr WP,T0 
-    add T3,#4 
-    cmp T3,#32 
-    bmi 1b 
-    str WP,[DSP]
-    mov TOS,T2 
-    _NEXT 
-
-
-/********************************************
-    BCD- ( bcd1 bcd2 borrow -- diff borrow )
-    diff=bcd1-borrow-bcd2 
-********************************************/
-    _HEADER BCD_SUB,4,"BCD-"
-    eor T3,T3 // bit shift 
-    eor WP,WP
-    mov T2,TOS 
-    _POP 
-1:  ldr T0,[DSP]
-    lsr T0,T3 
-    and T0,#15 
-    lsr T1,TOS,T3
-    and T1,#15 
-    bl digit_sub
-    lsl T0,T3 
-    orr WP,T0 
-    add T3,#4 
-    cmp T3,#32 
-    bmi 1b 
-    str WP,[DSP]
-    mov TOS,T2 
-    _NEXT 
-
-
-/*********************************
-    BCD1+ ( bcd -- bcd+1 carry )
-    increment bcd integer 
-*********************************/
-    _HEADER BCD_1P,5,"BCD1+"
-    eor T3,T3 
-    mov WP,TOS 
-    mov T0,#15 
-1:  lsl T1,T0,T3 
-    mvn T1,T1 
-    and WP,T1 
-    lsr T1,TOS,T3
-    and T1,#15 
-    add T1,#1 
-    cmp T1,#10 
-    bmi 2f 
-    add T1,#6 
-2:  lsr T2,T1,#4 
-    and T1,#15 
-    lsl T1,T3 
-    orr WP,T1
-    cbz T2,3f 
-    add T3,#4 
-    cmp T3,#32 
-    bmi 1b 
-3:  str WP,[DSP,#-4]! 
-    mov TOS,T2 
-    _NEXT     
+    MANTISSA_SIGN = 0x800000 
 
 /*******************************
-    BCD-NEG ( bcd -- - bcd carry )
-    BCD ten's complement 
+    FPSW  variable  ( -- a )
+    floating point state flags 
+    bit 0  zero flag 
+    bit 1  negative flag 
+    bit 2  overflow error 
 *******************************/
-    _HEADER BCD_NEG,7,"BCD-NEG"
-    _MOV32 WP,0x99999999
-1:  rsb TOS,WP  
-    b BCD_1P 
+    _HEADER FPSW,4,"FPSW"
+    _PUSH 
+    add TOS,UP,#VFPSW
+    _NEXT  
 
+/*******************************
+    FBASE variable ( -- a )
+    floating point numerical base
+**********************************/
+    _HEADER FBASE,5,"FBASE"
+    _PUSH  
+    add TOS,UP,#VFBASE 
+    _NEXT  
 
-/*****************************************
-    BCD* ( bcd1 bcd2 -- prod_low prod_hi )
-    multiply 2 bcd numbers 
-    return 16 digits products 
-*****************************************/
-    _HEADER BCD_STAR,4,"BCD*"
-
+/*****************************
+    FRESET ( -- )
+    reset state 
+******************************/
+    _HEADER FRESET,6,"FRESET"
+    eor T0,T0 
+    str T0,[UP,#VFPSW]
     _NEXT 
 
-/**********************************
-    BCD>BIN ( bcd sign -- binary )
-    convert bcd number to binary 
+/******************************
+    FINIT ( -- )
+    initialise floating point 
+******************************/
+    _HEADER FINIT,5,"FINIT"
+    _NEST 
+    _ADR FRESET 
+    _ADR BASE 
+    _ADR AT 
+    _ADR FBASE 
+    _ADR STORE 
+    _UNNEST 
+
+
+/*******************************
+    FER ( -- n )
+    return FPSW value 
+********************************/
+    _HEADER FER,3,"FER"
+    _PUSH 
+    ldr TOS,[UP,#VFPSW]
+    _NEXT 
+
+/*******************************
+    FZE ( -- flag )
+    return zero flag 
+*******************************/
+    _HEADER FZE,3,"FZE"
+    _PUSH 
+    ldr TOS,[UP,#VFPSW]
+    and TOS,#1
+    _NEXT 
+
+/*********************************
+    FNE ( -- flag )
+    return negative flag 
 **********************************/
-    _HEADER BCD_BIN,7,"BCD>BIN"
-    push {TOS}
-    _POP 
-    eor WP,WP 
-    mov T1,#10 
-    mov T3,#28 
-1:  mul WP,T1 
-    lsr T2,TOS,T3 
-    and T2,#15 
-    add WP,T2 
-    subs T3,#4 
-    bpl 1b
-    mov TOS,WP
-    pop {T0}
-    cbz T0,4f
-    rsb TOS,#0 
-4:  _NEXT 
+    _HEADER FNE,3,"FNE"
+    _PUSH 
+    ldr TOS,[UP,#VFPSW]
+    and TOS,#2 
+    _NEXT     
 
 /**********************************
-    BIN>BCD ( int -- bcd sign )
-    convert bcd number to binary 
-**********************************/
-    _HEADER BIN_BCD,7,"BIN>BCD"
-    mov T0,TOS 
-    _PUSH
-    eor TOS,TOS // sign  
-    tst T0,#(1<<31)
-    beq 1f 
-    mvn TOS,TOS // negative 
-    rsb T0,#0 // 2's complement 
-1:  mov T1,#10
-    eor WP,WP 
-    eor T3,T3 
-2:  cbz T0,3f 
-    udiv T2,T0,T1    
-    push {T2}
-    mul T2,T1 
-    rsb T2,T0 
-    pop {T0}
-    lsl T2,T3 
-    orr WP,T2 
-    add T3,#4 
-    cmp T3,#32 
-    bne 2b 
-3:  str WP,[DSP]
+    FOV ( -- flag )
+    return overflow flag 
+***********************************/
+    _HEADER FOV,3,"FOV"
+    _PUSH 
+    ldr TOS,[UP,#VFPSW]
+    and TOS,#4 
     _NEXT 
+
+/************************************
+    SFZ ( F# -- f# ; z )
+    set zero flag 
+*************************************/
+    _HEADER SFZ,3,"SFZ"
+    ldr T0,[UP,#VFPSW]
+    and T0,#-2
+    and T1,TOS,#MANTISSA_MASK 
+    cbz T1, 1f 
+    orr T0,#1 
+1:  str T0,[UP,#VFPSW]
+    _NEXT 
+
+/************************************
+    SFN ( f# -- f# ; neg )
+    set negative flag 
+*************************************/
+    _HEADER SFN,3,"SFN"
+    ldr T0,[UP,#VFPSW]
+    and T0,#-3
+    and T1,TOS,#(1<<23)
+    lsr T1,#22
+    orr T0,T1
+    str T0,[UP,#VFPSW]
+    _NEXT 
+
+
+/************************
+    SFV (  -- )
+    set overflow flag 
+************************/
+    _HEADER SFV,3,"SFV"
+    ldr T0,[UP,#VFPSW]
+    orr T0,#4 
+    str T0,[UP,#VFPSW]
+    _NEXT 
+
+/*************************************
+    @EXPONENT ( f# -- m e ; z n )    
+    split exponent and mantissa 
+    update FPSW flags 
+*************************************/
+    _HEADER AT_EXPONENT,9,"@EXPONENT"
+    _NEST 
+    _ADR FRESET 
+    _ADR SFZ 
+    _ADR SFN 
+    _ADR DUPP 
+    _ADR FNE 
+    _QBRAN 1f 
+    _DOLIT 0xFF000000 
+    _ADR ORR  
+    _BRAN 2f 
+1:  _DOLIT MANTISSA_MASK 
+    _ADR ANDD 
+2:  _ADR SWAP 
+    _DOLIT 24 
+    _ADR RSHIFT 
+    _UNNEST 
+
+/*************************************
+    !EXPONENT ( m e -- f# ; z n )
+    format float from mantissa and
+    exponent. Set flags 
+**************************************/
+    _HEADER STOR_EXPONENT,9,"!EXPONENT"
+    _NEST
+// exponent overflow?    
+    _ADR DUPP 
+    _ADR ABSS 
+    _DOLIT 255 
+    _ADR GREAT 
+    _QBRAN 1f 
+    _ADR SFV 
+// mantissa overflow?     
+1:  _ADR OVER 
+    _ADR ABSS 
+    _DOLIT 0x7ffffff 
+    _ADR GREAT 
+    _QBRAN 2f
+    _ADR SFV 
+2:  _DOLIT 24 
+    _ADR LSHIFT 
+    _ADR SWAP 
+    _DOLIT MANTISSA_MASK
+    _ADR ANDD  
+    _ADR ORR 
+    _UNNEST 
+    
+/******************************
+    E. ( f# -- )
+    print float in scientific 
+    notation.
+*******************************/
+    _HEADER EDOT,2,"E."
+    _NEST 
+    _ADR SPACE 
+    _ADR DUPP 
+    _ADR ZEQUAL 
+    _QBRAN 1f 
+    _DOTQP 3,"0.0"
+    _ADR DROP 
+    _BRAN 9f
+1:  _ADR BASE 
+    _ADR AT 
+    _ADR TOR 
+    _ADR FBASE 
+    _ADR AT 
+    _ADR BASE 
+    _ADR STORE
+    _ADR AT_EXPONENT
+    _ADR SWAP 
+    _ADR DUPP 
+    _ADR TOR // mantissa copy 
+    _ADR FNE 
+    _QBRAN 2f 
+    _ADR ABSS 
+2:  _ADR STOD 
+    _ADR BDIGS
+3:  _ADR DIG 
+    _ADR ROT 
+    _ADR ONEP 
+    _ADR NROT 
+    _ADR OVER 
+    _ADR BASE 
+    _ADR AT 
+    _ADR ULESS 
+    _QBRAN 3b
+    _DOLIT '.' 
+    _ADR HOLD 
+    _ADR DIGS
+    _ADR RFROM 
+    _ADR SIGN 
+    _ADR EDIGS
+    _ADR TYPEE 
+    _ADR QDUP 
+    _QBRAN 8f
+    _DOLIT 'E'
+    _ADR EMIT 
+    _ADR DUPP 
+    _ADR ZLESS 
+    _QBRAN 4f 
+    _ADR ABSS 
+    _DOLIT '-' 
+    _ADR EMIT 
+4:  _ADR STOD
+    _ADR BDIGS 
+    _ADR DIGS 
+    _ADR EDIGS 
+    _ADR TYPEE     
+8:  _ADR RFROM 
+    _ADR BASE 
+    _ADR STORE 
+9:  _UNNEST 
+
+/******************************
+    F. ( f# -- )
+    print float in fixed point 
+    format 
+*******************************/
+    _HEADER FDOT,2,"F."
+    _NEST 
+    _ADR DUPP 
+    _ADR AT_EXPONENT 
+    _ADR TOR 
+    _ADR I 
+    _ADR ABSS 
+    _DOLIT 32 
+    _ADR UGREAT 
+    _QBRAN 1f
+    _ADR RFROM 
+    _ADR DROP 
+    _ADR EDOT 
+    _BRAN 9f 
+1:  _ADR SPACE 
+    _ADR FNE 
+    _QBRAN 2f
+    _ADR ABSS 
+2:  _ADR STOD 
+    _ADR BDIGS 
+    _ADR I 
+    _ADR ZLESS 
+    _QBRAN 4f 
+    _ADR I 
+    _ADR ABSS 
+    _DOLIT 0 
+    _ADR TOR 
+    _ADR TOR 
+3:  _ADR DIG 
+    _ADR RFROM 
+    _ADR ONEP
+    _ADR DUPP
+    _ADR TOR  
+    _ADR J 
+    _ADR LESS 
+    _QBRAN 3f
+    _BRAN 3b 
+3:  _ADR RFROM
+    _ADR RFROM 
+    _ADR DDROP 
+    _DOLIT '.' 
+    _ADR HOLD 
+    _BRAN 6f 
+4:  _DOLIT '.' 
+    _ADR HOLD 
+    _ADR I 
+    _QBRAN 6f 
+    _ADR I 
+    _DOLIT 0 
+    _ADR TOR 
+    _ADR TOR 
+5:  _DOLIT '0' 
+    _ADR HOLD
+    _ADR RFROM 
+    _ADR ONEP 
+    _ADR DUPP 
+    _ADR TOR 
+    _ADR J 
+    _ADR LESS 
+    _QBRAN 5f 
+    _BRAN 5b
+5:  _ADR RFROM 
+    _ADR RFROM 
+    _ADR DDROP 
+6:  _ADR RFROM 
+    _ADR DROP 
+    _ADR DIGS 
+    _ADR SWAP 
+    _DOLIT 8
+    _ADR LSHIFT 
+    _ADR SIGN 
+    _ADR EDIGS 
+    _ADR TYPEE 
+9:  _UNNEST 
+
 
 /*******************************
     F+ ( f1 f2 -- f1+f2 )
@@ -296,29 +399,29 @@ digit_prod:
     _UNNEST 
 
 /*******************************
-    INT ( f -- n )
+    F>S ( f -- n )
     convert float to integer 
 *******************************/
-    _HEADER INT,3,"INT"
+    _HEADER FTOS,3,"F>S"
     _NEST 
 
     _UNNEST 
 
 /*******************************
-    UFLOAT ( n -- f )
+    S>F ( s -- f )
     convert integer to float 
 *******************************/
-    _HEADER UFLOAT,6,"UFLOAT"
+    _HEADER STOF,3,"S>F"
     _NEST 
 
     _UNNEST 
 
 /*******************************
-    F. ( f -- )
-    print float
+    D>F ( d -- f)
+    convert double to float 
 *******************************/
-    _HEADER FDOT,2,"F."
-    _NEST
+    _HEADER DTOF,3,"D>F"
+    _NEST 
 
     _UNNEST 
 
@@ -453,6 +556,8 @@ SCALE_UP:
 /*******************************
     FLOAT? ( a -- f -1 | a 0 )
     parse floating point 
+    float ::=  [-]digit*'.'[digit]*[E[-]digit+]
+    digit ::= '0'..'9' 
 *******************************/
     _HEADER FLOATQ,6,"FLOAT?"
     _NEST

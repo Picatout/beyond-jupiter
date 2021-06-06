@@ -37,20 +37,22 @@ VARIABLE FBASE \ floating point base
 : FOV  ( -- ovf_flag ) \ return overflow flag  
     FER 4 AND 0= NOT ; 
 
-: SFZ ( F# -- ; z ) \ set zero flag from float on TOS 
+: SFZ ( f# -- f# ; z ) \ set zero flag from float on TOS 
     FER $FE AND OVER $FFFFFF AND 0= 1 AND OR FPSW C! ;
 
-: SFN FER ( f# -- ; n ) \ set negative flag from float on TOS 
+: SFN FER ( f# -- f# ; n ) \ set negative flag from float on TOS 
     $FD AND OVER $800000 AND 22 RSHIFT OR FPSW C! ;
 
 : @EXPONENT ( F# -- m e ; z n ) \ split mantissa and exponent, set flags 
-    FRESET SFZ SFN DUP $FF000000 AND 24 RSHIFT >R \ exponent 
-    FNE IF $FF000000 OR ELSE $FFFFFF AND THEN R> ; \ sign extend mantissa 
+    FRESET SFZ SFN DUP 
+    FNE IF $FF000000 OR ELSE $FFFFFF AND THEN SWAP  \ sign extend mantissa 
+    24 RSHIFT \ exponent 
+;
 
-: !EXPONENT ( m e -- ; z n v ) 
+: !EXPONENT ( m e -- f# ; z n v ) 
 \ format float from mantissa and exponent 
-    DUP ABS 255 > IF 4 FPSW C! THEN \ exponent overflow 
-    OVER ABS $FFFFFF > IF 4 FPSW C! THEN \ mantissa overflow 
+    DUP ABS 255 > IF 4 FPSW C! $FF AND THEN \ exponent overflow 
+    OVER ABS $7FFFFF > IF 4 FPSW C! THEN \ mantissa overflow 
     24 LSHIFT SWAP 
     $FFFFFF AND OR 
     SFZ SFN ;
@@ -75,13 +77,13 @@ VARIABLE FBASE \ floating point base
         BEGIN 
             # ROT 1+ -ROT    
         OVER BASE @  U< UNTIL
-        [ CHAR . ] LITERAL HOLD 
+        [CHAR] . HOLD 
         #S  R>  SIGN #> TYPE
         ?DUP IF 
-            [ CHAR E ] LITERAL EMIT 
+            [CHAR] E EMIT 
             DUP 0< IF 
                 ABS
-                [ CHAR - ] LITERAL EMIT 
+                [CHAR] - EMIT 
             THEN 
             S>D  <# #S #> TYPE
         THEN 
@@ -100,10 +102,10 @@ VARIABLE FBASE \ floating point base
         S>D  
         <#   
         I 0< IF
-           I ABS 0 DO # LOOP 46 HOLD
+           I ABS 0 DO # LOOP [CHAR] . HOLD
         ELSE  
-            46 HOLD I IF
-                I 0 DO 48 HOLD LOOP 
+            [CHAR] . HOLD I IF
+                I 0 DO [CHAR] 0 HOLD LOOP 
             THEN
         THEN 
         R> DROP  
@@ -297,5 +299,73 @@ VARIABLE FBASE \ floating point base
     < 
 ; 
 
+\ check for charcter c 
+\ move pointer if true 
+: C? ( a c -- a+ t | a f )
+    SWAP  
+    COUNT  
+    ROT 
+    = DUP NOT IF
+        SWAP 1- SWAP 
+    THEN 
+;
+
+\ parse digits 
+\  d digits count 
+\  n parsed integer
+\  a+ updated pointer   
+: PARSE_DIGITS ( d n a -- d+ n+ a+ )
+    BEGIN 
+        COUNT FBASE @ DIGIT? WHILE 
+        ROT FBASE @ * + SWAP 
+        ROT 1+ -ROT
+    REPEAT
+    DROP 
+    1-  \ decrement a 
+;
+
+\ check for exponent 
+: EXPONENT ( a -- e a+ )
+    [CHAR] E C? IF 
+        [CHAR] - C? >R 
+        0 0 ROT 
+        PARSE_DIGITS
+        ROT DROP \ discard digits count  
+        R> IF SWAP NEGATE SWAP THEN  
+    ELSE 
+        0 SWAP 
+    THEN 
+;
+
+\ parse float number
+: FLOAT? ( a -- f# -2 | a 0 )
+\ simpler to find the end of null terminated string  
+    DUP ASCIZ 
+    0 0 ROT   \ -- a d n asciz  
+\ check for sign  
+    [CHAR] - C? >R  
+    PARSE_DIGITS 
+    ROT DROP \ d not used 
+    0 -ROT   \ reset it 
+\ check for '.'
+    [CHAR] . C?
+    IF  PARSE_DIGITS 
+        ROT NEGATE -ROT \ negate digit count 
+    THEN 
+    EXPONENT 
+\ a d n e asciz 
+    COUNT 0= IF  
+        DROP  \ a d n e 
+        ROT +  \ a n e- 
+        ROT DROP 
+        SWAP 
+        R> IF NEGATE THEN 
+        SWAP !EXPONENT 
+        -2 
+    ELSE
+        2DROP 2DROP  
+        0 
+    THEN 
+;
 
 FINIT 

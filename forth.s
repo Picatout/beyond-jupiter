@@ -1914,7 +1914,7 @@ PARSE_DIGITS:
 	_NEXT 
 
 /************************************
-	DASH? ( a c -- a+ c- t | a c f )
+	DASH? ( a c -- a+ t | a c f )
 	check if *a is '-' 
 *************************************/
 	_HEADER DASHQ,5,"DASH?"
@@ -2400,6 +2400,16 @@ PARS8:
 	_UNNEST
 
 /**********************************
+	[CHAR] ( -- c )
+	immediate version of CHAR 
+**********************************/
+	_HEADER IMCHAR,COMPO+IMEDD+6,"[CHAR]"
+	_NEST 
+	_ADR CHAR
+	_ADR LITER 
+	_UNNEST 
+
+/**********************************
     WORD	( c -- a //  string> )
  	Parse a word from input stream
 	and copy it to code dictionary.
@@ -2566,15 +2576,20 @@ FIND5:
 *****************************/
 	_HEADER ASCIZ,5,"ASCIZ" 
 	_NEST 
-	_ADR COUNT 
+	_ADR COUNT
+	_ADR DUPP
 	_ADR TOR 
-	_ADR DUPP 
+	_ADR PAD 
+	_ADR SWAP
+	_ADR MOVE  
+	_ADR PAD 
 	_ADR RFROM
 	_ADR PLUS 
 	_DOLIT 0 
-	_ADR SWAP 
-	_ADR CSTOR  
-	_NEXT 
+	_ADR SWAP  
+	_ADR CSTOR
+	_ADR PAD   
+	_UNNEST 
 
 /***********************
 	UPPER (cstring -- cstring )

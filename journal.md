@@ -1,3 +1,11 @@
+2021-06-05
+
+* Débuté transcription de [float.f](float.f) dans [float.s](float.s)
+
+* Travail sur [float.f](float.f)
+
+* Ajout de **[CHAR]** dans [forth.s](forth.s)
+
 2021-06-04
 
 * Ajout des mots **FABS**, **FNEGATE**, **FMIN**, **FMAX** , **F&gt;** et **F&lt;**. 

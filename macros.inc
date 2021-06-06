@@ -105,6 +105,8 @@
   .equ COL,ROW+4 
   .equ BK_COLOR,COL+4 
   .equ PEN_COLOR,BK_COLOR+4
+  .equ VFPSW, PEN_COLOR+4 
+  .equ VFBASE, VFPSW+4 
 
 /***********************************************
 * MACROS
