@@ -1,3 +1,7 @@
+2021-06-06
+
+A faire: déboguer E. et F. 
+
 2021-06-05
 
 * Débuté transcription de [float.f](float.f) dans [float.s](float.s)

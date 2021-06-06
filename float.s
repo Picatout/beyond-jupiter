@@ -36,6 +36,7 @@ Format:
 
     MANTISSA_MASK = 0xffffff // biggest mantissa 
     MANTISSA_SIGN = 0x800000 
+    MANTISSA_MAX = 0x7fffff 
 
 /*******************************
     FPSW  variable  ( -- a )
@@ -207,6 +208,8 @@ Format:
     _DOLIT MANTISSA_MASK
     _ADR ANDD  
     _ADR ORR 
+    _ADR SFN 
+    _ADR SFZ 
     _UNNEST 
     
 /******************************
@@ -217,11 +220,13 @@ Format:
     _HEADER EDOT,2,"E."
     _NEST 
     _ADR SPACE 
-    _ADR DUPP 
+    _ADR DUPP
+    _DOLIT MANTISSA_MASK 
+    _ADR ANDD  
     _ADR ZEQUAL 
     _QBRAN 1f 
-    _DOTQP 3,"0.0"
     _ADR DROP 
+    _DOTQP 3,"0.0"
     _BRAN 9f
 1:  _ADR BASE 
     _ADR AT 
@@ -232,10 +237,6 @@ Format:
     _ADR STORE
     _ADR AT_EXPONENT
     _ADR SWAP 
-    _ADR DUPP 
-    _ADR TOR // mantissa copy 
-    _ADR FNE 
-    _QBRAN 2f 
     _ADR ABSS 
 2:  _ADR STOD 
     _ADR BDIGS
@@ -251,9 +252,11 @@ Format:
     _DOLIT '.' 
     _ADR HOLD 
     _ADR DIGS
-    _ADR RFROM 
-    _ADR SIGN 
-    _ADR EDIGS
+    _ADR FNE 
+    _QBRAN 4f 
+    _DOLIT '-'
+    _ADR HOLD 
+4:  _ADR EDIGS
     _ADR TYPEE 
     _ADR QDUP 
     _QBRAN 8f
@@ -275,86 +278,173 @@ Format:
     _ADR STORE 
 9:  _UNNEST 
 
+
+/*****************************
+  format integer part 
 /******************************
     F. ( f# -- )
     print float in fixed point 
     format 
 *******************************/
     _HEADER FDOT,2,"F."
-    _NEST 
+    _NEST
+    _ADR BASE 
+    _ADR AT 
+    _ADR TOR 
+    _ADR FBASE
+    _ADR AT  
+    _ADR BASE 
+    _ADR STORE 
+    _ADR SPACE 
+    _ADR BDIGS
+    _DOLIT '0'
+    _ADR HOLD   
+    _ADR AT_EXPONENT 
+    _ADR SWAP  
+    _ADR ABSS
+    _ADR STOD 
+    _ADR ROT  
     _ADR DUPP 
+    _ADR ZLESS 
+    _QBRAN POS_E // positive exponent   
+// negative exponent
+1:  _ADR DUPP 
+    _QBRAN POS_E   
+    _ADR NROT  
+    _ADR DIG  
+    _ADR ROT   
+    _ADR ONEP 
+    _BRAN 1b  
+POS_E:
+    _DOLIT '.'
+    _ADR HOLD 
+1:  _ADR DUPP 
+    _QBRAN 8f 
+    _DOLIT '0'
+    _ADR HOLD 
+    _ADR ONEM 
+    _BRAN 1b
+8:  _ADR DROP 
+    _ADR DIGS 
+    _ADR FNE
+    _QBRAN 9f 
+    _DOLIT '-'
+    _ADR HOLD 
+9:  _ADR EDIGS 
+    _ADR TYPEE 
+    _ADR RFROM 
+    _ADR BASE 
+    _ADR STORE 
+    _UNNEST 
+
+
+/*******************************
+    F* ( f1 f2 -- f1*f2 )
+    multiply 2 float 
+******************************/
+    _HEADER FSTAR,2,"F*"
+    _NEST 
     _ADR AT_EXPONENT 
     _ADR TOR 
-    _ADR I 
-    _ADR ABSS 
-    _DOLIT 32 
-    _ADR UGREAT 
-    _QBRAN 1f
+    _ADR SWAP 
+    _ADR AT_EXPONENT 
     _ADR RFROM 
-    _ADR DROP 
-    _ADR EDOT 
-    _BRAN 9f 
-1:  _ADR SPACE 
-    _ADR FNE 
-    _QBRAN 2f
-    _ADR ABSS 
-2:  _ADR STOD 
-    _ADR BDIGS 
-    _ADR I 
-    _ADR ZLESS 
-    _QBRAN 4f 
-    _ADR I 
-    _ADR ABSS 
+    _ADR PLUS  // e1+e2
+    _ADR TOR 
+    _ADR MSTAR // m1*m2 
+    _ADR DUPP 
+    _DOLIT 31 
+    _ADR RSHIFT // product sign  
+    _ADR NROT  // put it on back burner
+    _ADR DABS 
+1:  _ADR DDUP 
+    _DOLIT MANTISSA_MAX     
     _DOLIT 0 
-    _ADR TOR 
-    _ADR TOR 
-3:  _ADR DIG 
-    _ADR RFROM 
-    _ADR ONEP
-    _ADR DUPP
-    _ADR TOR  
-    _ADR J 
-    _ADR LESS 
-    _QBRAN 3f
-    _BRAN 3b 
-3:  _ADR RFROM
-    _ADR RFROM 
-    _ADR DDROP 
-    _DOLIT '.' 
-    _ADR HOLD 
-    _BRAN 6f 
-4:  _DOLIT '.' 
-    _ADR HOLD 
-    _ADR I 
-    _QBRAN 6f 
-    _ADR I 
-    _DOLIT 0 
-    _ADR TOR 
-    _ADR TOR 
-5:  _DOLIT '0' 
-    _ADR HOLD
+    _ADR UDGREAT 
+    _QBRAN 2f 
+    _ADR FBASE 
+    _ADR AT 
+    _ADR DSLMOD 
+    _ADR ROT 
+    _ADR DROP
     _ADR RFROM 
     _ADR ONEP 
-    _ADR DUPP 
     _ADR TOR 
-    _ADR J 
-    _ADR LESS 
-    _QBRAN 5f 
-    _BRAN 5b
-5:  _ADR RFROM 
-    _ADR RFROM 
-    _ADR DDROP 
-6:  _ADR RFROM 
-    _ADR DROP 
-    _ADR DIGS 
-    _ADR SWAP 
-    _DOLIT 8
-    _ADR LSHIFT 
-    _ADR SIGN 
-    _ADR EDIGS 
-    _ADR TYPEE 
-9:  _UNNEST 
+    _BRAN 1b 
+2:  _ADR ROT  // product sign 
+    _QBRAN 3f 
+    _ADR DNEGA 
+3:  _ADR RFROM 
+    _ADR STOR_EXPONENT
+    _UNNEST  
 
+
+/*******************************
+    F/ ( f1 f2 -- f1/f2 )
+    divide f1 by f2 
+*******************************/
+    _HEADER FSLH,2,"F/"
+    _NEST 
+    _ADR AT_EXPONENT 
+    _ADR TOR 
+    _ADR SWAP 
+    _ADR AT_EXPONENT 
+    _ADR RFROM
+    _ADR PLUS 
+    _ADR TOR  
+    _ADR SWAP 
+    _ADR SLASH 
+    _ADR RFROM 
+    _ADR STOR_EXPONENT
+    _UNNEST 
+
+
+/******************************
+    ALIGN ( f#1 f#2 -- m1 m2 e )
+    align 2 floats for f+ or f- 
+    operation 
+*********************************/
+    _HEADER ALIGN,5,"ALIGN" 
+    _NEST 
+    _ADR AT_EXPONENT 
+    _ADR TOR 
+    _ADR SWAP 
+    _ADR AT_EXPONENT
+    _ADR RFROM 
+    _ADR DDUP 
+    _ADR LESS 
+    _QBRAN 4f 
+    _ADR SWAP 
+    _ADR TOR 
+    _ADR ROT // M1 E2 M2 R: E1         
+1:  _ADR OVER 
+    _ADR RAT 
+    _ADR DIFF 
+    _QBRAN 2f 
+    _ADR FBASE 
+    _ADR STAR 
+    _ADR SWAP 
+    _ADR ONEM 
+    _ADR SWAP
+    _BRAN 1b 
+2:  _ADR SWAP  
+    _BRAN 8f 
+4:  _ADR TOR 
+    _ADR SWAP // M2 E1 M1 R: E2 
+5:  _ADR OVER 
+    _ADR RAT 
+    _ADR DIFF 
+    _QBRAN 6f 
+    _ADR FBASE 
+    _ADR STAR 
+    _ADR SWAP 
+    _ADR ONEM 
+    _ADR SWAP 
+    _BRAN 5b 
+6:  _ADR NROT 
+8:  _ADR RFROM 
+    _ADR DROP  // M1 M2 E     
+    _UNNEST 
 
 /*******************************
     F+ ( f1 f2 -- f1+f2 )
@@ -362,7 +452,11 @@ Format:
 *******************************/
     _HEADER FPLUS,2,"F+"
     _NEST 
-
+    _ADR ALIGN 
+    _ADR TOR 
+    _ADR PLUS 
+    _ADR RFROM 
+    _ADR STOR_EXPONENT
     _UNNEST 
 
 /*******************************
@@ -371,21 +465,11 @@ Format:
 *******************************/
     _HEADER FMINUS,2,"F-"
     _NEST 
-
-    _UNNEST 
-
-/*******************************
-    F* ( f1 f2 -- f1*f2 )
-    multiply 2 float 
-******************************/
-
-/*******************************
-    F/ ( f1 f2 -- f1/f2 )
-    divide f1 by f2 
-*******************************/
-    _HEADER FSLH,2,"F/"
-    _NEST 
-
+    _ADR ALIGN 
+    _ADR TOR 
+    _ADR SUBB 
+    _ADR RFROM 
+    _ADR STOR_EXPONENT
     _UNNEST 
 
 
@@ -395,7 +479,11 @@ Format:
 ********************************/
     _HEADER FNEG,7,"FNEGATE"
     _NEST 
-
+    _ADR AT_EXPONENT 
+    _ADR TOR 
+    _ADR NEGAT 
+    _ADR RFROM 
+    _ADR STOR_EXPONENT
     _UNNEST 
 
 /*******************************
@@ -425,210 +513,132 @@ Format:
 
     _UNNEST 
 
+/**************************
+ check for charcter c 
+ move pointer if true 
+**************************/
+CQ: // ( a c -- a+ t | a f )
+    ldr T0,[DSP]
+    ldrb T1,[T0],#1 
+    mov T2,TOS 
+    eor TOS,TOS
+    cmp T1,T2
+    bne 1f 
+    str T0,[DSP]
+    mvn TOS,TOS  
+1:  _NEXT
 
-// accumulate digits 
-// ( n a+ c -- n+ a+ c- )
-ACCUM_DIGITS:
-    _NEST 
-    _ADR TOR 
-    _BRAN 4f 
-1:  _ADR COUNT 
-    _DOLIT 10  // n a+ char 10 
-    _ADR DIGTQ
-    _QBRAN 6f
-    _ADR ROT 
-    _DOLIT 10 
-    _ADR STAR 
-    _ADR PLUS 
-    _ADR SWAP // n a+  
-4:  _ADR RFROM  
-    _ADR DUPP 
-    _QBRAN 9f 
-    _ADR ONEM 
-    _ADR TOR
-    _BRAN 1b 
-6:  _ADR DROP 
-    _ADR ONEM
-    _ADR RFROM
-    _ADR DUPP  
-    _QBRAN 9f 
-    _ADR ONEP      
-9:  _UNNEST 
 
-// parse mantissa
-//  ( a c -- dcnt m a+ c- ) 
-MANTISSA:
+/***********************************
+ parse digits 
+  d digits count 
+  n parsed integer
+  a+ updated pointer  
+************************************/
+PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
     _NEST
-    _ADR OVER 
+    _ADR FBASE 
+    _ADR AT 
     _ADR TOR  
-    _DOLIT 0 
-    _ADR NROT 
-    _ADR ACCUM_DIGITS
-    _ADR SWAP  // m c- a+ 
-    _ADR DUPP  
-    _ADR RFROM // m c- a+ a+ a 
-    _ADR  SUBB // m c- a+ dcnt 
-    _ADR NROT // m dcnt c- a+ 
-    _ADR SWAP // m dcnt a+ c-
-    _ADR TOR  // m dcnt a+ R: c- 
-    _ADR SWAP // m a+ dcnt 
-    _ADR NROT // dcnt m a+ 
-    _ADR RFROM // dcnt m a+ c-  
-    _UNNEST 
-
-//parse exponent
-// ( a c -- e esign a+ c- ) 
-EXPONENT:
-    _NEST 
-    _ADR DASHQ 
-    _ADR TOR  // a c R: esign 
-    _DOLIT 0 
-    _ADR NROT 
-    _ADR ACCUM_DIGITS 
-    _ADR RFROM 
-    _ADR NROT // e esign a+ c- 
-    _UNNEST 
-
-// build float
-//  ( dcnt m e esign msign -- float ) 
-FORMAT_FLOAT:
-    _NEST 
-    _DOLIT (1<<31)
-    _ADR ANDD 
-    _ADR SWAP 
-    _DOLIT (1<<30)
-    _ADR XORR  
-    _ADR ORR  // dcnt m e sign 
-    _ADR ROT  // dcnt e sign m 
-    _ADR DUPP 
-    _QBRAN 2f // mantissa = 0 
-    _ADR TOR // dcnt e sign R:  mantissa 
-    _ADR NROT 
-    _ADR PLUS // sign e R: mantissa  
-    _DOLIT 64 
-    _ADR PLUS 
-    _DOLIT 24 
-    _ADR LSHIFT 
-    _ADR RFROM 
-    _ADR BOUND_MANTISSA
-    _ADR ORR 
-    _BRAN 9f
-2:  _ADR TOR // 
-    _ADR DDROP 
-    _ADR DROP 
-    _ADR RFROM 
-9:  _UNNEST 
-
-
-// bound mantissa
-//  0xfffff < m <= MANTISSA_MASK
-//  ( e m1 -- e m2 )
-BOUND_MANTISSA:
-    _NEST
-    _ADR DUPP 
-    _DOLIT MANTISSA_MASK
-    _ADR UGREAT  
-    _QBRAN SCALE_UP
-// to much digits 
-// scale down  
-1:  _ADR DUPP 
-    _DOLIT MANTISSA_MASK 
-    _ADR UGREAT 
-    _QBRAN 2f 
-    _DOLIT 10 
-    _ADR SLASH 
-    _BRAN 1b
-2:  _UNNEST 
-SCALE_UP:
-    _ADR DUPP 
-    _DOLIT 0xff0000
-    _ADR ANDD 
-    _ADR INVER
-    _QBRAN 9f
-    _DOLIT 10 
+1:  _ADR COUNT 
+    _ADR RAT 
+    _ADR DIGTQ
+    _QBRAN 2f
+    _ADR ROT 
+    _ADR RAT 
     _ADR STAR 
+    _ADR PLUS
     _ADR SWAP 
-    _ADR ONEM
+    _ADR ROT 
+    _ADR ONEP 
+    _ADR NROT
     _BRAN 1b 
-9:  _UNNEST 
+2:  _ADR DROP 
+    _ADR ONEM  // decrement a 
+    _ADR RFROM 
+    _ADR DROP     
+    _UNNEST 
+
+/********************************
+ check for exponent 
+********************************/
+EXPONENT: // ( a -- e a+ )
+    _NEST 
+    _DOLIT 'E'
+    _ADR CQ 
+    _QBRAN 2f 
+    _DOLIT '-'
+    _ADR CQ
+    _ADR TOR
+    _DOLIT 0 
+    _ADR DUPP  
+    _ADR ROT 
+    _ADR PARSE_DIGITS
+    _ADR ROT
+    _ADR DROP // discard digits count  
+    _ADR RFROM 
+    _QBRAN 2f 
+    _ADR SWAP
+    _ADR NEGAT
+    _ADR SWAP
+    _BRAN 8f    
+2:  _DOLIT 0 
+    _ADR SWAP     
+8:  _UNNEST 
 
 
-/*******************************
-    FLOAT? ( a -- f -1 | a 0 )
-    parse floating point 
-    float ::=  [-]digit*'.'[digit]*[E[-]digit+]
-    digit ::= '0'..'9' 
-*******************************/
+/*************************************
+    FLOAT? ( a -- f# -2 | a 0 )
+     parse float number
+**************************************/
     _HEADER FLOATQ,6,"FLOAT?"
     _NEST
-    _ADR BASE 
-    _ADR AT 
-    _ADR TOR
-    _ADR DECIM 
-    _DOLIT 0
-    _ADR OVER   // a 0 a  
-    _ADR COUNT  // a 0 a+ c 
-    _ADR DASHQ  // negative sign? 
-    _ADR TOR   // a 0 a+ c- R: base msign   
-    _ADR MANTISSA // a 0 dcnt m a+ c- 
-    _ADR OVER 
-    _ADR CAT
-    _ADR DUPP  
-    _DOLIT '.' 
-    _ADR XORR 
-    _QBRAN 1f 
-    _DOLIT 'E' 
-    _ADR XORR 
-    _QBRAN 2f
-// format error 
-0:  _ADR _DDROP // -- a 0 dcnt m 
-    _ADR _DDROP // -- a 0
-    _ADR RFROM 
-    _ADR DROP 
-    _BRAN 9f  
-1:  _ADR DROP
-    _ADR ONEM
-    _ADR SWAP 
-    _ADR ONEP 
-    _ADR SWAP
-_ADR TRACE 
-    _ADR ACCUM_DIGITS // a 0 dcnt m a+ c-
-_ADR TRACE 
-    _ADR OVER 
-    _ADR CAT 
-    _ADR DUPP 
-    _DOLIT '.' 
-    _ADR EQUAL 
-    _QBRAN 2f
-    _ADR DROP 
+// simpler to find the end of null terminated string  
+    _ADR DUPP
+    _ADR ASCIZ 
     _DOLIT 0 
-    _BRAN 3f 
-2:  _DOLIT 'E'
-    _ADR XORR 
-    _QBRAN 2f
     _ADR DUPP 
-    _ADR ZEQUAL 
-    _QBRAN 0b 
-    _DOLIT 0
+    _ADR ROT   // -- a d n asciz  
+// check for sign  
+    _DOLIT '-'
+    _ADR  CQ 
+    _ADR  TOR  
+    _ADR PARSE_DIGITS 
     _ADR ROT 
-    _BRAN 3f  
-2:  _ADR EXPONENT // a 0 dcnt m e esign a+ c- 
-    _QBRAN 3f   // if not char left ok 
-    _ADR DDROP 
-    _BRAN 0b
-3: _ADR TRACE   
-    _ADR DROP // a 0 dcnt m e esign 
-    _ADR RFROM // a 0 dcnt m e esign msign 
-_ADR TRACE 
-    _ADR FORMAT_FLOAT
-_ADR TRACE 
-    _ADR NROT 
-    _ADR DDROP 
-    _DOLIT -2 
-9:  _ADR RFROM 
-    _ADR BASE 
-    _ADR STORE     
-    _UNNEST    
+    _ADR DROP // d not used 
+    _DOLIT 0 
+    _ADR NROT   // reset it 
+// check for '.'
+    _DOLIT '.'
+    _ADR  CQ
+    _QBRAN 1f 
+    _ADR PARSE_DIGITS 
+    _ADR ROT 
+    _ADR NEGAT
+    _ADR  NROT // negate digit count 
+1:  _ADR EXPONENT // a d n e asciz 
+    _ADR COUNT 
+    _ADR ZEQUAL 
+    _QBRAN 4f   
+    _ADR  DROP  // a d n e 
+    _ADR  ROT 
+    _ADR  PLUS  // a n e- 
+    _ADR  ROT
+    _ADR  DROP 
+    _ADR  SWAP 
+    _ADR  RFROM
+    _QBRAN 3f
+    _ADR NEGAT 
+3:  _ADR SWAP
+    _ADR STOR_EXPONENT 
+    _DOLIT -2
+    _BRAN 8f  
+4:  _ADR  DDROP
+    _ADR  DDROP  
+    _DOLIT 0 
+8:  _UNNEST 
+
+
 
 /********************************
     NUMBER ( a -- int -1 | float -2 | a 0 )

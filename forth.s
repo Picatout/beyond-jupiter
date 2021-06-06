@@ -1887,8 +1887,8 @@ DGTQ1:
 	n  parsed integer 
 	c- character left in string   
 ****************************/
-	.type PARSE_DIGITS, %function 
-PARSE_DIGITS:
+	.type PARSE_INT, %function 
+PARSE_INT:
 	mov T0,TOS // string length 
 	_POP // TOS <- a 
 	eor WP,WP  // integer accumulator  
@@ -1976,7 +1976,7 @@ PARSE_DIGITS:
 	_ADR	TOR   // save sign -- a 0 a+ c- 
 	_ADR	QDUP
 	_QBRAN	6f
-	_ADR	PARSE_DIGITS  // a 0 a+ c -- a 0 a+ n c- 
+	_ADR	PARSE_INT  // a 0 a+ c -- a 0 a+ n c- 
 	_ADR	ZEQUAL
 	_QBRAN  5f // digits left, not an integer 
 2:	_ADR	RFROM  // sign 
@@ -4022,6 +4022,7 @@ COLD1:
 	_ADR	IF_SENSE
 	_ADR	WR_DIS          // disable WEL bit in U3 spi flash  
 	_ADR 	PS2_QUERY  
+	_ADR    FINIT 
 	_ADR	TBOOT
 	_ADR	ATEXE			// application boot
 	_ADR	OVERT

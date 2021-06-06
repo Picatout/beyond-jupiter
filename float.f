@@ -61,9 +61,10 @@ VARIABLE FBASE \ floating point base
 \ d.fffffE[-]ee 
 : E. ( F# -- ) 
     SPACE
-    DUP 0= IF 
-        ." 0.0"
+    DUP $FFFFFF AND 
+    0= IF 
         DROP 
+        ." 0.0"
     ELSE 
         SPACE 
         BASE @ >R
@@ -118,7 +119,7 @@ VARIABLE FBASE \ floating point base
     @EXPONENT >R 
     SWAP @EXPONENT R> + >R   
     M* DUP 31 RSHIFT DUP >R -ROT     
-    R> IF DABS THEN  
+    DABS  
     BEGIN 
     2DUP $7FFFFF S>D UD> WHILE
     10 D/MOD ROT DROP 
