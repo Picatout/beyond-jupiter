@@ -3675,33 +3675,47 @@ DUMP3:
 	_ADR	STORE			// restore radix
 	_UNNEST
 
-/***********************
-	TRACE ( -- )
-**********************/
-	_HEADER TRACE,5,"TRACE"
-	_NEST
-	_ADR HLD
-	_ADR AT 
-	_ADR TOR  
-	_ADR CR 
+/*******************************
+   TRACE. display in hexadecimal
+   TRACE. use a different buffer 
+   than DOT  to avoid current 
+   display overwrite.
+*******************************/ 
+TDOT: // ( u -- )
+	_NEST 
 	_ADR BASE 
 	_ADR AT 
 	_ADR TOR
-	_ADR DECIM
-	_DOLIT '>' 
-	_DOLIT 'S'
-	_ADR EMIT 
-	_ADR EMIT  
-	_ADR DOTS
-	_ADR CR
-	_ADR RFROM 
-	_ADR BASE 
-	_ADR STORE  
+	_ADR HEX  
+	_ADR HLD 
+	_ADR AT 
+	_ADR TOR   // R: base *hold 
+	_ADR HERE 
+	_DOLIT 160 
+	_ADR PLUS
+	_ADR DUPP 
+	_ADR TOR  
+	_ADR HLD 
+	_ADR STORE
+	_ADR STOD 
+	_ADR DIGS  
+	_ADR DROP
+	_DOLIT '$'
+	_ADR HOLD 
+	_ADR HLD 
+	_ADR AT
+	_ADR RFROM   
+	_ADR OVER 
+	_ADR SUBB 
+	_ADR SPACE 
+	_ADR TYPEE 
 	_ADR RFROM 
 	_ADR HLD 
-	_ADR STORE  
+	_ADR STORE 
+	_ADR RFROM 
+	_ADR BASE 
+	_ADR STORE 
 	_UNNEST 
-
 
 /**********************
    .S	  ( ... -- ... )
@@ -3710,18 +3724,76 @@ DUMP3:
 *************************/
 	_HEADER DOTS,2,".S"
 	_NEST
-	_ADR	SPACE
-	_ADR	DEPTH			// stack depth
-	_ADR	TOR			// start count down loop
-	_BRAN	DOTS2			// skip first pass
+	_ADR	DEPTH	// stack depth
+	_ADR	TOR		// start count down loop
+	_BRAN	DOTS2  // skip first pass
 DOTS1:
 	_ADR	RAT
 	_ADR	PICK
-	_ADR	DOT			// index stack, display contents
+	_ADR	TDOT // index stack, display contents
 DOTS2:
-	_DONXT	DOTS1	// loop till done
-	_ADR	SPACE
+	_DONXT	DOTS1 // loop till done
+	_ADR	CR 
 	_UNNEST
+
+RPAT: 
+	_PUSH 
+	mov TOS,RSP 
+	_NEXT 
+
+RBASE: 
+	_PUSH 
+	_MOV32 TOS,RPP 
+	_NEXT 
+
+
+/**************************
+  R.  display return stack 
+**************************/
+RDOT: 
+	_NEST 
+	_ADR RBASE
+	_ADR RPAT 
+	_ADR SUBB
+	_ADR CELLSL   
+	_DOLIT 2
+	_ADR SUBB 
+	_ADR TOR
+	_ADR RBASE 
+1:	_ADR CELLM 
+	_ADR DUPP 
+	_ADR AT 
+	_ADR TDOT 
+	_ADR RFROM   
+	_ADR ONEM 
+	_ADR DUPP
+	_ADR TOR 
+	_ADR ZEQUAL   
+	_QBRAN 1b
+	_ADR RFROM  
+	_ADR DROP
+	_ADR CR   
+	_UNNEST 
+
+/**************************
+	TRACE ( -- )
+	display stacks content 
+**************************/
+	_HEADER TRACE,5,"TRACE"
+	_NEST
+	_ADR CR 
+	_DOLIT '>' 
+	_DOLIT 'S'
+	_ADR EMIT 
+	_ADR EMIT  
+	_ADR DOTS
+	_DOLIT '>'
+	_DOLIT 'R'
+	_ADR EMIT 
+	_ADR EMIT 
+	_ADR RDOT 
+	_UNNEST 
+
 
 /*****************************
     >NAME	( ca -- na | F )

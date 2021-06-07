@@ -562,7 +562,7 @@ EXPONENT: // ( a -- e a+ )
     _ADR ROT
     _ADR DROP // discard digits count  
     _ADR RFROM 
-    _QBRAN 2f 
+    _QBRAN 8f 
     _ADR SWAP
     _ADR NEGAT
     _ADR SWAP
@@ -578,7 +578,6 @@ EXPONENT: // ( a -- e a+ )
 **********************************/
     _HEADER FLOATQ,6,"FLOAT?"
     _NEST
-// simpler to find the end of null terminated string  
     _ADR BASE 
     _ADR AT 
     _ADR TOR 
@@ -591,7 +590,7 @@ EXPONENT: // ( a -- e a+ )
     _ADR DROP  // count not used  
     _DOLIT 0 
     _ADR DUPP 
-    _ADR ROT   // -- a d n a+  
+    _ADR ROT   // -- a 0 0 a+  
 // check for sign  
     _DOLIT '-'
     _ADR  CHARQ 
@@ -600,7 +599,7 @@ EXPONENT: // ( a -- e a+ )
     _ADR ROT 
     _ADR DROP // d not used 
     _DOLIT 0 
-    _ADR NROT   // reset it 
+    _ADR NROT   // reset it ( -- a 0 n a+ ) R: base sign  
 // check for '.'
     _DOLIT '.'
     _ADR  CHARQ
@@ -608,8 +607,8 @@ EXPONENT: // ( a -- e a+ )
     _ADR PARSE_DIGITS 
     _ADR ROT 
     _ADR NEGAT
-    _ADR  NROT // negate digit count 
-1:  _ADR EXPONENT // a d n e a+ 
+    _ADR  NROT // negate digit count ( -- a d n a+ )
+1:  _ADR EXPONENT // a d n e a+  
     _ADR COUNT 
     _ADR ZEQUAL 
     _QBRAN 4f   
@@ -626,10 +625,13 @@ EXPONENT: // ( a -- e a+ )
     _ADR STOR_EXPONENT 
     _DOLIT -2
     _BRAN 8f  
-4:  _ADR  DDROP
+4:  _ADR RFROM 
+    _ADR DROP 
+    _ADR  DDROP
     _ADR  DDROP  
     _DOLIT 0 
-8:  _ADR RFROM 
+8:
+    _ADR RFROM 
     _ADR BASE 
     _ADR STORE 
     _UNNEST 

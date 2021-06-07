@@ -1,3 +1,13 @@
+2021-06-07 
+
+* Bogue dans F>S à corrigé 
+```
+$7fffff s>f dup f. f>s . 8388600.0 -2009910608
+```
+* Modifié TRACE pour afficher R> en plus de S>. Ajouter TRACE. pour éviter que TRACE écrase le tampon PAD. 
+
+* Corrigé bogue dans **FLOAT?** .
+
 2021-06-06
 
 A faire: déboguer E. et F. 
