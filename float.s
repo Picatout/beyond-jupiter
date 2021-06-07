@@ -400,11 +400,11 @@ POS_E:
 
 
 /******************************
-    ALIGN ( f#1 f#2 -- m1 m2 e )
+    F-ALIGN ( f#1 f#2 -- m1 m2 e )
     align 2 floats for f+ or f- 
     operation 
 *********************************/
-    _HEADER ALIGN,5,"ALIGN" 
+    _HEADER FALIGN,7,"F-ALIGN" 
     _NEST 
     _ADR AT_EXPONENT 
     _ADR TOR 
@@ -448,11 +448,11 @@ POS_E:
 
 /*******************************
     F+ ( f1 f2 -- f1+f2 )
-    add 2 float 
+    add 2 floats 
 *******************************/
     _HEADER FPLUS,2,"F+"
     _NEST 
-    _ADR ALIGN 
+    _ADR FALIGN 
     _ADR TOR 
     _ADR PLUS 
     _ADR RFROM 
@@ -465,7 +465,7 @@ POS_E:
 *******************************/
     _HEADER FMINUS,2,"F-"
     _NEST 
-    _ADR ALIGN 
+    _ADR FALIGN 
     _ADR TOR 
     _ADR SUBB 
     _ADR RFROM 
@@ -492,72 +492,57 @@ POS_E:
 *******************************/
     _HEADER FTOS,3,"F>S"
     _NEST 
-
+    _DOLIT 0 
+    _ADR FALIGN
+    _ADR DDROP 
     _UNNEST 
+/*   
+    ldr T0,TOS
+    _MOV32 T1,MANTISSA_MASK  
+    and T0,T1
+    lsl T0,#8 
+    asr T0,#8 
+    asr TOS,#24 // exponent 
+    ldr T1,[UP,#VFBASE]
+    tst TOS,#(1<<31)
+    beq 1f 
+    rsb TOS,#0 
+1:  cbz TOS,2f
+    mul T0,T1 
+    cbz T0,2f
+    sub TOS,#1
+    b 1b 
+2:  mov TOS,T0 
+    _NEXT 
+*/
+    
 
 /*******************************
     S>F ( s -- f )
     convert integer to float 
 *******************************/
-    _HEADER STOF,3,"S>F"
-    _NEST 
+    _HEADER STOF,3,"S>F" 
+    eor T0,T0 // exponent 
+    eor T2,T2 // sign 
+    ldr T1,[UP,#VFBASE]
+    _MOV32 T3,MANTISSA_MAX 
+    tst TOS,#(1<<31)
+    beq 1f 
+    rsb TOS,#0 
+    mvn T2,T2 // - integer  
+1:  cmp TOS,T3 
+    bmi 2f 
+    udiv TOS,TOS,T1 
+    add T0,#1 
+    b 1b
+2:  cbz T2,3f 
+    rsb TOS,#0 
+    _MOV32 T3,MANTISSA_MASK 
+    and TOS,T3
+3:  lsl T0,#24 
+    orr TOS,T0 
+    _NEXT 
 
-    _UNNEST 
-
-/*******************************
-    D>F ( d -- f)
-    convert double to float 
-*******************************/
-    _HEADER DTOF,3,"D>F"
-    _NEST 
-
-    _UNNEST 
-
-/**************************
- check for charcter c 
- move pointer if true 
-**************************/
-CQ: // ( a c -- a+ t | a f )
-    ldr T0,[DSP]
-    ldrb T1,[T0],#1 
-    mov T2,TOS 
-    eor TOS,TOS
-    cmp T1,T2
-    bne 1f 
-    str T0,[DSP]
-    mvn TOS,TOS  
-1:  _NEXT
-
-
-/***********************************
- parse digits 
-  d digits count 
-  n parsed integer
-  a+ updated pointer  
-************************************/
-PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
-    _NEST
-    _ADR FBASE 
-    _ADR AT 
-    _ADR TOR  
-1:  _ADR COUNT 
-    _ADR RAT 
-    _ADR DIGTQ
-    _QBRAN 2f
-    _ADR ROT 
-    _ADR RAT 
-    _ADR STAR 
-    _ADR PLUS
-    _ADR SWAP 
-    _ADR ROT 
-    _ADR ONEP 
-    _ADR NROT
-    _BRAN 1b 
-2:  _ADR DROP 
-    _ADR ONEM  // decrement a 
-    _ADR RFROM 
-    _ADR DROP     
-    _UNNEST 
 
 /********************************
  check for exponent 
@@ -565,10 +550,10 @@ PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
 EXPONENT: // ( a -- e a+ )
     _NEST 
     _DOLIT 'E'
-    _ADR CQ 
+    _ADR CHARQ 
     _QBRAN 2f 
     _DOLIT '-'
-    _ADR CQ
+    _ADR CHARQ
     _ADR TOR
     _DOLIT 0 
     _ADR DUPP  
@@ -587,21 +572,29 @@ EXPONENT: // ( a -- e a+ )
 8:  _UNNEST 
 
 
-/*************************************
+/**********************************
     FLOAT? ( a -- f# -2 | a 0 )
-     parse float number
-**************************************/
+    parse float number
+**********************************/
     _HEADER FLOATQ,6,"FLOAT?"
     _NEST
 // simpler to find the end of null terminated string  
+    _ADR BASE 
+    _ADR AT 
+    _ADR TOR 
+    _ADR FBASE 
+    _ADR AT 
+    _ADR BASE 
+    _ADR STORE 
     _ADR DUPP
-    _ADR ASCIZ 
+    _ADR COUNT 
+    _ADR DROP  // count not used  
     _DOLIT 0 
     _ADR DUPP 
-    _ADR ROT   // -- a d n asciz  
+    _ADR ROT   // -- a d n a+  
 // check for sign  
     _DOLIT '-'
-    _ADR  CQ 
+    _ADR  CHARQ 
     _ADR  TOR  
     _ADR PARSE_DIGITS 
     _ADR ROT 
@@ -610,13 +603,13 @@ EXPONENT: // ( a -- e a+ )
     _ADR NROT   // reset it 
 // check for '.'
     _DOLIT '.'
-    _ADR  CQ
+    _ADR  CHARQ
     _QBRAN 1f 
     _ADR PARSE_DIGITS 
     _ADR ROT 
     _ADR NEGAT
     _ADR  NROT // negate digit count 
-1:  _ADR EXPONENT // a d n e asciz 
+1:  _ADR EXPONENT // a d n e a+ 
     _ADR COUNT 
     _ADR ZEQUAL 
     _QBRAN 4f   
@@ -636,7 +629,10 @@ EXPONENT: // ( a -- e a+ )
 4:  _ADR  DDROP
     _ADR  DDROP  
     _DOLIT 0 
-8:  _UNNEST 
+8:  _ADR RFROM 
+    _ADR BASE 
+    _ADR STORE 
+    _UNNEST 
 
 
 

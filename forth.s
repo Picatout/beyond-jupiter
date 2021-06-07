@@ -1648,10 +1648,10 @@ FILL2:
 	_NEST
 	_ADR	ALGND
 	_ADR	DUPP
-	_ADR	TOR			// strings only on cell boundary
+	_ADR	TOR		// strings only on cell boundary
 	_ADR	OVER
 	_ADR	PLUS
-	_ADR	ONEP
+	_ADR	ONEP 
 	_DOLIT 	0xFFFFFFFC
 	_ADR	ANDD			// count mod cell
 	_DOLIT 	0
@@ -1879,57 +1879,51 @@ DGTQ1:
 	_ADR	ULESS
 	_UNNEST
 
-/*****************************
-	( a c -- a+ n c- )
-	a  string pointer 
-	c string length 
-	a+ updated pointer 
-	n  parsed integer 
-	c- character left in string   
-****************************/
-	.type PARSE_INT, %function 
-PARSE_INT:
-	mov T0,TOS // string length 
-	_POP // TOS <- a 
-	eor WP,WP  // integer accumulator  
-	ldr T2,[UP,#NBASE] // conversion base 
-1:	cbz T0, 8f 
-	ldrb T1,[TOS],#1
-	sub T1,#'0'
-	cmp T1,#10 
-	bmi 2f 
-	sub T1,#7
-2:  cmp T1,T2
-	bcs 7f 
-	mul WP,T2 
-	add WP,T1
-	sub T0,#1 
-	b 1b 
-7:  // not a valid character 
-	sub TOS,#1
-	add T0,#1 
-8:	_PUSH // -- a+
-	str WP,[DSP,#-4]! // -- a+ n 
-	mov TOS,T0  // -- a+ n c- 
-	_NEXT 
+/***********************************
+ parse digits 
+  d digits count 
+  n parsed integer
+  a+ updated pointer  
+************************************/
+PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
+    _NEST
+    _ADR BASE 
+    _ADR AT 
+    _ADR TOR  
+1:  _ADR COUNT 
+    _ADR RAT 
+    _ADR DIGTQ
+    _QBRAN 2f
+    _ADR ROT 
+    _ADR RAT 
+    _ADR STAR 
+    _ADR PLUS
+    _ADR SWAP 
+    _ADR ROT 
+    _ADR ONEP 
+    _ADR NROT
+    _BRAN 1b 
+2:  _ADR DROP 
+    _ADR ONEM  // decrement a 
+    _ADR RFROM 
+    _ADR DROP 
+    _UNNEST 
 
-/************************************
-	DASH? ( a c -- a+ t | a c f )
-	check if *a is '-' 
-*************************************/
-	_HEADER DASHQ,5,"DASH?"
-	eor T2,T2  // flag 
-	ldr T0,[DSP] // T0 <- a 
-	str TOS,[DSP,#-4]! // a c c 
-	ldrb T1,[T0],#1
-	cmp T1,#'-'
-	bne 9f 
-	str T0,[DSP,#4] // a+ 
-	sub TOS,#1 
-	str TOS,[DSP] // a+ c- 
-	mvn T2,T2 // -1 
-9:	mov TOS,T2 // a+ c- -1 | a c 0 
-	_NEXT
+/**************************
+ CHAR? 
+ check for charcter c 
+ move pointer if true 
+**************************/
+CHARQ: // ( a c -- a+ t | a f )
+    ldr T0,[DSP]
+    ldrb T1,[T0],#1 
+    mov T2,TOS 
+    eor TOS,TOS
+    cmp T1,T2
+    bne 1f 
+    str T0,[DSP]
+    mvn TOS,TOS  
+1:  _NEXT
 
 
 /**********************************
@@ -1949,49 +1943,54 @@ PARSE_INT:
 	_ADR	TOR
 	_DOLIT	0      // a 0 
 	_ADR	OVER   // a 0 a 
-	_ADR	COUNT  // a 0 a+ c 
-	_ADR	OVER   // a 0 a+ c a+
-	_ADR	CAT    // a 0 a+ c char 
-	_DOLIT '$'     // a 0 a+ c char '$'
-	_ADR	EQUAL  // a 0 a+ c f 
+	_ADR	COUNT  // a 0 a+ cnt 
+	_ADR	OVER   // a 0 a+ cnt a+
+	_ADR	CAT    // a 0 a+ cnt char 
+	_DOLIT '$'     // a 0 a+ cnt char '$'
+	_ADR	EQUAL  // a 0 a+ cnt f 
 	_QBRAN	0f    
 	_ADR	HEX
-	_ADR	SWAP  // a 0 c a+ 
-	_ADR	ONEP
-	_ADR	SWAP
-	_ADR	ONEM // a 0 a+ c 
-	_BRAN   1f
-0:  _ADR    OVER  // a 0 a+ c a+
-	_ADR    CAT   // a 0 a+ c char 
-	_DOLIT  '%'   // a 0 a+ c char '%'
-	_ADR	EQUAL  // a 0 a+ c f 
-	_QBRAN  1f
+	_BRAN   1f 
+0:  _ADR    OVER  // a 0 a+ cnt a+
+	_ADR    CAT   // a 0 a+ cnt char 
+	_DOLIT  '%'   // a 0 a+ cnt char '%'
+	_ADR	EQUAL  // a 0 a+ cnt f 
+	_QBRAN  2f
 	_ADR	BIN 
-	_ADR	SWAP 
+1:	_ADR	SWAP 
 	_ADR	ONEP 
 	_ADR	SWAP 
-	_ADR	ONEM
-1:  // a 0 a+ c 
-	_ADR	DASHQ
-	_ADR	TOR   // save sign -- a 0 a+ c- 
-	_ADR	QDUP
-	_QBRAN	6f
-	_ADR	PARSE_INT  // a 0 a+ c -- a 0 a+ n c- 
-	_ADR	ZEQUAL
+	_ADR	ONEM // a 0 a+ cnt-  
+2: // check for '-'
+	_ADR 	SWAP // a 0 cnt a+ 
+	_DOLIT  '-' 
+	_ADR	CHARQ
+	_ADR	ROT 
+	_ADR	OVER 
+	_ADR    TOR   // a 0 a+ f cnt R: sign  
+	_ADR	SWAP   // a 0 a+ cnt f 
+	_QBRAN  2f 
+	_ADR	ONEM 
+2:	_ADR 	TOR  // a 0 a+  R: sign cnt 
+	_DOLIT  0
+	_ADR	DUPP 
+	_ADR	ROT // a 0 0 0 a+ R: sign cnt 
+	_ADR	PARSE_DIGITS  // a 0 d n a+
+	_ADR	DROP // a 0 d n 
+	_ADR	SWAP  // a 0 n d 
+	_ADR	RFROM // a 0 n d cnt  
+	_ADR	EQUAL // d == cnt ? 
 	_QBRAN  5f // digits left, not an integer 
 2:	_ADR	RFROM  // sign 
 	_QBRAN  3f   // positive integer 
 	_ADR	NEGAT
 3:	
-	_ADR	NROT  // a n 0 a+
-	_ADR	DDROP // a n 
-	_DOLIT  -1    // a n -1 
-	_ADR	ROT   // n -1 a 
-	_ADR	DROP 
+	_ADR	NROT  // n a 0 
+	_ADR	DDROP // n  
+	_DOLIT  -1    // n -1 
 	_BRAN   7f  
-5:  _ADR    DROP  // -- a 0 a+   	 
-6:  _ADR	RFROM
-	_ADR	DDROP
+5:  _ADR	RFROM //  a 0 n sign      	 
+    _ADR	DDROP 
 7:	_ADR	RFROM
 	_ADR	BASE
 	_ADR	STORE
@@ -2268,7 +2267,7 @@ PARS:
 PARS1:
 	_ADR	BLANK
 	_ADR	OVER
-	_ADR	CAT			// skip leading blanks 
+	_ADR	CAT	 // skip leading blanks 
 	_ADR	SUBB
 	_ADR	ZLESS
 	_ADR	INVER
@@ -2291,7 +2290,7 @@ PARS4:
 	_ADR	AT
 	_ADR	OVER
 	_ADR	CAT
-	_ADR	SUBB			// scan for delimiter
+	_ADR	SUBB // scan for delimiter
 	_ADR	TEMP
 	_ADR	AT
 	_ADR	BLANK

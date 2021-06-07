@@ -114,11 +114,11 @@ VARIABLE FBASE \ floating point base
     THEN 
 ;
 
-
+\  float product 
 : F* ( F#1 F#2 -- F#3 )
     @EXPONENT >R 
     SWAP @EXPONENT R> + >R   
-    M* DUP 31 RSHIFT DUP >R -ROT     
+    M* DUP 31 RSHIFT -ROT     
     DABS  
     BEGIN 
     2DUP $7FFFFF S>D UD> WHILE
@@ -129,6 +129,7 @@ VARIABLE FBASE \ floating point base
     R> !EXPONENT  
 ;
 
+\ float division 
 : F/ ( F#1 F#2 -- F#1/F#2 )
     @EXPONENT >R 
     SWAP @EXPONENT R> + >R 
