@@ -201,21 +201,6 @@ VARIABLE FBASE \ floating point base
     R> DROP      
 ;
 
-\ convert float to double 
-: F>D ( F# -- D )
-    @EXPONENT >R 
-    S>D 
-    BEGIN 
-        I WHILE 
-        I 0> IF 
-            FBASE @ S>D D* R> 1- >R 
-        ELSE 
-            FBASE @ D/ R> 1+ >R 
-        THEN 
-    REPEAT 
-    R> DROP  
-;
-
 \ convert single to float 
 : S>F ( s -- f# )
     DUP 0< IF 

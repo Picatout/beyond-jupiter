@@ -25,8 +25,7 @@
     Parsing float32 to IEEE-754 format is quite Complex
     so I rather adapted  Forth dimensions Volume IV, #1
     library proposed by Michael Jesch 
-    adapted to this ARM-7M architecture.
-    REF: docs/FD-V04N1.pdf 
+    REF: docs/FD-V04N1.pdf ,  page 23
 
 Format:
     bit 23:0  6 digits signed mantissa
@@ -478,12 +477,83 @@ POS_E:
     negate floating point 
 ********************************/
     _HEADER FNEG,7,"FNEGATE"
+    mov T0,TOS 
+    _MOV32 T1,MANTISSA_MASK 
+    and T0,T1 
+    lsl T0,#8 
+    asr T0,#8 
+    rsb T0,#0 
+    and T0,T1 
+    mvn T1,T1 
+    and TOS,T1 
+    orr TOS,T0 
+    _NEXT 
+
+/**********************************
+    FABS ( f -- f )
+    return absolute value 
+******************************/
+    _HEADER FABS,4,"FABS"
+    mov T0,TOS 
+    _MOV32 T1,MANTISSA_MASK 
+    and T0,T1 
+    mvn T1,T1 
+    tst T0,#(1<<23)
+    beq 1f
+    mvn T1,T1  
+    eor T0,T1 
+1:  and TOS,T1 
+    orr TOS,T0 
+    _NEXT 
+
+/*******************************
+    FMIN ( f#1 f#2 -- smallest )
+********************************/
+    _HEADER FMIN,4,"FMIN"
     _NEST 
-    _ADR AT_EXPONENT 
-    _ADR TOR 
-    _ADR NEGAT 
-    _ADR RFROM 
-    _ADR STOR_EXPONENT
+    _ADR DDUP 
+    _ADR FALIGN 
+    _ADR DROP 
+    _ADR GREAT   
+    _QBRAN 1f 
+    _ADR SWAP 
+1:  _ADR DROP 
+    _UNNEST 
+
+/*******************************
+    FMAX (f#1 f#2 -- largest )
+*******************************/
+    _HEADER FMAX,4,"FMAX"
+    _NEST 
+    _ADR DDUP 
+    _ADR FALIGN 
+    _ADR DROP 
+    _ADR LESS 
+    _QBRAN 1f 
+    _ADR SWAP 
+1:  _ADR DROP 
+    _UNNEST 
+
+/*****************************
+    F> ( f#1 f#2 -- flag )
+    f#1>f#2 ? 
+*****************************/
+    _HEADER FGREAT,2,"F>"
+    _NEST 
+    _ADR FALIGN
+    _ADR DROP 
+    _ADR GREAT  
+    _UNNEST 
+
+/*****************************
+    F< ( f#1 f#2 -- flag )
+    f#1<f#2 ? 
+*****************************/
+    _HEADER FLESS,2,"F<"
+    _NEST 
+    _ADR FALIGN
+    _ADR DROP 
+    _ADR LESS   
     _UNNEST 
 
 /*******************************
@@ -491,30 +561,29 @@ POS_E:
     convert float to integer 
 *******************************/
     _HEADER FTOS,3,"F>S"
-    _NEST 
-    _DOLIT 0 
-    _ADR FALIGN
-    _ADR DDROP 
-    _UNNEST 
-/*   
-    ldr T0,TOS
+    mov T0,TOS
     _MOV32 T1,MANTISSA_MASK  
     and T0,T1
     lsl T0,#8 
-    asr T0,#8 
-    asr TOS,#24 // exponent 
-    ldr T1,[UP,#VFBASE]
+    asr T0,#8
+0:  asr TOS,#24 // exponent 
+    ldr T2,[UP,#VFBASE]
     tst TOS,#(1<<31)
-    beq 1f 
-    rsb TOS,#0 
-1:  cbz TOS,2f
-    mul T0,T1 
-    cbz T0,2f
-    sub TOS,#1
+    bne 2f 
+// positive exponent 
+1:  cbz TOS,8f 
+    cbz T0,8f 
+    mul T0,T2 
+    sub TOS,#1 
     b 1b 
-2:  mov TOS,T0 
+// negative exponent 
+2:  cbz TOS,8f 
+    cbz T0,8f 
+    sdiv T0,T2 
+    add TOS,#1
+    b 2b 
+8:  mov TOS,T0 
     _NEXT 
-*/
     
 
 /*******************************
