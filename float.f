@@ -139,7 +139,7 @@ VARIABLE FBASE \ floating point base
 
 \ align 2 floats to same exponent
 \ for addition or substraction 
-: ALIGN ( F#1 F#2 -- M1 M2 E )
+: F-ALIGN ( F#1 F#2 -- M1 M2 E )
     @EXPONENT >R 
     SWAP @EXPONENT ROT R>
     BEGIN 
@@ -156,14 +156,14 @@ VARIABLE FBASE \ floating point base
 
 \ add 2 floats 
 : F+ ( f#1 f#2 -- f#1+f#2 )
-    ALIGN 
+    F-ALIGN 
     >R + 
     R> !EXPONENT
 ;
 
 \ substract 2 floats
 : F- ( f#1 f#2 -- f#1-f#2 )
-    ALIGN 
+    F-ALIGN 
     >R - 
     R> !EXPONENT 
 ;
@@ -221,25 +221,6 @@ VARIABLE FBASE \ floating point base
     R> 24 LSHIFT OR  
 ;
 
-\ convert double to float 
-: D>F ( d -- f# )
-    DUP 0< IF 
-        DABS -1
-    ELSE 
-        0 
-    THEN 
-    -ROT 
-    0 
-    BEGIN 
-        >R 
-        2DUP $7FFFFF S>D UD> WHILE 
-        FBASE @ D/ R> 1+ 
-    REPEAT
-    DROP 
-    SWAP IF NEGATE $FFFFFF AND THEN 
-    R> 24 LSHIFT OR
-;
-
 \  float absulute value 
 : FABS ( f# -- f# )
     @EXPONENT 
@@ -259,7 +240,7 @@ VARIABLE FBASE \ floating point base
 \ float min 
 : FMIN ( f#1 f#2  -- smallest float )
     2DUP 
-    ALIGN 
+    F-ALIGN 
     DROP 
     < IF DROP ELSE SWAP DROP THEN 
 ;
@@ -267,21 +248,21 @@ VARIABLE FBASE \ floating point base
 \ float max 
 : FMAX ( f#1 f#2 -- largest float )
     2DUP 
-    ALIGN 
+    F-ALIGN 
     DROP 
     < IF SWAP DROP ELSE DROP THEN 
 ; 
 
 \ f#1 > f#2 
 : F> ( f#1 f#2 -- f )
-    ALIGN  
+    F-ALIGN  
     DROP 
     > 
 ; 
 
 \ f#1 < f#2 
 : F< ( f#1 f#2 -- f )
-    ALIGN  
+    F-ALIGN  
     DROP 
     < 
 ; 

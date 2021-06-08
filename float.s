@@ -405,42 +405,47 @@ POS_E:
 *********************************/
     _HEADER FALIGN,7,"F-ALIGN" 
     _NEST 
-    _ADR AT_EXPONENT 
-    _ADR TOR 
-    _ADR SWAP 
-    _ADR AT_EXPONENT
-    _ADR RFROM 
-    _ADR DDUP 
-    _ADR LESS 
+    _ADR AT_EXPONENT // F#1 M2 E2 
+    _ADR TOR  // F#1 M2 R: E2
+    _ADR SWAP // M2 F#1
+    _ADR AT_EXPONENT // M2 M1 E1 
+    _ADR ROT    // M1 E1 M2
+    _ADR SWAP  // M1 M2 E1  
+    _ADR RFROM  // M1 M2 E1 E2 
+    _ADR DDUP   
+    _ADR LESS  
     _QBRAN 4f 
-    _ADR SWAP 
-    _ADR TOR 
-    _ADR ROT // M1 E2 M2 R: E1         
-1:  _ADR OVER 
+// E1 < E2     
+    _ADR SWAP // M1 M2 E2 E1  
+    _ADR TOR  // M1 M2 E2 R: E1 
+1:  _ADR DUPP 
     _ADR RAT 
-    _ADR DIFF 
-    _QBRAN 2f 
-    _ADR FBASE 
+    _ADR DIFF   
+    _QBRAN 8f 
+    _ADR SWAP 
+    _ADR FBASE
+    _ADR AT  
     _ADR STAR 
     _ADR SWAP 
     _ADR ONEM 
-    _ADR SWAP
     _BRAN 1b 
-2:  _ADR SWAP  
-    _BRAN 8f 
-4:  _ADR TOR 
-    _ADR SWAP // M2 E1 M1 R: E2 
-5:  _ADR OVER 
+// E2 <= E1     
+4:  _ADR TOR  // M1 M2 E1 R: E2   
+    _ADR ROT   // M2 E1 M1 R: E2
+    _ADR SWAP // M2 M1 E1 R: E2  
+5:  _ADR DUPP  
     _ADR RAT 
     _ADR DIFF 
-    _QBRAN 6f 
+    _QBRAN 6f
+    _ADR SWAP  
     _ADR FBASE 
+    _ADR AT 
     _ADR STAR 
     _ADR SWAP 
     _ADR ONEM 
-    _ADR SWAP 
     _BRAN 5b 
-6:  _ADR NROT 
+6:  _ADR ROT  // M1 E1 M2 
+    _ADR SWAP  // m1 m2 E1 
 8:  _ADR RFROM 
     _ADR DROP  // M1 M2 E     
     _UNNEST 
@@ -500,9 +505,12 @@ POS_E:
     mvn T1,T1 
     tst T0,#(1<<23)
     beq 1f
-    mvn T1,T1  
-    eor T0,T1 
-1:  and TOS,T1 
+    lsl T0,#8 
+    asr T0,#8 
+    rsb T0,#0
+    and T0,T1 
+1:  mvn T1,T1  
+    and TOS,T1 
     orr TOS,T0 
     _NEXT 
 
@@ -528,7 +536,7 @@ POS_E:
     _ADR DDUP 
     _ADR FALIGN 
     _ADR DROP 
-    _ADR LESS 
+    _ADR LESS  
     _QBRAN 1f 
     _ADR SWAP 
 1:  _ADR DROP 
