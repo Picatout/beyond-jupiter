@@ -20,7 +20,9 @@
 /**********************************
     SPI FLASH memory 
     U3 chip: Winbound W25Q128FV
-    16 MBytes 
+    16 MBytes
+    erase BLOCK are 4KB 
+    write pages are 256 bytes
 **********************************/
 
     PIN_F_SC = 4 
@@ -294,3 +296,64 @@ sr_cmd: .byte 5,0x35,0x15
     _ADR WAIT_DONE 
     _UNNEST
 
+
+/********************************
+   FILES structures 
+   -----------------
+   name: 16 bytes null padded 
+   size: 4 bytes
+   blocks count: 4 bytes
+   update counter: 4 bytes  
+   block size: 4KB 
+   free block: first byte 0xFF 
+   erased file: first byte 0x00
+********************************/
+
+/*******************************
+    SEARCH-FILE 'name' ( -- adr )
+    search file in flash 
+********************************/
+    _HEADER SEARCH_FILE,11,"SEARCH-FILE"
+    _NEST 
+    
+    _UNNEST 
+
+ /******************************
+    ERASE-FILE 'name' ( -- )
+    delete a file 
+*******************************/
+    _HEADER ERASE_FILE,10,"ERASE-FILE"
+    _NEST 
+
+    _UNNEST 
+
+/*******************************
+    DIR ( -- )
+    print files list 
+*******************************/
+    _HEADER DIR,3,"DIR"
+    _NEST 
+
+    _UNNEST 
+
+/*******************************
+    SAVE 'name' ( -- ) 
+    save program in flash 
+********************************/
+    _HEADER SAVE,4,"SAVE"
+    _NEST 
+
+    _UNNEST 
+
+/******************************
+    LOAD 'name ( -- )
+    load program from flash 
+******************************/
+    _HEADER LOAD,4,"LOAD"
+    _NEST 
+
+    _UNNEST 
+
+
+
+    

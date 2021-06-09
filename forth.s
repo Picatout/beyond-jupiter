@@ -805,6 +805,29 @@ BRAN:
     RSBNE   TOS,TOS,#0
 	_NEXT
 
+/**************************
+	CLZ ( n - n )
+	count leading zeros 
+**************************/
+	_HEADER CLZ,3,"CLZ"
+	clz TOS,TOS 
+	_NEXT 
+
+/*************************
+	CTZ ( n -- n )
+	count trailing zeros 
+************************/
+	_HEADER CTZ,3,"CTZ"
+	eor T0,T0 
+1:  tst TOS,#1 
+	bne 2f 
+	lsr TOS,#1 
+	add T0,#1 
+	b 1b 
+2:  mov TOS,T0 
+	_NEXT 
+
+
 /*******************
   0= ( w -- f )
  TOS==0?

@@ -1,3 +1,12 @@
+2021-06-08
+
+* Ajout de **CLZ** et **CTLZ** dans [forth.s](forth.s).
+
+* Ajout de **SEARCH-FILE**, **ERASE-FILE**, **SAVE** et **LOAD**, **DIR**.
+
+
+* Travail sur les fichiers en flash externe. [spi-flash.s](spi-flash.s)
+
 2021-06-07 
 
 * Ajoutré **FABS**, **FMIN**, **FMAX**, **F&gt;** et **F&lt;**
