@@ -14,7 +14,7 @@ BUILD_DIR=build/
 LD_FILE=stm32f411ce.ld 
 LD_FLAGS=-mmcu=stm32f411re
 #sources
-SRC=init.s ser-term.s tvout.s ps2_kbd.s spi-flash.s float.s forth.s 
+SRC=init.s ser-term.s tvout.s ps2_kbd.s spi-flash.s fpu.s strtof.s forth.s 
  
 # programmer
 VERSION=STLINKV2
@@ -23,13 +23,15 @@ SMALL_DUNGLE=483f6e066772574857351967
 STV2_DUNGLE=$(SMALL_DUNGLE)
 STV3_PROG_SN=
 SERIAL=$(STV2_DUNGLE)
+# MCU 
+CPU=-march=armv7m -mfpu=vfpv4 -mfloat-abi=hard 
 
 .PHONY: all 
 
 all: clean build dasm
 
 build:  *.s Makefile *.inc $(LD_FILE)
-	$(AS) -a=$(BUILD_DIR)$(NAME).lst $(SRC) -g -o$(BUILD_DIR)$(NAME).o
+	$(AS) $(CPU) -a=$(BUILD_DIR)$(NAME).lst $(SRC) -g -o$(BUILD_DIR)$(NAME).o
 	$(LD) -T $(LD_FILE) -g $(BUILD_DIR)$(NAME).o -o $(BUILD_DIR)$(NAME).elf
 	$(OBJCOPY) -O binary $(BUILD_DIR)$(NAME).elf $(BUILD_DIR)$(NAME).bin 
 #	$(OBJCOPY) -O ihex $(BUILD_DIR)$(NAME).elf $(BUILD_DIR)$(NAME).hex  

@@ -148,12 +148,14 @@ ser_init:
         str T0,[UP,#STDIN]
         ldr T0,=SER_EMIT
         str T0,[UP,#STDOUT]
+        _CALL_COLWORD READY 
         _NEXT 
 4: // local console 
         ldr T0,=PS2_QKEY
         str T0,[UP,#STDIN]
         ldr T0,=TV_EMIT
         str T0,[UP,#STDOUT]
+        _CALL_COLWORD READY 
         _NEXT 
 
 /*******************************

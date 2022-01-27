@@ -23,7 +23,7 @@
 
   .syntax unified
   .cpu cortex-m4
-  .fpu softvfp
+  .fpu vfpv4
   .thumb
 
   .include "stm32f411ce.inc"
@@ -39,11 +39,11 @@ isr_vectors:
   .word   _mstack          /* main return stack address */
   .word   reset_handler    /* startup address */
 /* core interrupts || exceptions */
-  .word   default_handler  /*  -14 NMI */
-  .word   default_handler  /*  -13 HardFault */
-  .word   default_handler  /*  -12 Memory Management */
-  .word   default_handler  /* -11 Bus fault */
-  .word   default_handler  /* -10 Usage fault */
+  .word   nmi_handler  /*  -14 NMI */
+  .word   hardfault_handler  /*  -13 HardFault */
+  .word   memfault_handler  /*  -12 Memory Management */
+  .word   busfault_handler  /* -11 Bus fault */
+  .word   usagefault_handler  /* -10 Usage fault */
   .word   0 /* -9 */
   .word   0 /* -8 */ 
   .word   0 /* -7 */
@@ -136,7 +136,7 @@ isr_vectors:
   .word		 0 /* IRQ78, not used */
   .word		 0 /* IRQ79, not used */
   .word		 0 /* IRQ80, not used */
-  .word		 default_handler /* IRQ81, FPU */
+  .word		 fpu_exception /* IRQ81, FPU */
   .word		 0 /* IRQ82, not used */
   .word		 0 /* IRQ83, not used */
   .word		 default_handler /* IRQ84, SPI4 */
@@ -158,55 +158,185 @@ default_handler:
   ldr IP,=dh
   b INEXT  
 dh:
-  _ADR PRESE    
-	_DOLIT exception_msg 
-  _ADR COUNT 
-  _ADR TYPEE 
-  _ADR GET_CFSR 
+  _ADR PRESE
+  _DOTQP 23, "exeption reboot, CFSR: "     
+  _ADR CFSR 
   _ADR DUPP
   _ADR TOR 
   _DOLIT 16 
   _ADR BASE 
   _ADR STORE 
-  _ADR DOT 
+  _ADR UDOT 
+  _DOTQP 8 , ", BFAR: "
   _ADR RFROM
   _DOLIT (1<<15)
   _ADR ANDD
   _QBRAN 1f
-  _ADR GET_BFAR
+  _ADR BFAR
   _DOLIT ','
   _ADR EMIT 
   _ADR SPACE 
-  _ADR DOT 
+  _ADR UDOT 
+// display fpu
+1:
+  _DOTQP 9 , ", FPSCR: "
+  _ADR FPSCR
+  _ADR UDOT 
 1:
   _ADR reset_mcu 
 
-/***************************
-  GET_CFSR ( -- u )
-  stack CFSR register 
-***************************/
-GET_CFSR:
-    _MOV32 r3,SCB_BASE_ADR  
-    _PUSH 
-    ldr TOS,[r3,SCB_CFSR]
-    _NEXT 
+  
 
-/*****************************
-  GET_BFAR ( -- u )
-  stack BFAR register
-*****************************/
-GET_BFAR:
-    _MOV32 r3,SCB_BASE_ADR  
-    _PUSH 
-    ldr TOS,[r3,SCB_BFAR]
-    _NEXT 
+/*********************************
+   fpu exception 
+*********************************/
+  .type fpu_exception, %function 
+  .global fpu_exception 
+  .p2align 2 
+fpu_exception:
+  _MOV32 r0,RAM_END 
+  mov sp,r0 
+  ldr IP,=fpu_except 
+  b INEXT 
+fpu_except:  
+//  _CALL forth_init 
+  _ADR PRESE
+  _ADR CR  
+  _DOLIT 16 
+  _ADR BASE 
+  _ADR STORE 
+  _DOTQP 21 , "fpu exception FPSCR: "
+  _ADR FPSCR 
+  _ADR UDOT 
+  _ADR CR 
+  _ADR reset_mcu  
 
 
-  .size  default_handler, .-default_handler
-exception_msg:
-	.byte 23
-	.ascii "exeption reboot, CFSR: "
-	.p2align 2
+
+
+/*********************************
+  non maskable interrupt handler
+  irq -14 
+*********************************/
+  .type nmi_handler, %function
+  .p2align 2
+  .global nmi_handler 
+nmi_handler:
+  ldr IP,=nmi_hl 
+  b  INEXT
+nmi_hl:
+  _ADR PRESE 
+  _ADR CR 
+  _DOTQP  25 , "not managed nmi exception"
+  _ADR CR 
+  _ADR ABORT 
+   
+
+/***********************************
+   hard fault handler
+   irq -13
+***********************************/
+  .type hardfault_handler, %function
+  .p2align 2
+  .global hardfault_handler 
+hardfault_handler:
+  _MOV32 r0,RAM_END 
+  mov sp,r0 
+  ldr IP,=hardfault_hl 
+  b INEXT
+hardfault_hl:
+  _ADR PRESE
+  _ADR CR  
+  _DOTQP  20 , "hard fault exception"
+  _ADR CR 
+  _ADR reset_mcu
+
+/***********************************
+   memory manager fault 
+   irq -12 
+************************************/
+  .type memfault_handler, %function
+  .p2align 2
+  .global memfault_handler 
+memfault_handler:
+  _MOV32 r0,RAM_END 
+  mov sp,r0 
+  ldr IP,=memfault_hl 
+  b INEXT 
+memfault_hl: 
+  _ADR PRESE
+  _ADR CR  
+  _DOTQP  33 , "memory manager exception, MMFSR: "
+  _DOLIT 16 
+  _ADR BASE 
+  _ADR STORE   
+  _ADR CFSR
+  _DOLIT 255 
+  _ADR ANDD 
+  _ADR UDOT 
+  _ADR CR 
+  _ADR reset_mcu 
+
+
+/************************************
+   bus fault 
+   irq -11 
+***********************************/
+  .type busfault_handler, %function
+  .p2align 2
+  .global busfault_handler 
+busfault_handler:
+  _MOV32 r0,RAM_END 
+  mov sp,r0 
+  ldr IP,=busfault_hl 
+  b INEXT 
+busfault_hl:
+  _ADR PRESE
+  _DOLIT 1 
+  _ADR ULED 
+  _DOLIT  100 
+  _ADR MSEC 
+  _ADR BFAR 
+  _ADR CFSR 
+  _ADR CR  
+  _DOTQP  27 , "bus fault exception, BFSR: "
+  _DOLIT 16 
+  _ADR BASE 
+  _ADR STORE   
+  _DOLIT 0XFF00 
+  _ADR ANDD   
+  _ADR UDOT 
+  _DOTQP 7 , " BFAR: "
+  _ADR UDOT 
+  _ADR CR 
+  _ADR reset_mcu  
+
+/************************************
+    usage fault
+    irq -10 
+************************************/
+  .type usagefault_handler, %function
+  .p2align 2
+  .global usagefault_handler 
+usagefault_handler:
+  _MOV32 r0,RAM_END 
+  mov sp,r0 
+  ldr IP,=usagefault_hl
+  b INEXT 
+usagefault_hl:
+  _ADR PRESE
+  _ADR CR  
+  _DOTQP  23 , "usage exception, UFSR: "
+  _DOLIT 16 
+  _ADR BASE 
+  _ADR STORE   
+  _ADR CFSR
+  _DOLIT 16 
+  _ADR RSHIFT 
+  _ADR UDOT 
+  _ADR CR 
+  _ADR reset_mcu  
+
 
 /*********************************
 	system milliseconds counter
@@ -264,14 +394,19 @@ reset_mcu:
   .global reset_handler
 reset_handler:
 	_MOV32 r0,RAM_END
-	mov sp,r0  
+	mov sp,r0 
+// enable memory, bus and usage exceptions  
+  _MOV32 r0,SCB_BASE_ADR
+  eor r1,r1 
+  movt r1,#7 
+  str r1,[r0,#SCB_SHCSR]
 	bl	remap 
 	bl	init_devices	 	/* RCC, GPIOs, USART */
+  bl  fpu_init 
 	bl  ser_init
  	bl	tv_init
   bl  kbd_init
   bl  flash_spi_init   
-	bl forth_init 
 	b COLD 
 
 
@@ -567,7 +702,7 @@ UZERO:
 	.word 0xaa55aa55 /* SEED  */ 
 	.word 0      /* TICKS */
     .word 0     /* CD_TIMER */
-	.word HI  /*'BOOT */
+	.word HI_BOTH  /*'BOOT */
 	.word PS2_QKEY /* query for character */
   .word TV_EMIT  /* char output device */
   .word BASEE 	/*BASE */

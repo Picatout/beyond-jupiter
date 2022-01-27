@@ -1,5 +1,5 @@
 /**************************************************************************
- Copyright Jacques Deschênes 2021 
+ Copyright Jacques Deschênes 2021, 2022 
  This file is part of beyond-Jupiter 
 
      beyond-Jupiter is free software: you can redistribute it and/or modify

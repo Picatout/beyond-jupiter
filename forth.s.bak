@@ -66,7 +66,7 @@
 
 	.syntax unified
 	.cpu cortex-m4
-	.fpu vfpv4  
+	.fpu softvfp  
 	.thumb
 
 	.include "stm32f411ce.inc"
@@ -124,31 +124,7 @@ TSTDOUT:
 	_PUSH 
 	ADD TOS,UP,#STDOUT
 	_NEXT 
-
-/***************************
-  CFSR ( -- u )
-  stack CFSR register 
-***************************/
-    _HEADER CFSR,6,"ATCFSR"
-    _MOV32 T0,SCB_BASE_ADR  
-    _PUSH 
-    ldr TOS,[T0,#SCB_CFSR]
-    eor T1,T1 
-    str T1,[T0,#SCB_CFSR]
-    _NEXT 
-
-/*****************************
-  BFAR ( -- u )
-  stack BFAR register
-*****************************/
-    _HEADER BFAR,6,"ATBFAR"
-    _MOV32 T0,SCB_BASE_ADR  
-	_PUSH 
-    ldr TOS,[T0,#SCB_BFAR]
-    eor T1,T1 
-    str T1,[T0,#SCB_BFAR]
-    _NEXT 
-
+	
 /********************************************
 	KEY? ( -- c T | F )
 	check if available character 
@@ -829,29 +805,6 @@ BRAN:
     RSBNE   TOS,TOS,#0
 	_NEXT
 
-/**************************
-	CLZ ( n - n )
-	count leading zeros 
-**************************/
-	_HEADER CLZ,3,"CLZ"
-	clz TOS,TOS 
-	_NEXT 
-
-/*************************
-	CTZ ( n -- n )
-	count trailing zeros 
-************************/
-	_HEADER CTZ,3,"CTZ"
-	eor T0,T0 
-1:  tst TOS,#1 
-	bne 2f 
-	lsr TOS,#1 
-	add T0,#1 
-	b 1b 
-2:  mov TOS,T0 
-	_NEXT 
-
-
 /*******************
   0= ( w -- f )
  TOS==0?
@@ -874,19 +827,6 @@ BRAN:
     MVNEQ	TOS,#0
 	MOVNE	TOS,#0
 	_NEXT
-
-/************************
-	<> ( w w -- f )
-	different?
-************************/
-	_HEADER DIFF,2,"<>"
-	mov T0,TOS 
-	_POP 
-	eor TOS,T0
-	clz T0,TOS 
-	lsl TOS,T0 
-	asr TOS,#31 
-	_NEXT 
 
 /************************
     U<	 ( w w -- t )
@@ -1142,7 +1082,7 @@ TEMP:
 *********************************/
 	_HEADER HLD,3,"HLD"
 	_PUSH
-	ADD	TOS,UP,#VHOLD
+	ADD	TOS,UP,#HOLD
 	_NEXT
 
 /**********************************
@@ -1308,16 +1248,16 @@ MMOD3:
 	ASR TOS,#31
 	_NEXT 
 
+
 /****************************
 	D2* ( d -- d<<1 )
 	double * 2 
 ***************************/
 	_HEADER D2STAR,3,"D2*"
 	ldr T0,[DSP]
-	lsls T0,#1
+	adds T0,T0,T0
+	adc TOS,TOS,TOS
 	str T0,[DSP]
-	lsl TOS,#1
-	adc TOS,#0
 	_NEXT 
 
 /****************************
@@ -1330,6 +1270,7 @@ MMOD3:
 	rrx T0,T0 
 	str T0,[DSP]
 	_NEXT 
+
 
 /***************************
 	D/MOD  ( d+ n+ - r+ qd+ )
@@ -1367,78 +1308,6 @@ MMOD3:
 	mov TOS,T0  // q hi 		
 	_NEXT 
 
-
-/****************************
-	D/  ( ud u -- udq )
-	divide unsigned double 
-	by unsigned single 
-	return double quotient
-	rounded to nearest integer 
-****************************/
-	_HEADER DSLASH,2,"D/"
-	_NEST 
-	_ADR DUPP 
-	_DOLIT 1 
-	_ADR RSHIFT 
-	_ADR TOR 
-	_ADR DSLMOD 
-	_ADR ROT 
-	_ADR RFROM 
-	_ADR GREAT 
-	_QBRAN 9f
-	_DOLIT 1 
-	_ADR STOD 
-	_ADR DPLUS 
-9:	_UNNEST 
-
-
-/****************************
-	D* ( d s -- d )
-    multiply a double 
-	by a single 
-****************************/
-	_HEADER DSTAR,2,"D*"
-/*
-	_NEST 
-	_ADR NROT 
-	_ADR DUPP 
-	_ADR TOR 
-	_ADR DABS
-	_ADR SWAP  
-	_ADR ROT   
-	_ADR DUPP
-	_ADR TOR
-	_ADR MSTAR
-	_ADR ROT
-	_ADR RFROM 
-	_ADR STAR 
-	_ADR PLUS
-	_ADR RFROM 
-	_ADR ZLESS 
-	_QBRAN 9f
-	_ADR DNEGA   
-9:	_UNNEST 
-*/
-	ldr T0,[DSP],#4
-	ldr T1,[DSP]
-	str T0,[DSP] 
-	eor T3,T3 
-	tst T0,#(1<<31)
-	beq 1f 
-	// DNEGATE 
-	subs T1,T3,T1  
-	sbc T0,T3,T0 
-1:	smull  T2,T1,T1,TOS // partial product 
-	mul TOS,T0,TOS // second partial product 
-	add TOS,T1  // TOS:T2 product  
-	ldr r0,[DSP]
-	tst T0,#(1<<31)
-	beq 2f 
-	// DNEGATE product 
-	subs T2,T3,T2  
-	sbc TOS,T3,TOS 
-2:  str T2,[DSP]
-	_NEXT 
 
 
 /****************************
@@ -1695,10 +1564,10 @@ FILL2:
 	_NEST
 	_ADR	ALGND
 	_ADR	DUPP
-	_ADR	TOR		// strings only on cell boundary
+	_ADR	TOR			// strings only on cell boundary
 	_ADR	OVER
 	_ADR	PLUS
-	_ADR	ONEP 
+	_ADR	ONEP
 	_DOLIT 	0xFFFFFFFC
 	_ADR	ANDD			// count mod cell
 	_DOLIT 	0
@@ -1714,7 +1583,7 @@ FILL2:
 	_UNNEST   			// move string
 
 /***********************************
-  Numeric output, single precision
+  Numeric output, double precision
 ***********************************/
 
 /**************************
@@ -1735,14 +1604,14 @@ FILL2:
 	_UNNEST
 
 /*********************************
-    EXTRACT	( ud base -- ud c )
+    EXTRACT	( d+ base -- d+ c )
  	Extract the least significant
-	digit from positive double.
+	digit from d+
 **********************************/
 	_HEADER EXTRC,7,"EXTRACT"
 	_NEST
 	_ADR	DSLMOD
-	_ADR	ROT
+	_ADR	ROT 
 	_ADR	DIGIT
 	_UNNEST
 
@@ -1775,9 +1644,9 @@ FILL2:
 	_UNNEST
 
 /***********************
-    #	   ( ud -- ud )
+    #	   ( d+ -- d+ )
  	Extract one digit 
-	from ud and append 
+	from u and append 
 	the digit to output 
 	string.
 *************************/
@@ -1789,9 +1658,10 @@ FILL2:
 	_ADR	HOLD
 	_UNNEST
 
+
 /***************************
-    #S	  ( ud -- 0 )
- 	Convert ud until all 
+    #S	  ( d+ -- 0 )
+ 	Convert d+ until all 
 	digits are added to 
 	the output string.
 ***************************/
@@ -1800,12 +1670,11 @@ FILL2:
 DIGS1:
     _ADR	DIG
 	_ADR	DDUP
-	_ADR    ORR 
-	_QBRAN 	DIGS2
-	_BRAN	DIGS1
+	_ADR    DZEQUAL
+	_QBRAN 	DIGS1
 DIGS2:
 	 _ADR DROP 
-	 _UNNEST
+	  _UNNEST
 
 /*********************
     SIGN	( n -- )
@@ -1846,10 +1715,10 @@ hidden word used by compiler
 ***************************/
 STRR:
 	_NEST
-	_ADR 	STOD 
 	_ADR	DUPP
 	_ADR	TOR
-	_ADR	DABS
+	_ADR	ABSS
+	_DOLIT  0 
 	_ADR	BDIGS
 	_ADR	DIGS
 	_ADR	RFROM
@@ -1926,56 +1795,62 @@ DGTQ1:
 	_ADR	ULESS
 	_UNNEST
 
-/***********************************
- parse digits 
-  d digits count 
-  n parsed integer
-  a+ updated pointer  
-************************************/
-PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
-    _NEST
-    _ADR BASE 
-    _ADR AT 
-    _ADR TOR  
-1:  _ADR COUNT 
-    _ADR RAT 
-    _ADR DIGTQ
-    _QBRAN 2f
-    _ADR ROT 
-    _ADR RAT 
-    _ADR STAR 
-    _ADR PLUS
-    _ADR SWAP 
-    _ADR ROT 
-    _ADR ONEP 
-    _ADR NROT
-    _BRAN 1b 
-2:  _ADR DROP 
-    _ADR ONEM  // decrement a 
-    _ADR RFROM 
-    _ADR DROP 
-    _UNNEST 
+/*****************************
+	( a c -- a+ n c- )
+	a  string pointer 
+	c string length 
+	a+ updated pointer 
+	n  parsed integer 
+	c- character left in string   
+****************************/
+	.type PARSE_DIGITS, %function 
+PARSE_DIGITS:
+	mov T0,TOS // string length 
+	_POP // TOS <- a 
+	eor WP,WP  // integer accumulator  
+	ldr T2,[UP,#NBASE] // conversion base 
+1:	cbz T0, 8f 
+	ldrb T1,[TOS],#1
+	sub T1,#'0'
+	cmp T1,#10 
+	bmi 2f 
+	sub T1,#7
+2:  cmp T1,T2
+	bcs 7f 
+	mul WP,T2 
+	add WP,T1
+	sub T0,#1 
+	b 1b 
+7:  // not a valid character 
+	sub TOS,#1
+	add T0,#1 
+8:	_PUSH // -- a+
+	str WP,[DSP,#-4]! // -- a+ n 
+	mov TOS,T0  // -- a+ n c- 
+	_NEXT 
 
-/**************************
- CHAR? 
- check for charcter c 
- move pointer if true 
-**************************/
-CHARQ: // ( a c -- a+ t | a f )
-    ldr T0,[DSP]
-    ldrb T1,[T0],#1 
-    mov T2,TOS 
-    eor TOS,TOS
-    cmp T1,T2
-    bne 1f 
-    str T0,[DSP]
-    mvn TOS,TOS  
-1:  _NEXT
+/************************************
+	DASH? ( a c -- a+ c- t | a c f )
+	check if *a is '-' 
+*************************************/
+	_HEADER DASHQ,5,"DASH?"
+	eor T2,T2  // flag 
+	ldr T0,[DSP] // T0 <- a 
+	str TOS,[DSP,#-4]! // a c c 
+	ldrb T1,[T0],#1
+	cmp T1,#'-'
+	bne 9f 
+	str T0,[DSP,#4] // a+ 
+	sub TOS,#1 
+	str TOS,[DSP] // a+ c- 
+	mvn T2,T2 // -1 
+9:	mov TOS,T2 // a+ c- -1 | a c 0 
+	_NEXT
 
 
 /**********************************
     INT?	( a -- n T | a F )
- 	parse string for at 'a' for 
+ 	parse string at 'a' for 
 	integer. Push a flag on TOS.
 	integer form:
 		[-]hex_digit+  | 
@@ -1990,54 +1865,49 @@ CHARQ: // ( a c -- a+ t | a f )
 	_ADR	TOR
 	_DOLIT	0      // a 0 
 	_ADR	OVER   // a 0 a 
-	_ADR	COUNT  // a 0 a+ cnt 
-	_ADR	OVER   // a 0 a+ cnt a+
-	_ADR	CAT    // a 0 a+ cnt char 
-	_DOLIT '$'     // a 0 a+ cnt char '$'
-	_ADR	EQUAL  // a 0 a+ cnt f 
+	_ADR	COUNT  // a 0 a+ c 
+	_ADR	OVER   // a 0 a+ c a+
+	_ADR	CAT    // a 0 a+ c char 
+	_DOLIT '$'     // a 0 a+ c char '$'
+	_ADR	EQUAL  // a 0 a+ c f 
 	_QBRAN	0f    
 	_ADR	HEX
-	_BRAN   1f 
-0:  _ADR    OVER  // a 0 a+ cnt a+
-	_ADR    CAT   // a 0 a+ cnt char 
-	_DOLIT  '%'   // a 0 a+ cnt char '%'
-	_ADR	EQUAL  // a 0 a+ cnt f 
-	_QBRAN  2f
+	_ADR	SWAP  // a 0 c a+ 
+	_ADR	ONEP
+	_ADR	SWAP
+	_ADR	ONEM // a 0 a+ c 
+	_BRAN   1f
+0:  _ADR    OVER  // a 0 a+ c a+
+	_ADR    CAT   // a 0 a+ c char 
+	_DOLIT  '%'   // a 0 a+ c char '%'
+	_ADR	EQUAL  // a 0 a+ c f 
+	_QBRAN  1f
 	_ADR	BIN 
-1:	_ADR	SWAP 
+	_ADR	SWAP 
 	_ADR	ONEP 
 	_ADR	SWAP 
-	_ADR	ONEM // a 0 a+ cnt-  
-2: // check for '-'
-	_ADR 	SWAP // a 0 cnt a+ 
-	_DOLIT  '-' 
-	_ADR	CHARQ
-	_ADR	ROT 
-	_ADR	OVER 
-	_ADR    TOR   // a 0 a+ f cnt R: sign  
-	_ADR	SWAP   // a 0 a+ cnt f 
-	_QBRAN  2f 
-	_ADR	ONEM 
-2:	_ADR 	TOR  // a 0 a+  R: sign cnt 
-	_DOLIT  0
-	_ADR	DUPP 
-	_ADR	ROT // a 0 0 0 a+ R: sign cnt 
-	_ADR	PARSE_DIGITS  // a 0 d n a+
-	_ADR	DROP // a 0 d n 
-	_ADR	SWAP  // a 0 n d 
-	_ADR	RFROM // a 0 n d cnt  
-	_ADR	EQUAL // d == cnt ? 
+	_ADR	ONEM
+1:  // a 0 a+ c 
+	_ADR	DASHQ
+	_ADR	TOR   // save sign -- a 0 a+ c- 
+	_ADR	QDUP
+	_QBRAN	6f
+	_ADR	PARSE_DIGITS  // a 0 a+ c -- a 0 a+ n c- 
+	_ADR	ZEQUAL
 	_QBRAN  5f // digits left, not an integer 
 2:	_ADR	RFROM  // sign 
 	_QBRAN  3f   // positive integer 
 	_ADR	NEGAT
 3:	
-	_ADR	NROT  // n a 0 
-	_ADR	DDROP // n  
-	_DOLIT  -1    // n -1 
+	_ADR	NROT  // a n 0 a+
+	_ADR	DDROP // a n 
+	_DOLIT  -1    // a n -1 
+	_ADR	ROT   // n -1 a 
+	_ADR	DROP 
 	_BRAN   7f  
-5:  _ADR	RFROM //  a 0 n sign      	 
-    _ADR	DDROP 
+5:  _ADR    DROP  // -- a 0 a+   	 
+6:  _ADR	RFROM
+	_ADR	DDROP
 7:	_ADR	RFROM
 	_ADR	BASE
 	_ADR	STORE
@@ -2189,9 +2059,6 @@ DOTQP:
 ***************************/
 	_HEADER UDOTR,3,"U.R"
 	_NEST
-	_ADR	SWAP 
-	_ADR 	STOD 
-	_ADR	ROT 
 	_ADR	TOR
 	_ADR	BDIGS
 	_ADR	DIGS
@@ -2210,7 +2077,7 @@ DOTQP:
 ***************************/
 	_HEADER UDOT,2,"U."
 	_NEST
-	_ADR 	STOD 
+	_DOLIT  0 
 	_ADR	BDIGS
 	_ADR	DIGS
 	_ADR	EDIGS
@@ -2247,8 +2114,12 @@ DOT1:
 	_NEST 
 	_ADR DUPP 
 	_ADR TOR 
+	_ADR DUPP 
+	_DOLIT (1<<31)
+	_ADR ANDD 
+	_QBRAN 1f 
 	_ADR DABS 
-	_ADR BDIGS
+1:	_ADR BDIGS
 	_ADR DIGS 
 	_ADR RFROM
 	_ADR SIGN 
@@ -2256,7 +2127,6 @@ DOT1:
 	_ADR SPACE 
 	_ADR TYPEE 
 	_UNNEST 
-
 
 /***********************
 	H. ( w -- )
@@ -2314,7 +2184,7 @@ PARS:
 PARS1:
 	_ADR	BLANK
 	_ADR	OVER
-	_ADR	CAT	 // skip leading blanks 
+	_ADR	CAT			// skip leading blanks 
 	_ADR	SUBB
 	_ADR	ZLESS
 	_ADR	INVER
@@ -2337,7 +2207,7 @@ PARS4:
 	_ADR	AT
 	_ADR	OVER
 	_ADR	CAT
-	_ADR	SUBB // scan for delimiter
+	_ADR	SUBB			// scan for delimiter
 	_ADR	TEMP
 	_ADR	AT
 	_ADR	BLANK
@@ -2444,16 +2314,6 @@ PARS8:
 	_ADR	DROP
 	_ADR	CAT
 	_UNNEST
-
-/**********************************
-	[CHAR] ( -- c )
-	immediate version of CHAR 
-**********************************/
-	_HEADER IMCHAR,COMPO+IMEDD+6,"[CHAR]"
-	_NEST 
-	_ADR CHAR
-	_ADR LITER 
-	_UNNEST 
 
 /**********************************
     WORD	( c -- a //  string> )
@@ -2622,20 +2482,15 @@ FIND5:
 *****************************/
 	_HEADER ASCIZ,5,"ASCIZ" 
 	_NEST 
-	_ADR COUNT
-	_ADR DUPP
+	_ADR COUNT 
 	_ADR TOR 
-	_ADR PAD 
-	_ADR SWAP
-	_ADR MOVE  
-	_ADR PAD 
+	_ADR DUPP 
 	_ADR RFROM
 	_ADR PLUS 
 	_DOLIT 0 
-	_ADR SWAP  
-	_ADR CSTOR
-	_ADR PAD   
-	_UNNEST 
+	_ADR SWAP 
+	_ADR CSTOR  
+	_NEXT 
 
 /***********************
 	UPPER (cstring -- cstring )
@@ -3722,47 +3577,27 @@ DUMP3:
 	_ADR	STORE			// restore radix
 	_UNNEST
 
-/*******************************
-   TRACE. display in hexadecimal
-   TRACE. use a different buffer 
-   than DOT  to avoid current 
-   display overwrite.
-*******************************/ 
-TDOT: // ( u -- )
+/***********************
+	TRACE ( -- )
+**********************/
+	_HEADER TRACE,5,"TRACE"
 	_NEST 
+	_ADR CR 
 	_ADR BASE 
 	_ADR AT 
 	_ADR TOR
-	_ADR HEX  
-	_ADR HLD 
-	_ADR AT 
-	_ADR TOR   // R: base *hold 
-	_ADR HERE 
-	_DOLIT 160 
-	_ADR PLUS
-	_ADR DUPP 
-	_ADR TOR  
-	_ADR HLD 
-	_ADR STORE
-	_ADR STOD 
-	_ADR DIGS  
-	_ADR DROP
-	_DOLIT '$'
-	_ADR HOLD 
-	_ADR HLD 
-	_ADR AT
-	_ADR RFROM   
-	_ADR OVER 
-	_ADR SUBB 
-	_ADR SPACE 
-	_ADR TYPEE 
-	_ADR RFROM 
-	_ADR HLD 
-	_ADR STORE 
+	_ADR DECIM
+	_DOLIT '>' 
+	_DOLIT 'S'
+	_ADR EMIT 
+	_ADR EMIT  
+	_ADR DOTS
 	_ADR RFROM 
 	_ADR BASE 
-	_ADR STORE 
+	_ADR STORE  
+	_ADR CR 
 	_UNNEST 
+
 
 /**********************
    .S	  ( ... -- ... )
@@ -3771,76 +3606,18 @@ TDOT: // ( u -- )
 *************************/
 	_HEADER DOTS,2,".S"
 	_NEST
-	_ADR	DEPTH	// stack depth
-	_ADR	TOR		// start count down loop
-	_BRAN	DOTS2  // skip first pass
+	_ADR	SPACE
+	_ADR	DEPTH			// stack depth
+	_ADR	TOR			// start count down loop
+	_BRAN	DOTS2			// skip first pass
 DOTS1:
 	_ADR	RAT
 	_ADR	PICK
-	_ADR	TDOT // index stack, display contents
+	_ADR	DOT			// index stack, display contents
 DOTS2:
-	_DONXT	DOTS1 // loop till done
-	_ADR	CR 
+	_DONXT	DOTS1	// loop till done
+	_ADR	SPACE
 	_UNNEST
-
-RPAT: 
-	_PUSH 
-	mov TOS,RSP 
-	_NEXT 
-
-RBASE: 
-	_PUSH 
-	_MOV32 TOS,RPP 
-	_NEXT 
-
-
-/**************************
-  R.  display return stack 
-**************************/
-RDOT: 
-	_NEST 
-	_ADR RBASE
-	_ADR RPAT 
-	_ADR SUBB
-	_ADR CELLSL   
-	_DOLIT 2
-	_ADR SUBB 
-	_ADR TOR
-	_ADR RBASE 
-1:	_ADR CELLM 
-	_ADR DUPP 
-	_ADR AT 
-	_ADR TDOT 
-	_ADR RFROM   
-	_ADR ONEM 
-	_ADR DUPP
-	_ADR TOR 
-	_ADR ZEQUAL   
-	_QBRAN 1b
-	_ADR RFROM  
-	_ADR DDROP
-	_ADR CR   
-	_UNNEST 
-
-/**************************
-	TRACE ( -- )
-	display stacks content 
-**************************/
-	_HEADER TRACE,5,"TRACE"
-	_NEST
-	_ADR CR 
-	_DOLIT '>' 
-	_DOLIT 'S'
-	_ADR EMIT 
-	_ADR EMIT  
-	_ADR DOTS
-	_DOLIT '>'
-	_DOLIT 'R'
-	_ADR EMIT 
-	_ADR EMIT 
-	_ADR RDOT 
-	_UNNEST 
-
 
 /*****************************
     >NAME	( ca -- na | F )
@@ -4057,7 +3834,6 @@ VERSN:
 	_ADR	HEX	// save radix
 	_ADR	VERSN
 	_ADR	BDIGS
-	_DOLIT  0 
 	_ADR	DIG
 	_ADR	DIG
 	_DOLIT	'.'
@@ -4069,21 +3845,6 @@ VERSN:
 	_ADR	STORE
 	_ADR	CR
 	_UNNEST			// restore radix
-
-/***********************
-   HI_BOTH ( -- )
-   display sign-on 
-   on both CONSOLE
-***********************/
-HI_BOTH:
-    _NEST 
-	_ADR LOCAL 
-	_ADR CONSOLE 
-	_ADR HI 
-	_ADR SERIAL 
-	_ADR CONSOLE 
-	_ADR HI
-	_UNNEST 
 
 /**********************
  check if PS2 keyboard 
@@ -4128,15 +3889,6 @@ IF_SENSE:
 9:  _ADR CONSOLE 
 	_UNNEST 
 
-/****************************
-   display READY on active
-   console
-***************************/
-READY:
-    _NEST 
-	_DOTQP 5,"READY"
-	_ADR  CR 
-    _UNNEST 
 
 /********************
     COLD	( -- )
@@ -4161,12 +3913,12 @@ COLD1:
 	_DOLIT	ULAST-UZERO
 	_ADR	MOVE 			// initialize user area
 	_ADR	PRESE			// initialize stack and TIB
+	_ADR	IF_SENSE
 	_ADR	WR_DIS          // disable WEL bit in U3 spi flash  
 	_ADR 	PS2_QUERY  
 	_ADR	TBOOT
 	_ADR	ATEXE			// application boot
 	_ADR	OVERT
-	_ADR	IF_SENSE
 	_BRAN	QUIT			// start interpretation
 COLD2:
 	.p2align 2 	

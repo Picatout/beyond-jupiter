@@ -44,7 +44,7 @@
   .equ UART, USART1_BASE_ADR 
 
 /* Forth specific constants */
-	.equ RPP ,	RAM_END-128	/*top of return stack (RP0) */
+	.equ RPP ,	RAM_END-256	/*top of return stack (RP0) */
 	.equ TIBB ,	RPP-128	/*terminal input buffer (TIB) */
 	.equ SPP ,	RPP-128	/*top of data stack (SP0) */
 	.equ VID_BUFF, SPP-256-32000 /* video buffer */

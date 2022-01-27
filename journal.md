@@ -1,3 +1,23 @@
+2022-01-26
+
+* Continuer travail sur fpu.s qui va au final contenir les fonctions arithmétiques sur type float32. 
+
+* Création de **strtof.s**  
+
+2022-01-25
+
+* Ajouts de mots pour les fonctions arithmétique sur type float32 dans fpu.s  
+
+* Trouvé bogue causé par FPU. La pile des retours n'était pas assez grande. Augmentée à 256 octets. Lorsque le FPU est utilisé tous les regustres du FPU sont sauvegardés sur la pile lors d'un exception. 
+
+2022-01-22 
+
+* essaie de débogger bus fault quand aux accès du FPU. 
+
+* Modification du vecteur BOOT vers HI_BOTH pour afficher le message sur les 2 consoles.
+
+*  Ajout du message **READY** sur la console active.
+
 2021-06-08
 
 * Ajout de **CLZ** et **CTLZ** dans [forth.s](forth.s).
@@ -9,7 +29,7 @@
 
 2021-06-07 
 
-* Ajoutré **FABS**, **FMIN**, **FMAX**, **F&gt;** et **F&lt;**
+* Ajouté **FABS**, **FMIN**, **FMAX**, **F&gt;** et **F&lt;**
 
 * Corrigé bogue dans **F-ALIGN**.
 
