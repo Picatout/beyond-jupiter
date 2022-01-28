@@ -393,12 +393,23 @@ BRAN:
 	_NEXT 
 
 /*********************************************
-    R>	  ( -- w )
- 	Pop the return stack to the data stack.
+    R>	  ( -- w  R: w -- ) 
+ 	push from rstack.
 **********************************************/
 	_HEADER RFROM,2,"R>"
 	_PUSH
 	LDR	TOS,[RSP],#4
+	_NEXT 
+
+/***********************************************
+	2R> (  -- D ) R: D --  
+    push a double from rstack 
+***********************************************/
+	_HEADER DTOR,3,"2R>"
+	_PUSH 
+	LDR TOS,[RSP],#4 
+	_PUSH 
+	LDR TOS,[RSP],#4
 	_NEXT 
 
 /************************************************
@@ -411,13 +422,25 @@ BRAN:
 	_NEXT 
 
 /***********************************************
-    >R	  ( w -- )
- 	Push the data stack to the return stack.
+    >R	  ( w -- ) R: -- w 
+ 	pop to rstack.
 ************************************************/
 	_HEADER TOR,2,">R"
 	STR	TOS,[RSP,#-4]!
 	_POP
 	_NEXT
+
+/*********************************************
+	2>R ( d -- ) R: -- d 
+	pop a double to rstack 
+*********************************************/
+	_HEADER DTOR,3,"2>R"
+	STR TOS,[RSP,#-4]
+    _POP 
+	STR TOS,[RSP,#-4]
+	_POP  
+	_NEXT 	
+
 
 /*******************************
 //	RP! ( u -- )

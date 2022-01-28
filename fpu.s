@@ -69,13 +69,58 @@ fpu_init:
 
 
 /*******************************
-    FBASE variable ( -- a )
-    floating point numerical base
+    >S0 variable ( f# --  )
+    send float to fpu S0 
 **********************************/
-    _HEADER FBASE,5,"FBASE"
-    _PUSH  
-    add TOS,UP,#VFBASE 
+    _HEADER TOS0,3,">S0"
+    vmov.f32 S0,TOS 
+    _POP 
     _NEXT  
+
+/*******************************
+    >S1 variable ( f# --  )
+    send float to fpu S1 
+**********************************/
+    _HEADER TOS1,3,">S1"
+    vmov.f32 S1,TOS 
+    _POP 
+    _NEXT  
+
+/*******************************
+    >S2 variable ( f# --  )
+    send float to fpu S2 
+**********************************/
+    _HEADER TOS2,3,">S2"
+    vmov.f32 S2,TOS 
+    _POP 
+    _NEXT  
+
+/*******************************
+    S0>  ( -- f )
+    push fpu S0 
+*******************************/
+    _HEADER S0FROM,3,"S0>"
+    _PUSH 
+    vmov.f32 TOS,S0 
+    _NEXT 
+
+/*******************************
+    S1>  ( -- f )
+    push fpu S1 
+*******************************/
+    _HEADER S1FROM,3,"S1>"
+    _PUSH 
+    vmov.f32 TOS,S1 
+    _NEXT 
+
+/*******************************
+    S2>  ( -- f )
+    push fpu S2 
+*******************************/
+    _HEADER S2FROM,3,"S2>"
+    _PUSH 
+    vmov.f32 TOS,S2 
+    _NEXT 
 
 
 /*******************************

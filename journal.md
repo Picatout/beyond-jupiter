@@ -1,3 +1,9 @@
+2022-01-27
+
+* Travail sur **strtof.s**.
+
+* Ajout de **2&gt;R** et **2R&gt;** 
+
 2022-01-26
 
 * Continuer travail sur fpu.s qui va au final contenir les fonctions arithmétiques sur type float32. 
