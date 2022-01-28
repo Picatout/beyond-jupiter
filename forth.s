@@ -405,7 +405,7 @@ BRAN:
 	2R> (  -- D ) R: D --  
     push a double from rstack 
 ***********************************************/
-	_HEADER DTOR,3,"2R>"
+	_HEADER DRFROM,3,"2R>"
 	_PUSH 
 	LDR TOS,[RSP],#4 
 	_PUSH 
@@ -435,9 +435,9 @@ BRAN:
 	pop a double to rstack 
 *********************************************/
 	_HEADER DTOR,3,"2>R"
-	STR TOS,[RSP,#-4]
+	STR TOS,[RSP,#-4]!
     _POP 
-	STR TOS,[RSP,#-4]
+	STR TOS,[RSP,#-4]!
 	_POP  
 	_NEXT 	
 

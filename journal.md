@@ -1,3 +1,7 @@
+2022-01-28
+
+* Travail sur **strtof.s**.
+
 2022-01-27
 
 * Travail sur **strtof.s**.

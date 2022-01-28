@@ -25,7 +25,7 @@
 
 ****************************************************************************************/
 
-******************************************************
+/******************************************************
     powers of 10 used in parsing float numbers 
 *******************************************************/    
 
@@ -39,7 +39,7 @@ powersof10:  .word  0x41200000  // 10.0
 fzero =  0x0
 fone =  0x3F800000
 fminus1 = 0xBF800000
-ften: = 0x41200000 
+ften = 0x41200000 
 
 // check first char for '-'|'+' 
 // update pointer if found 
@@ -77,7 +77,7 @@ mant_size: // ( a cnt -- a+ cnt- m )
 2:  _ADR OVER 
     _ADR CAT 
     _ADR DIGTQ // return u flag  
-    _ADR SWAPP 
+    _ADR SWAP 
     _ADR DROP  // don't keep u  
     _QBRAN 4f  // not a digit 
     _ADR ROT 
@@ -141,7 +141,7 @@ parse_frac: // ( a cnt -- a+ cnt- ff )
     _ADR FSTAR
     _ADR DUPP  
     _ADR RFROM 
-    _ADR FDIV 
+    _ADR FSLH
     _ADR RFROM 
     _ADR FPLUS 
     _ADR TOR 
@@ -186,15 +186,91 @@ parse_exp: // ( a cnt -- a+ cnt- exp )
     _ADR NEGAT 
 5:  _UNNEST 
 
+// fetch element from powersof10 array 
+power10: // ( idx -- f )
+    _NEST 
+    _DOLIT 2 
+    _ADR LSHIFT 
+    _DOLIT powersof10
+    _ADR PLUS 
+    _ADR AT 
+    _UNNEST 
 
+
+// check if exponent bit at idx position is 
+// set or reset   
+bit_state: // ( idx f e -- idx f bit )
+    _NEST 
+    _DOLIT 1  // idx f e 1
+    _DOLIT 3  // idx f e 1 3 
+    _ADR PICK  // idx f e 1 idx 
+    _ADR LSHIFT // idx f e bit_mask 
+    _ADR ANDD   // idx f bit, i.e. 0||1<<idx  
+    _UNNEST 
+
+// exponent adjustment 
+// multiply or divide mantissa by exponent  
+// if exponant < 0 divide 
+// if exponant >0 multiply 
+// 8f exponant == 0 done 
+mult_div_exp: // ( e f  -- f )
+    _NEST 
+    _ADR OVER  // e f e 
+    _QBRAN 4f // exp==0,  done 
+    _DOLIT 0  // e f idx  
+    _ADR NROT // idx e f
+    _ADR SWAP // idx f e   
+    _ADR DUPP  // idx f e e 
+    _ADR ZLESS
+    _QBRAN pos_exp 
+// negative exponent 
+    _ADR ABSS 
+    _ADR TOR //  -- idx f R: e 
+div_loop:
+    _ADR RAT   // idx f e R: e 
+    _ADR bit_state // idx f state 
+    _QBRAN 1f   // bit reset 
+    _ADR OVER 
+    _ADR power10 // idx f pwr10 R: e
+    _ADR FSLH  // idx f R: e 
+1:  _ADR SWAP  // f idx R: e 
+    _ADR ONEP   // F idx++ R: e 
+    _ADR SWAP   // idx f  
+    _ADR OVER   // idx f idx 
+    _DOLIT 5 
+    _ADR GREAT  // idx > 5
+    _QBRAN div_loop 
+    _BRAN 3f 
+pos_exp: // positive exponent 
+    _ADR TOR // idx f  R: e 
+mult_loop:
+    _ADR RAT   // idx f e R: e 
+    _ADR bit_state // idx f state 
+    _QBRAN 1f   // bit reset 
+    _ADR OVER  
+    _ADR power10 // idx f pwr10 R: e
+    _ADR FSTAR  // idx f R: e 
+1:  _ADR SWAP  // f idx R: e 
+    _ADR ONEP   // F idx++ R: e 
+    _ADR SWAP   // idx f  
+    _ADR OVER   // idx f idx 
+    _DOLIT 5 
+    _ADR GREAT  // idx > 5
+    _QBRAN mult_loop 
+// adjustment done 
+3:  _ADR RFROM 
+    _ADR DROP 
+4:  _ADR SWAP 
+    _ADR DROP 
+    _UNNEST 
 
 // move pointer forward and decrement count 
 padv: // ( a cnt -- a++ cnt-- )
     _NEST 
     _ADR ONEM 
-    _ADR SWAPP 
+    _ADR SWAP 
     _ADR ONEP 
-    _ADR SWAPP 
+    _ADR SWAP 
     _UNNEST 
 
 
@@ -230,7 +306,7 @@ int_part: // parse integer part.
 // check for end of string 
     _ADR   DUPP 
     _ADR   ZEQUAL  
-    _QBAN  dot_or_e 
+    _QBRAN  dot_or_e 
     _BRAN  not_float  // if end of string it's not a float, missing '.' or 'E'.  
 dot_or_e: // next character must be '.' or 'E'   
     _ADR   OVER 
@@ -264,15 +340,7 @@ test_E:
     _QBRAN not_float // character left in string. 
     _ADR RFROM  
 exp_to_bin: // convert decimal exponent to binary exponent  
-    _ADR DUPP 
-    _ADR ZLESS 
-    _QBRAN exp_pos 
-// exponent is negative 
-    _ADR ABSS 
-
-    _BRAN is_float 
-exp_pos: // exponent is positive 
-
+    _ADR mult_div_exp 
 is_float: // a 0 a+ cnt- R: base float  
     _ADR DDROP 
     _ADR DDROP 
@@ -282,7 +350,7 @@ is_float: // a 0 a+ cnt- R: base float
     _DOLIT fminus1  
     _ADR FSTAR 
 1:  _DOLIT 2  // flag indicating a float 
-    _BRAN restore base 
+    _BRAN restore_base 
 not_float: // a 0 a+ cnt- R: base sign float 
     _ADR RFROM 
     _ADR DROP  
