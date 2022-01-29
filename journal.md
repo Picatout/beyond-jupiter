@@ -2,6 +2,8 @@
 
 * Travail sur **strtof.s**.
 
+* Corrigé bogue sur **2&gt;R**. 
+
 2022-01-27
 
 * Travail sur **strtof.s**.

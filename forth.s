@@ -1998,7 +1998,7 @@ CHARQ: // ( a c -- a+ t | a f )
 
 /**********************************
     INT?	( a -- n T | a F )
- 	parse string for at 'a' for 
+ 	parse string  at 'a' for 
 	integer. Push a flag on TOS.
 	integer form:
 		[-]hex_digit+  | 
@@ -2008,40 +2008,40 @@ CHARQ: // ( a c -- a+ t | a f )
 **********************************/
 	_HEADER INTQ,4,"INT?"
 	_NEST
+// save BASE 	
 	_ADR	BASE
 	_ADR	AT
 	_ADR	TOR
 	_DOLIT	0      // a 0 
 	_ADR	OVER   // a 0 a 
 	_ADR	COUNT  // a 0 a+ cnt 
-	_ADR	OVER   // a 0 a+ cnt a+
-	_ADR	CAT    // a 0 a+ cnt char 
-	_DOLIT '$'     // a 0 a+ cnt char '$'
-	_ADR	EQUAL  // a 0 a+ cnt f 
-	_QBRAN	0f    
-	_ADR	HEX
+	_ADR    SWAP   
+	_DOLIT  '$' 
+	_ADR    CHARQ 
+	_QBRAN  0f 
+// hexadecimal number 
+	_ADR    HEX
 	_BRAN   1f 
-0:  _ADR    OVER  // a 0 a+ cnt a+
-	_ADR    CAT   // a 0 a+ cnt char 
-	_DOLIT  '%'   // a 0 a+ cnt char '%'
-	_ADR	EQUAL  // a 0 a+ cnt f 
+0:  _DOLIT  '%'   // -- a 0 cnt a '%'
+	_ADR	CHARQ  // -- a 0 cnt a f 
 	_QBRAN  2f
 	_ADR	BIN 
-1:	_ADR	SWAP 
-	_ADR	ONEP 
-	_ADR	SWAP 
-	_ADR	ONEM // a 0 a+ cnt-  
-2: // check for '-'
-	_ADR 	SWAP // a 0 cnt a+ 
-	_DOLIT  '-' 
-	_ADR	CHARQ
-	_ADR	ROT 
-	_ADR	OVER 
-	_ADR    TOR   // a 0 a+ f cnt R: sign  
-	_ADR	SWAP   // a 0 a+ cnt f 
-	_QBRAN  2f 
+1:	// decrement cnt 
+    _ADR	SWAP 
 	_ADR	ONEM 
-2:	_ADR 	TOR  // a 0 a+  R: sign cnt 
+	_ADR	SWAP  // -- a 0 cnt- a  
+2: // check for '-'
+	_DOLIT  '-' 
+	_ADR	CHARQ // -- a 0 cnt a f 
+	_ADR    DUPP  
+	_ADR	TOR  // -- a 0 cnt a f  R: sign 
+	_QBRAN  2f 
+// decrement cnt 
+	_ADR   SWAP 
+	_ADR   ONEM 
+	_ADR   SWAP // a 0 cnt- a  R: sign  
+2:	_ADR   SWAP 
+	_ADR 	TOR  // a 0 a+  R: sign cnt 
 	_DOLIT  0
 	_ADR	DUPP 
 	_ADR	ROT // a 0 0 0 a+ R: sign cnt 
@@ -2061,7 +2061,8 @@ CHARQ: // ( a c -- a+ t | a f )
 	_BRAN   7f  
 5:  _ADR	RFROM //  a 0 n sign      	 
     _ADR	DDROP 
-7:	_ADR	RFROM
+7: // restore BASE 
+	_ADR	RFROM
 	_ADR	BASE
 	_ADR	STORE
 	_UNNEST

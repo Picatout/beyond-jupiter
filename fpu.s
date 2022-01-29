@@ -370,40 +370,6 @@ frac_digit:
 2: // float > 0         
     _UNNEST 
 
-/*********************************
-    float parsing 
-*********************************/
-
-
- /********************************
- check for exponent 
-********************************/
-EXPONENT: // ( a -- e a+ )
-    _NEST 
-    _DOLIT 'E'
-    _ADR CHARQ 
-    _QBRAN 2f 
-    _DOLIT '-'
-    _ADR CHARQ
-    _ADR TOR
-    _DOLIT 0 
-    _ADR DUPP  
-    _ADR ROT 
-    _ADR PARSE_DIGITS
-    _ADR ROT
-    _ADR DROP // discard digits count  
-    _ADR RFROM 
-    _QBRAN 8f 
-    _ADR SWAP
-    _ADR NEGAT
-    _ADR SWAP
-    _BRAN 8f    
-2:  _DOLIT 0 
-    _ADR SWAP     
-8:  _UNNEST 
-
-
-
 
 /********************************
     NUMBER ( a -- int -1 | float -2 | a 0 )
