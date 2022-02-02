@@ -199,7 +199,6 @@ fpu_exception:
   ldr IP,=fpu_except 
   b INEXT 
 fpu_except:  
-//  _CALL forth_init 
   _ADR PRESE
   _ADR CR  
   _DOLIT 16 
@@ -209,8 +208,7 @@ fpu_except:
   _ADR FPSCR 
   _ADR UDOT 
   _ADR CR 
-  _ADR reset_mcu  
-
+  _ADR reset_mcu 
 
 
 

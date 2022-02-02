@@ -393,6 +393,20 @@ BRAN:
 	_NEXT 
 
 /*********************************************
+	array@ ( a i -- w )
+	fetch array element 
+	a -> pointer to array 
+	i -> index 
+*********************************************/
+	_HEADER ARRAYAT,6,"ARRAY@"
+	mov T0,#2 
+	lsl T0,TOS,T0 
+	_POP 
+	add TOS,T0 
+	ldr TOS,[TOS]
+	_NEXT 
+
+/*********************************************
     R>	  ( -- w  R: w -- ) 
  	push from rstack.
 **********************************************/
@@ -468,6 +482,15 @@ BRAN:
 	_PUSH
 	MOV	TOS,DSP
 	_NEXT
+
+/**************************************
+   RP@ ( -- a )
+   push current rstack pointer 
+**************************************/
+	_HEADER RPAT,3,"RP@"
+	_PUSH 
+	MOV TOS,RSP 
+	_NEXT 
 
 /********************************
     DROP	( w -- )
@@ -1867,6 +1890,7 @@ SIGN1:
 	string.
 hidden word used by compiler
 ***************************/
+	_HEADER ITOA,3,"I>A" 
 STRR:
 	_NEST
 	_ADR 	STOD 
@@ -1982,7 +2006,7 @@ PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
 /**************************
  CHAR? 
  check for charcter c 
- move pointer if true 
+ move pointer if *a==c  
 **************************/
 CHARQ: // ( a c -- a+ t | a f )
     ldr T0,[DSP]
@@ -1994,6 +2018,25 @@ CHARQ: // ( a c -- a+ t | a f )
     str T0,[DSP]
     mvn TOS,TOS  
 1:  _NEXT
+
+/*********************************
+   NEG? ( a -- a|a+  f|t )
+   skip '-'|'+' return -1 if '-' 
+   else return 0 
+*********************************/
+NEGQ: 
+    _NEST 
+    _DOLIT '-' 
+    _ADR CHARQ
+    _ADR DUPP  
+    _QBRAN 1f
+    _BRAN 2f
+1:  _ADR SWAP 
+    _DOLIT '+'
+    _ADR CHARQ
+    _ADR DROP  
+	_ADR SWAP 
+2:  _UNNEST 
 
 
 /**********************************
@@ -2030,17 +2073,18 @@ CHARQ: // ( a c -- a+ t | a f )
     _ADR	SWAP 
 	_ADR	ONEM 
 	_ADR	SWAP  // -- a 0 cnt- a  
-2: // check for '-'
-	_DOLIT  '-' 
-	_ADR	CHARQ // -- a 0 cnt a f 
-	_ADR    DUPP  
-	_ADR	TOR  // -- a 0 cnt a f  R: sign 
-	_QBRAN  2f 
-// decrement cnt 
-	_ADR   SWAP 
-	_ADR   ONEM 
-	_ADR   SWAP // a 0 cnt- a  R: sign  
-2:	_ADR   SWAP 
+2: // check if negative number 
+	_ADR    DUPP 
+	_ADR    NEGQ 
+	_ADR	TOR  // -- a 0 cnt a a+  R: sign 
+	_ADR    DUPP 
+	_ADR    ROT  // a 0 cnt a+ a+ a 
+	_ADR    SUBB // -- a 0 cnt a+ diff 
+	_QBRAN  2f  
+	_ADR    SWAP  // -- a 0 a cnt 
+	_ADR    ONEM  // -- a 0 a cnt--
+	_ADR    SWAP   
+2:  _ADR    SWAP 
 	_ADR 	TOR  // a 0 a+  R: sign cnt 
 	_DOLIT  0
 	_ADR	DUPP 
@@ -2293,7 +2337,14 @@ DOT1:
 	_ADR AT 
 	_ADR SWAP
 	_ADR HEX
-	_ADR UDOT 
+	_DOLIT 0 
+	_ADR BDIGS
+	_ADR DIGS
+	_ADR EDIGS
+	_ADR SPACE
+	_DOLIT '$'
+	_ADR EMIT 
+	_ADR TYPEE
 	_ADR BASE
 	_ADR STORE  
 	_UNNEST 
@@ -3806,11 +3857,6 @@ DOTS2:
 	_DONXT	DOTS1 // loop till done
 	_ADR	CR 
 	_UNNEST
-
-RPAT: 
-	_PUSH 
-	mov TOS,RSP 
-	_NEXT 
 
 RBASE: 
 	_PUSH 

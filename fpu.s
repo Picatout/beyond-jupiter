@@ -222,9 +222,10 @@ fpu_init:
     return absolute value 
 ******************************/
     _HEADER FABS,4,"FABS"
-    vmov.f32 s0,TOS 
-    vabs.f32 S0,S0 
-    vmov.f32 TOS,S0    
+    eor T0,T0 
+    mvn T0,T0 
+    lsr T0,#1 
+    and TOS,T0 
     _NEXT 
 
 
@@ -300,6 +301,41 @@ fpu_init:
 
 
 /*******************************
+    FSIGN ( f -- n )
+    return float sign 
+*******************************/
+    _HEADER FSIGN,5,"FSIGN"
+    eor T0,T0 
+    movt T0,#0X8000
+    and TOS,T0
+    asr TOS,#31  
+    _NEXT 
+
+/*******************************
+    FEXP ( f --  n )
+    return binary exponent of f 
+*******************************/
+    _HEADER FEXP,4,"FEXP"
+    _MOV32 T0,0X7F800000
+    and TOS,T0 
+    lsr TOS,#23
+    sub TOS,#127 
+    _NEXT  
+
+/*******************************
+   FMANT ( f -- n )
+   return float mantisssa 
+********************************/
+    _HEADER FMANT,5,"FMANT"
+    _MOV32 T0, 0X7FFFFF
+    AND TOS,T0 
+    EOR T0,T0 
+    MOVT T0,0x80
+    ORR TOS,T0 
+    _NEXT 
+
+
+/*******************************
     PI  ( -- f )
     return 3.14159265
 *******************************/
@@ -308,68 +344,32 @@ fpu_init:
     _MOV32 TOS, 0x40490FDB
     _NEXT
  
-
-/*********************************
-     float printing 
-*********************************/
-
-/*********************************
-    @EXPONENT ( f -- n )
-    extract exponent from float 
-********************************/
-    _HEADER AT_EXPONENT,9,"@EXPONENT"
-    _NEST 
-    _DOLIT 23
-    _ADR RSHIFT 
-    _DOLIT 255  
-    _ADR ANDD 
-    _DOLIT 127 
-    _ADR SUBB  
-    _UNNEST 
-
-/**************************************
-    E. ( f -- )
-    print float in scientific notation
-***************************************
-    _HEADER EDOT,2,"E."
-    _NEST 
-
-    _UNNEST 
-
-frac_digit: 
-    vmov.f32 s2,#ten 
-    vmul.f32 s1,s0,s2 
+/********************************
+    LOG2 ( -- f)
+    return log10(2)
+*******************************/
+    _HEADER LOG2,4,"LOG2"
+    _PUSH 
+    _MOV32 TOS,0x3E9A209A
+    _NEXT 
 
 /********************************
-    F. ( f -- )
-    print float in fixed point 
-*********************************/
-    _HEADER FDOT,2,"F."
-    _NEST 
+    LOG2>10 ( f -- exp )
+    convert float base2 exponent 
+    to base10
+********************************/
+    _HEADER LOG2TO10,7,"LOG2>10" 
+    _NEST
+    _ADR FEXP 
+    _ADR STOF 
+    _ADR LOG2
+    _ADR FSTAR 
+    _ADR TRUNC  
     _ADR DUPP 
-    _ADR FZLESS 
+    _ADR ZLESS 
     _QBRAN 1f 
-    _DOLIT '-'
-    _ADR EMIT 
-    _ADR FNEG
-1:  _ADR DUPP 
-    _DOLIT plus1 
-    _ADR FLESS 
-    _QBRAN 2f // float > 0 
-// float < 0 
-    _DOLIT '0' 
-    _ADR EMIT 
-    _DOLIT '.' 
-    _ADR EMIT 
-    _DOLIT 7 
-    _ADR TOR
-    _DOLIT ten 
-
-1:      
-
-2: // float > 0         
-    _UNNEST 
-
+    _ADR ONEM
+1:  _UNNEST 
 
 /********************************
     NUMBER ( a -- int -1 | float -2 | a 0 )

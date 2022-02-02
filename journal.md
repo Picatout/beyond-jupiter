@@ -1,12 +1,41 @@
+2022-02-01
+
+
+* **e.** et **f.** dans  [ftoa.f](ftoa.f) testés et débogués.
+
+* Travail sur [ftoa.f](ftoa.f)
+
+2022-01-31
+
+
+* Travail sur [ftoa.f](ftoa.f)
+
+2022-01-30
+
+* Bogue à corrigé dans [strtof.s](strtof.s), **float?** laisse des résidus sur la pile: **0.5e-4 .s $200049BC $0 $3851B717**
+
+* Début du travail sur [ftoa.s](ftoa.s)
+
+* Ajout de **ARRAY@ -- ( a i -- w ) ** to fetch array element dans [forth.s](forth.s).
+
+
+2022-01-29
+
+* Travail sur [strtof.s](strtof.s).
+
+* Retraivaillé le mot **INT?** dans [forth.s](forth.s) 
+
+* Testé  **float?** dans [strtof.s](strtof.s)
+
 2022-01-28
 
-* Travail sur **strtof.s**.
+* Travail sur [strtof.s](strtof.s).
 
 * Corrigé bogue sur **2&gt;R**. 
 
 2022-01-27
 
-* Travail sur **strtof.s**.
+* Travail sur [strtof.s](strtof.s).
 
 * Ajout de **2&gt;R** et **2R&gt;** 
 
@@ -14,11 +43,11 @@
 
 * Continuer travail sur fpu.s qui va au final contenir les fonctions arithmétiques sur type float32. 
 
-* Création de **strtof.s**  
+* Création de [strtof.s](strtof.s)  
 
 2022-01-25
 
-* Ajouts de mots pour les fonctions arithmétique sur type float32 dans fpu.s  
+* Ajouts de mots pour les fonctions arithmétique sur type float32 dans [fpu.s](fpu.s)  
 
 * Trouvé bogue causé par FPU. La pile des retours n'était pas assez grande. Augmentée à 256 octets. Lorsque le FPU est utilisé tous les regustres du FPU sont sauvegardés sur la pile lors d'un exception. 
 
