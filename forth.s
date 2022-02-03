@@ -3770,6 +3770,10 @@ PDUM2:
 *********************/
 	_HEADER DUMP,4,"DUMP"
 	_NEST
+	_DOLIT  15 
+	_ADR    PLUS 
+	_DOLIT  0xFFFFFFF0 
+	_ADR    ANDD 
 	_ADR	BASE
 	_ADR	AT
 	_ADR	TOR
@@ -3779,7 +3783,7 @@ PDUM2:
 	_ADR	TOR
 	_BRAN	DUMP4			// start count down loop
 DUMP1:
-  _ADR	CR
+    _ADR	CR
 	_DOLIT	16
 	_ADR	DDUP
 	_ADR	DMP			// display numeric

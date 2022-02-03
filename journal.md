@@ -1,5 +1,8 @@
-2022-02-01
+2022-02-02
 
+
+
+2022-02-01
 
 * **e.** et **f.** dans  [ftoa.f](ftoa.f) testés et débogués.
 
