@@ -5,24 +5,22 @@
     over c! 1+ 
 ;
 
-\ f<# ( f -- f )
-\ check sign of float 
-\ and print it 
-
-
-\ print float integer part
-\ int. ( d i -- d- )
-\  d -> maximum digits count 
-\  i -> integer to print 
-\  d- -> n# digits left to print 
-: int. 
-    i>a  \ d b u 
-    dup >r \ d b u  R: u  
-    rot dup >r \ b u d r: u d  
-    min 
-    type 
-    2r> - \ d-  
+\ convert integer part 
+: I>A ( i b -- b+ u )
+    >r \ i r: b 
+    s>d 
+    dup >r
+    dabs   
+    <#
+    #s 
+    r> sign  
+    #> \ p u r: b 
+    \ copy p to b  
+    dup -rot \ u p u  
+    r@ swap cmove \ u r: b 
+    dup r> + swap \ b+ u    
 ;
+
 
 \ float fraction
 \  frac>a ( d f b  -- b+ )
@@ -47,7 +45,19 @@
     swap drop   
 ;
 
-\ frac* ( f1 -- m f2 ) 
+\ pwr10 ( n -- f )
+\ compute 10^n
+: pwr10
+    1.0 
+    begin over while
+        10.0 f* 
+        swap 1- swap 
+    repeat
+    swap drop   
+;
+
+
+\ SCALEUP ( f1 -- m f2 ) 
 \ multiply fraction until 
 \ f1 >= 0.1
 \ input: 
@@ -55,7 +65,7 @@
 \ output:
 \   m  log10 exponent 
 \   f2  >= 0.1 
-: frac* 
+: scaleup 
     0 swap 
     begin dup 0.1 f< while 
         10.0 f* 
@@ -63,6 +73,19 @@
     repeat
 ;
 
+
+\ SCALEDOWN ( d f1 -- d m f2 )
+\ divide by 10.0 until 
+\ f < 2e7 
+: scaledown ( d f1 -- m f2 )
+    over pwr10 0.5e-8 f- >r 
+    0 swap \ d 0 f1 r: pwr10    
+    begin dup r@ f> while 
+        10.0 f/ 
+        swap 1+ swap
+    repeat
+    r> drop  
+;
 
 \  f>a ( b d f -- b u )
 \ convert float to string
@@ -86,44 +109,49 @@
         fabs 
         swap \ d +f b+ 
     then 
-    over 1.0 f< if 
+    over 1.0 f< if \ d f b 
         \ no integer part
         [char] 0 c!+
         [char] . c!+
         rot 1- -rot \ decrement d
-        swap frac* 
-        swap >r
-        swap  \ d f b 
+        swap scaleup \ d b m f   
+        swap >r \ d b f r: b m 
+        swap  \ d f b  
         frac>a \ d f b -- b+
-        r@ 0< if
-            [char] e c!+
-            r> 
-            i>a \ b s u 
-            >r over r@ cmove 
-            r> +   
+        r@ 0< if \ exp < 0 ? 
+            [char] E c!+
+            r> swap \ e b 
+            i>a \ b  u
+            drop  
         else
             r> drop
         then 
-        r@ - r> swap \ b u         
     else \ d f b 
-         >r \ d f r: b 
-         dup trunc \ d f i  
-         dup  \ d f i i 
-         s>f f- \ d f R: b i 
-         r> i>a \ d f i -- d f bsrc u 
-         swap over \ d f u src u  
-         r@ swap cmove \ d f u r: b 
-         >r swap r@ - swap \ d- f r: b u  
-         r> r@ + \ d f b+ r: b
-         [char] . c!+ 
+         >r \ d f r: b b+ 
+         scaledown \ d m f r: b b+ 
+         >r swap r> \ m d f r: b b+  
+         dup trunc \ m d f i  
+         dup >r \ m d f i r: b b+ i  
+         s>f f- \ m d f R: b b+ i 
+         2r> i>a \  m d f i b -- m d f b+ u r: b 
+        >r rot r> - -rot \ m d- f b+    
          2 pick 0 > if 
-            frac>a \ d f b -- b+ 
-         else 
-            r@ - >r 2drop 
-            r> r> swap 
+            [char] . c!+ 
+            rot 1- -rot 
+            frac>a \ m d f b -- m b+ 
+         else \ m d f b+
+            >r 2drop 
+            r>  \ m b+ 
          then   
-
+         over 0 > if 
+            [char] E c!+
+            i>a \ b+ u r: b
+            drop 
+        else 
+            swap drop 
+         then 
     then
+    r@ - r> swap 
 ;
 
 
@@ -139,7 +167,6 @@
     r@ 16 0 fill \ fill buffer with 0s
     r> -rot \ b d f 
     f>a \ b d f -- b u 
-trace 
     type
     -16 allot \ free buffer  
 ;  

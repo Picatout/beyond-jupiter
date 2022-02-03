@@ -1890,7 +1890,6 @@ SIGN1:
 	string.
 hidden word used by compiler
 ***************************/
-	_HEADER ITOA,3,"I>A" 
 STRR:
 	_NEST
 	_ADR 	STOD 
