@@ -2,6 +2,8 @@
 
 * Travail sur [ftoa.f](ftoa.f)
 
+* Création du mot **ARRAY nom ( n -- )** dans [forth.s](forth.s).
+
 2022-02-02
 
 * Travail sur [ftoa.f](ftoa.f)

@@ -29,6 +29,40 @@ minus1 = 0xBF800000  // -1.0  to invert mantissa sign
 plus1 = 0x3F800000  // 1.0  
 ten = 0x41200000  // 10.0  
 
+     .word  0x3089705F // 1e-9
+     .word  0x322BCC77 // 1e-8
+     .word  0x33D6BF95 // 1e-7
+     .word  0x358637BD // 1e-6 
+     .word  0x3727C5AC // 1e-5 
+     .word  0x38D1B717 // 1e-4 
+     .word  0x3A83126F // 1e-3 
+     .word  0x3C23D70A // 1e-2 
+     .word  0x3DCCCCCD // 1e-1 
+p10:
+     .word  0x3F800000 // 1.0 
+     .word  0x41200000 // 1e1 
+     .word  0x42C80000 // 1e2 
+     .word  0x447A0000 // 1e3 
+     .word  0x461C4000 // 1e4 
+     .word  0x47C35000 // 1e5 
+     .word  0x49742400 // 1e6 
+     .word  0x4B189680 // 1e7
+     .word  0x4CBEBC20 // 1e8 
+     .word  0x4E6E6B28 // 1e9  
+
+/***********************
+    PWR10 
+    return powers of 10
+    from 1e-7..1e7
+***********************/    
+    _HEADER PWR10,5,"PWR10"
+    lsl TOS,#2  
+    ldr t0, =p10 
+    add TOS,TOS,T0
+    ldr TOS,[TOS]  
+    _NEXT  
+    
+
 
 /*****************************
    initialize FPU

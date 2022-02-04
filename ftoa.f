@@ -45,17 +45,6 @@
     swap drop   
 ;
 
-\ pwr10 ( n -- f )
-\ compute 10^n
-: pwr10
-    1.0 
-    begin over while
-        10.0 f* 
-        swap 1- swap 
-    repeat
-    swap drop   
-;
-
 
 \ SCALEUP ( f1 -- m f2 ) 
 \ multiply fraction until 

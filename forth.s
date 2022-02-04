@@ -392,19 +392,6 @@ BRAN:
 	LDRB	TOS,[TOS]
 	_NEXT 
 
-/*********************************************
-	array@ ( a i -- w )
-	fetch array element 
-	a -> pointer to array 
-	i -> index 
-*********************************************/
-	_HEADER ARRAYAT,6,"ARRAY@"
-	mov T0,#2 
-	lsl T0,TOS,T0 
-	_POP 
-	add TOS,T0 
-	ldr TOS,[TOS]
-	_NEXT 
 
 /*********************************************
     R>	  ( -- w  R: w -- ) 
@@ -3621,7 +3608,7 @@ CALLC:
 	.p2align 2 
 /****************************************
  doDOES> ( -- a )
- runtime action of DOES> 
+ runtime action of 		 
  leave parameter field address on stack 
 hidden word used by compiler 
 ***************************************/
@@ -3731,6 +3718,7 @@ DEFER_NOP:
 	_ADR	CALLC  
 	_UNNEST
 
+
 /***********
   Tools
 ***********/
@@ -3773,6 +3761,10 @@ PDUM2:
 	_ADR    PLUS 
 	_DOLIT  0xFFFFFFF0 
 	_ADR    ANDD 
+	_ADR    SWAP 
+	_DOLIT  0xFFFFFFFC
+	_ADR    ANDD 
+	_ADR    SWAP 
 	_ADR	BASE
 	_ADR	AT
 	_ADR	TOR
@@ -4100,6 +4092,36 @@ WORS2:
 	_ADR STORE 
 	_ADR OVERT
 	_UNNEST 
+
+/*********************************
+	ARRAY "name" ( n -- )
+    create an array of n elements 
+*********************************/
+	_HEADER ARRAY,5,"ARRAY"
+	_NEST 
+	_ADR	TOKEN
+	_ADR	SNAME
+	_ADR	OVERT
+	_ADR	COMPI_NEST
+	_DOLIT	DO_ARRAY
+	_ADR	CALLC
+	_DOLIT	UNNEST 
+	_ADR	CALLC  
+	_DOLIT  4 
+	_ADR    STAR 
+	_ADR    ALLOT 
+	_UNNEST 	
+
+\\ does> du array
+DO_ARRAY:
+	_NEST  
+	_DOLIT 4 
+	_ADR STAR  
+	_ADR RAT  
+	_ADR CELLP 
+	_ADR PLUS  
+	_UNNEST 
+
 
 /****************
   cold start
