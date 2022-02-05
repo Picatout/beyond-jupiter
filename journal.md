@@ -1,3 +1,13 @@
+2022-02-05
+
+* Travail sur [ftoa.s](ftoa.s)
+
+2022-02-04
+
+* Retravaillé [strtof.s](strtof.s), factorisation et optimisation. 
+
+* Travail sur [ftoa.s](ftoa.s)
+
 2022-02-03
 
 * Travail sur [ftoa.f](ftoa.f)

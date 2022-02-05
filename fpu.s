@@ -28,6 +28,7 @@
 minus1 = 0xBF800000  // -1.0  to invert mantissa sign 
 plus1 = 0x3F800000  // 1.0  
 ten = 0x41200000  // 10.0  
+onetenth = 0x3DCCCCCD // 0.1 
 
      .word  0x3089705F // 1e-9
      .word  0x322BCC77 // 1e-8
@@ -205,7 +206,7 @@ fpu_init:
     F- ( f1 f2 -- f1-f2 )
     substract 2 float 
 *******************************/
-    _HEADER FMINUS,2,"F-"
+    _HEADER FSUBB,2,"F-"
    vmov.f32 s0,TOS 
    _POP 
    vmov.f32 s1,TOS 
@@ -291,7 +292,7 @@ fpu_init:
 *****************************/
     _HEADER FGREAT,2,"F>"
     _NEST 
-    _ADR FMINUS
+    _ADR FSUBB
     _ADR FZLESS
     _ADR INVER     
     _UNNEST 
@@ -302,7 +303,7 @@ fpu_init:
 *****************************/
     _HEADER FLESS,2,"F<"
     _NEST 
-    _ADR FMINUS 
+    _ADR FSUBB 
     _ADR FZLESS
     _UNNEST 
 

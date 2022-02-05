@@ -1973,9 +1973,15 @@ PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
 1:  _ADR COUNT 
     _ADR RAT 
     _ADR DIGTQ
-    _QBRAN 2f
-    _ADR ROT 
-    _ADR RAT 
+    _QBRAN 3f
+    _ADR ROT
+	_ADR DUPP 
+	_DOLIT 0XCCCCCCC // limit before overflow 
+	_ADR GREAT 
+	_QBRAN 2f 
+	_ADR NROT 
+	_BRAN 3f  // too big 
+2:  _ADR RAT 
     _ADR STAR 
     _ADR PLUS
     _ADR SWAP 
@@ -1983,7 +1989,7 @@ PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
     _ADR ONEP 
     _ADR NROT
     _BRAN 1b 
-2:  _ADR DROP 
+3:  _ADR DROP 
     _ADR ONEM  // decrement a 
     _ADR RFROM 
     _ADR DROP 
@@ -4112,7 +4118,7 @@ WORS2:
 	_ADR    ALLOT 
 	_UNNEST 	
 
-\\ does> du array
+// does> du array
 DO_ARRAY:
 	_NEST  
 	_DOLIT 4 

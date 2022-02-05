@@ -21,29 +21,30 @@
   float number parser 
 *******************************/
 
-/******************************************************
-    powers of 10 used in parsing float numbers 
-*******************************************************/    
+/********************
+    10^2^n  
+    for n in [0..5]
+********************/    
 
-powersof10:  .word  0x41200000  // 10.0 
-             .word  0x42C80000  // 100.0
-             .word  0x461C4000  // 10000.0 
-             .word  0x4CBEBC20  // 1.0e8
-             .word  0x5A0E1BCA  // 1.0e16 
-             .word  0x749DC5AE  // 1.0e32 
+p10p2n:     .word  0x41200000  // 10.0 
+            .word  0x42C80000  // 100.0
+            .word  0x461C4000  // 10000.0 
+            .word  0x4CBEBC20  // 1.0e8
+            .word  0x5A0E1BCA  // 1.0e16 
+            .word  0x749DC5AE  // 1.0e32 
 
 fzero =  0x0
 fone =  0x3F800000
 fminus1 = 0xBF800000
 ften = 0x41200000 
 
-
-// fetch element from powersof10 array 
-power10: // ( idx -- f )
+//  P10P2N@ ( idx -- f )
+// fetch element from p10p2n array 
+p10p2at: // ( idx -- f )
     _NEST 
     _DOLIT 2 
     _ADR LSHIFT 
-    _DOLIT powersof10
+    _DOLIT p10p2n 
     _ADR PLUS 
     _ADR AT 
     _UNNEST 
@@ -62,30 +63,25 @@ bit_state: // ( idx f e -- idx f bit )
     _ADR ANDD   // idx f bit, i.e. 0||1<<idx  
     _UNNEST 
 
-// exponent adjustment 
-// multiply or divide mantissa by exponent  
-// if exponant < 0 divide 
-// if exponant >0 multiply 
-// 8f exponant == 0 done 
-mult_div_exp: // ( e f  -- f )
+
+//  mant_div ( 0 f e -- f )
+// negative exponent, divide mantissa 
+// to adjust from decimal to binary exponent.
+// input: 
+//  0  exponent bit counter  
+//  f  mantissa converted float 
+//  e  decimal exponent 
+// output:
+//   f float adjusted 
+mant_div:
     _NEST 
-    _ADR OVER  // e f e 
-    _QBRAN 4f // exp==0,  done 
-    _DOLIT 0  // e f idx  
-    _ADR NROT // idx e f
-    _ADR SWAP // idx f e   
-    _ADR DUPP  // idx f e e 
-    _ADR ZLESS
-    _QBRAN pos_exp 
-// negative exponent 
-    _ADR ABSS 
-    _ADR TOR //  -- idx f R: e 
+    _ADR TOR // idx f R: e 
 div_loop:
     _ADR RAT   // idx f e R: e 
     _ADR bit_state // idx f state 
     _QBRAN 1f   // bit reset 
     _ADR OVER 
-    _ADR power10 // idx f pwr10 R: e
+    _ADR p10p2at // idx f pwr10 R: e
     _ADR FSLH  // idx f R: e 
 1:  _ADR SWAP  // f idx R: e 
     _ADR ONEP   // F idx++ R: e 
@@ -94,15 +90,29 @@ div_loop:
     _DOLIT 5 
     _ADR GREAT  // idx > 5
     _QBRAN div_loop 
-    _BRAN 3f 
-pos_exp: // positive exponent 
-    _ADR TOR // idx f  R: e 
+    _ADR RFROM 
+    _ADR DROP 
+    _UNNEST 
+
+
+// mant_mult ( 0  f e -- f )
+// positive exponent, multiply mantissa 
+// to adjust from decimal to binary exponent 
+// input:
+//  0  exponent bit counter  
+//  f  mantissa converted float 
+//  e  decimal exponent 
+// output:
+//   f float adjusted 
+mant_mult:
+    _NEST 
+    _ADR TOR 
 mult_loop:
     _ADR RAT   // idx f e R: e 
     _ADR bit_state // idx f state 
     _QBRAN 1f   // bit reset 
     _ADR OVER  
-    _ADR power10 // idx f pwr10 R: e
+    _ADR p10p2at // idx f pwr10 R: e
     _ADR FSTAR  // idx f R: e 
 1:  _ADR SWAP  // f idx R: e 
     _ADR ONEP   // F idx++ R: e 
@@ -111,27 +121,37 @@ mult_loop:
     _DOLIT 5 
     _ADR GREAT  // idx > 5
     _QBRAN mult_loop 
-// adjustment done 
-3:  _ADR RFROM 
-    _ADR DROP 
-4:  _ADR SWAP 
+    _ADR RFROM 
     _ADR DROP 
     _UNNEST 
 
-// divide fraction by 
-// 10^d 
-div_fract: // ( d f -- f )
+
+// float adjustment from decimal exponent  
+// multiply or divide mantissa by exponent  
+// if exponant < 0 divide 
+// if exponant >0 multiply 
+// if exponant == 0 done 
+exp_adjust: // ( e f  -- f )
     _NEST 
-    _ADR SWAP  // -- f d 
-    _ADR TOR  // -- f R: d 
-    _DOLIT fone  // -- f 1.0 R: d 
-    _BRAN 2f 
-1: // create 10^d 
-    _DOLIT ften 
-    _ADR FSTAR 
-2:  _DONXT 1b  
-    _ADR FSLH
+    _ADR OVER  // e f e 
+    _QBRAN 3f // exp==0,  done 
+    _DOLIT 0  // e f idx  
+    _ADR NROT // idx e f
+    _ADR SWAP // idx f e   
+    _ADR DUPP  // idx f e e 
+    _ADR ZLESS
+    _QBRAN pos_exp 
+// negative exponent 
+    _ADR ABSS 
+    _ADR mant_div 
+    _BRAN 3f 
+pos_exp: // positive exponent 
+    _ADR mant_mult 
+// adjustment done 
+3:  _ADR SWAP 
+    _ADR DROP 
     _UNNEST 
+
 
 /*****************************
    decimals ( a -- a+ fdec | a 0.0 )
@@ -146,7 +166,11 @@ decimals:
     _ADR PARSE_DIGITS // d n a+ 
     _ADR NROT  // a d n 
     _ADR STOF  // convert integer n to float 
-    _ADR div_fract // a 0 a n/10^d 
+    _ADR SWAP
+    _DOLIT 9 
+    _ADR MIN 
+    _ADR PWR10 
+    _ADR FSLH 
     _UNNEST 
 
 
@@ -256,7 +280,7 @@ build_float: // a 0 R: base sign fint fdec exp
     _ADR RFROM 
     _ADR DRFROM 
     _ADR FPLUS 
-    _ADR mult_div_exp
+    _ADR exp_adjust
     _ADR RFROM 
     _QBRAN 1f 
     _DOLIT fminus1

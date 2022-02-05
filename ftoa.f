@@ -39,7 +39,7 @@
         swap 1- swap \ decrement d   
     repeat
     \ 0 f r: b+  
-    10.0 f* f>s  9 min  
+    10.0 f* trunc  
     [char] 0 +
     r> swap c!+ \ 0 b+ 
     swap drop   
@@ -80,7 +80,7 @@
 \ convert float to string
 \ input: 
 \   b  output buffer  
-\   d n# of digits [2..7] to convert 
+\   d n# of digits [1..7] to convert 
 \   f float to convert 
 \  output: 
 \   b output buffer 
@@ -99,7 +99,7 @@
         swap \ d +f b+ 
     then 
     over 1.0 f< if \ d f b 
-        \ no integer part
+        \ float < 1.0 
         [char] 0 c!+
         [char] . c!+
         rot 1- -rot \ decrement d
@@ -149,7 +149,7 @@
 \    f -> float to print 
 \    d -> n# digits in printout 
 : f.  ( f d -- )
-    2 max 7 min \ d range [2..7] digits 
+    1 max 7 min \ d range [2..7] digits 
     swap \ d f 
     here >r \ d f  
     16 allot  \ d f    
