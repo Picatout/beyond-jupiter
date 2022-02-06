@@ -74,10 +74,10 @@ fpu_init:
    orr r1,r1,#(0xf<<20)
    str r1,[r0]
    dsb 
-   ldr r0,=FPCCR
+   ldr r0,=FPC_BASE_ADR
    eor r1,r1 
-   str r1,[r0]
-   dsb 
+   str r1,[r0,FPCCR]
+   dsb
    mov r0,#FPU_IRQ 
    _CALL nvic_enable_irq
    _RET
@@ -94,11 +94,16 @@ fpu_init:
 
 
 /**************************
-   CLR_FPSCR ( -- )
+   CLR_FPSCR ( mask -- )
+   clear FPSCR bits 
+input:
+    mask  and mask 
 ************************/
    _HEADER CLR_FPSCR,9,"CLR_FPSCR"
-   eor T0,T0 
-   vmsr FPSCR,T0
+   vmrs T0,FPSCR 
+   dsb 
+   and TOS,T0  
+   vmsr FPSCR,TOS 
    dsb 
    _NEXT 
 

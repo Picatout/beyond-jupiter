@@ -75,8 +75,8 @@ rounding:
  in buffer b 
  i>a ( i b -- b+ u )
 *******************************/
-    _HEADER ITOA,3,"I>A"
-itoa:
+//    _HEADER ITOA,3,"I>A"
+ITOA:
     _NEST 
     _ADR TOR  // >R ( i r: b )
     _ADR STOD // ( dbl r: b )
@@ -110,8 +110,8 @@ itoa:
 \   m  log10 exponent 
 \   f2  >= 0.1 
 *************************/
-    _HEADER SCALEUP,7,"SCALEUP" 
-scaleup:
+//    _HEADER SCALEUP,7,"SCALEUP" 
+SCALEUP:
     _NEST 
     _DOLIT 0   // m 
     _ADR SWAP  // m f1 
@@ -133,8 +133,8 @@ scaleup:
 \ divide by 10.0 until 
 \ f < 10^d 
 ******************************/
-    _HEADER SCALEDOWN,9,"SCALEDOWN"
-scaledown: // ( d f1 -- m d f2 )
+//    _HEADER SCALEDOWN,9,"SCALEDOWN"
+SCALEDOWN: // ( d f1 -- m d f2 )
     _NEST 
     _ADR OVER 
     _ADR PWR10
@@ -170,7 +170,8 @@ input:
 output:
     b+   adjusted pointer 
 ****************************/
-    _HEADER EPART,5,"EPART"
+//    _HEADER EPART,5,"EPART"
+EPART:
     _NEST
     _ADR SWAP
     _ADR QDUP    
@@ -194,7 +195,8 @@ input:
 output:
     b+  updated string* 
 ****************************/
-    _HEADER FPART,5,"FPART"
+//    _HEADER FPART,5,"FPART"
+FPART:
     _NEST
     _DOLIT '.' 
     _ADR SWAP 
@@ -238,7 +240,8 @@ output:
     f   float fraction 
     b   update str* 
 ****************************/
-    _HEADER IPART,5,"IPART"
+//    _HEADER IPART,5,"IPART"
+IPART: 
     _NEST 
     _ADR TOR // ( -- d f r: b )
     _ADR DUPP 
@@ -249,7 +252,7 @@ output:
     _ADR RFROM 
     _ADR CSTOP 
     _ADR TOR 
-    _ADR scaleup
+    _ADR SCALEUP 
     _ADR SWAP 
     _ADR NROT 
     // decrement d 
@@ -258,7 +261,7 @@ output:
     _ADR SWAP 
     _ADR RFROM // r> ( -- m d f b )  
     _UNNEST 
-1:  _ADR scaledown // ( -- m d f r: b)
+1:  _ADR SCALEDOWN // ( -- m d f r: b)
     _ADR DUPP  // ( -- m d f f r: b )
     _ADR TRUNC // ( -- m d f i r: b )
     _ADR DUPP  // ( -- m d f i i r: b )

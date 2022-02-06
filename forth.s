@@ -4268,6 +4268,7 @@ COLD1:
 	_ADR	ATEXE			// application boot
 	_ADR	OVERT
 	_ADR	IF_SENSE
+	_ADR    READY 
 	_BRAN	QUIT			// start interpretation
 COLD2:
 	.p2align 2 	

@@ -185,7 +185,16 @@ dh:
 1:
   _ADR reset_mcu 
 
-  
+exit_fpu_isr:
+   ldr IP,=QUIT  
+   _MOV32 r0,SCB_BASE_ADR
+   eor r1,r1 
+   str r1,[r0,#SCB_ICSR]
+   mov r0,#FPU_IRQ 
+   bl nvic_enable_irq 
+   pop {lr}
+   bx lr 
+
 
 /*********************************
    fpu exception 
@@ -194,9 +203,10 @@ dh:
   .global fpu_exception 
   .p2align 2 
 fpu_exception:
-  _MOV32 r0,RAM_END 
-  mov sp,r0 
-  ldr IP,=fpu_except 
+  push {lr}
+  mov r0,#FPU_IRQ 
+  bl nvic_disable_irq 
+  ldr IP,=fpu_except
   b INEXT 
 fpu_except:  
   _ADR PRESE
@@ -206,10 +216,72 @@ fpu_except:
   _ADR STORE 
   _DOTQP 21 , "fpu exception FPSCR: "
   _ADR FPSCR 
-  _ADR UDOT 
-  _ADR CR 
-  _ADR reset_mcu 
+  _ADR DUPP 
+  _DOLIT '$'
+  _ADR EMIT 
+  _ADR UDOT
+  _ADR QDUP 
+  _QBRAN 2f 
+  _DOLIT ',' 
+  _ADR EMIT 
+  _DOLIT ' ' 
+  _ADR EMIT
+  _ADR DUPP 
+  _DOLIT 0x10 
+  _ADR ANDD
+  _ADR QDUP  
+  _QBRAN 1f 
+  _DOLIT fpu_exceptions
+  _ADR PLUS 
+  _ADR AT 
+  _ADR COUNT 
+  _ADR TYPEE
+1: _DOLIT 15 
+  _ADR ANDD
+  _ADR CLZ 
+  _DOLIT 31 
+  _ADR SWAP 
+  _ADR SUBB 
+  _DOLIT 2 
+  _ADR LSHIFT 
+  _DOLIT fpu_exceptions 
+  _ADR PLUS 
+  _ADR AT 
+  _ADR COUNT 
+  _ADR TYPEE 
+2: _ADR CR 
+  _DOLIT 0
+  _ADR CLR_FPSCR 
+  _ADR exit_fpu_isr // reset_mcu 
 
+  .p2align 2 
+// fpu exception 
+fpu_exceptions:  .word fpu_except_invalid_op, fpu_except_div0, fpu_except_overflow, fpu_except_underflow, fpu_except_inexact
+
+  .p2align 2 
+fpu_except_invalid_op: // bit 0  
+  .byte 18
+  .ascii " invalid operation" 
+                      
+  .p2align 2 
+fpu_except_div0: // bit 1 
+  .byte 14 
+  .ascii " division by 0" 
+
+  .p2align 2 
+fpu_except_overflow: // bit 2
+  .byte 9 
+  .ascii " overflow"
+
+  .p2align 2 
+fpu_except_underflow:  // bit 3 
+  .byte 10
+  .ascii " underflow"
+
+  .p2align 2 
+fpu_except_inexact: // bit 4 
+  .byte 10 
+  .ascii " inexact, "
 
 
 /*********************************
@@ -592,6 +664,24 @@ nvic_disable_irq:
     isb 
     pop {r1,r2,r3}
     _RET 
+
+// clear interrupt pending flag 
+// input: r0 = IRQn
+nvic_clear_irq_pending:
+    _MOV32 r3,(NVIC_BASE_ADR+NVIC_ICPR0)
+    push {r1,r2,r3}
+    mov r1,r0 
+    lsr r1,#5 
+    lsl r1,#2  // IABRn
+    and r0,#31 // bit#
+    mov r2,#1 
+    lsl r2,r0
+    str r2,[r3,r1]
+    dsb 
+    isb 
+    pop {r1,r2,r3}
+    _RET 
+
 
 /**********************************
   gpio_config 

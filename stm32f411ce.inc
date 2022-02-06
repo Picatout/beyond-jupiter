@@ -178,7 +178,7 @@
 
    // coprocessor control space 
    .equ CPACR, 0xE000ED88
-   .equ FPC_BASE_ADR, xE000EF34
+   .equ FPC_BASE_ADR, 0xE000EF34
    .equ FPCCR, 0 
    .EQU FPCAR, 4 
    .EQU FPDSCR,8
