@@ -3504,6 +3504,7 @@ COLON_ABORT:
 	_ADR AT 
 	_ADR LAST 
 	_ADR STORE 
+	_ADR OVERT 
 	_UNNEST 
 
 /*********************
@@ -3569,6 +3570,7 @@ CALLC:
 	_NEST
 	_ADR	TOKEN
 	_ADR	SNAME
+	_ADR    OVERT 
 	_ADR	COMPI_NEST 
 	_ADR	RBRAC
 	_UNNEST

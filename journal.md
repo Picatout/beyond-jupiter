@@ -1,6 +1,10 @@
 2022-02-05
 
-* Travail sur [ftoa.s](ftoa.s)
+* Travail sur [ftoa.s](ftoa.s)  complété.
+
+* Modifié code **CONSOLE** l'appel à **READY** se fait maintenant dans **COLD** 
+
+* Travail dans [init.s](init.s)  sur **fpu_excecption**. 
 
 2022-02-04
 
