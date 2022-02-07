@@ -185,16 +185,6 @@ dh:
 1:
   _ADR reset_mcu 
 
-exit_fpu_isr:
-   ldr IP,=QUIT  
-   _MOV32 r0,SCB_BASE_ADR
-   eor r1,r1 
-   str r1,[r0,#SCB_ICSR]
-   mov r0,#FPU_IRQ 
-   bl nvic_enable_irq 
-   pop {lr}
-   bx lr 
-
 
 /*********************************
    fpu exception 
@@ -210,16 +200,17 @@ fpu_exception:
   b INEXT 
 fpu_except:  
   _ADR PRESE
-  _ADR CR  
+  _ADR CR 
+  _ADR BASE 
+  _ADR AT 
+  _ADR TOR  
   _DOLIT 16 
   _ADR BASE 
   _ADR STORE 
   _DOTQP 21 , "fpu exception FPSCR: "
   _ADR FPSCR 
   _ADR DUPP 
-  _DOLIT '$'
-  _ADR EMIT 
-  _ADR UDOT
+  _ADR DOT
   _ADR QDUP 
   _QBRAN 2f 
   _DOLIT ',' 
@@ -252,7 +243,21 @@ fpu_except:
 2: _ADR CR 
   _DOLIT 0
   _ADR CLR_FPSCR 
+  _ADR RFROM  
+  _ADR BASE 
+  _ADR STORE 
   _ADR exit_fpu_isr // reset_mcu 
+
+exit_fpu_isr:
+   ldr IP,=QUIT  
+   _MOV32 r0,SCB_BASE_ADR
+   eor r1,r1 
+   str r1,[r0,#SCB_ICSR]
+   mov r0,#FPU_IRQ 
+   bl nvic_enable_irq 
+   pop {lr}
+   bx lr 
+
 
   .p2align 2 
 // fpu exception 

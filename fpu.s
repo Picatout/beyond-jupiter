@@ -411,18 +411,3 @@ input:
     _ADR ONEM
 1:  _UNNEST 
 
-/********************************
-    NUMBER ( a -- int -1 | float -2 | a 0 )
-    parse number, integer or float 
-    if not a number return ( a 0 ) 
-    if integer return ( int -1 ) 
-    if float return ( float -2 )
-**********************************/
-    _HEADER NUMBER,6,"NUMBER"
-    _NEST 
-    _ADR INTQ
-    _ADR QDUP 
-    _QBRAN 2f 
-    _UNNEST 
-2:  _ADR FLOATQ
-    _UNNEST 

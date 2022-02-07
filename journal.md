@@ -1,3 +1,15 @@
+2022-02-06
+
+* retraillé **PARSE_DIGITS** pour contrôler les débordements.
+
+* Création de **D>A** pour convertir entier double en chaîne. 
+
+* Retraillé l'impression des entiers. 
+
+* Modifié **fpu_exception** pour restaurer à base numérique avant de quitter. 
+
+* Modifié le mot **:** pour que permettre les définitions récursives.
+
 2022-02-05
 
 * Travail sur [ftoa.s](ftoa.s)  complété.

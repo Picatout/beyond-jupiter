@@ -1960,7 +1960,7 @@ DGTQ1:
 	_UNNEST
 
 /***********************************
- parse digits 
+ parse digits of positive integer 
   d digits count 
   n parsed integer
   a+ updated pointer  
@@ -1969,27 +1969,28 @@ PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
     _NEST
     _ADR BASE 
     _ADR AT 
-    _ADR TOR  
+    _ADR TOR
 1:  _ADR COUNT 
     _ADR RAT 
-    _ADR DIGTQ
-    _QBRAN 3f
-    _ADR ROT
-	_ADR DUPP 
-	_DOLIT 0XCCCCCCC // limit before overflow 
-	_ADR GREAT 
+    _ADR DIGTQ // d n a c f 
+    _QBRAN 4f
+    _ADR ROT 
+	_ADR RAT 
+    _ADR UMSTA 
+	_QBRAN 2f // overflow control
+	_BRAN 3f 
+2:	_ADR DUPP 
+	_ADR ZLESS // if 0< is overflow 
 	_QBRAN 2f 
-	_ADR NROT 
-	_BRAN 3f  // too big 
-2:  _ADR RAT 
-    _ADR STAR 
-    _ADR PLUS
-    _ADR SWAP 
+	_BRAN 3f 
+2:  _ADR PLUS // d a n 
+    _ADR SWAP // d n a  
     _ADR ROT 
     _ADR ONEP 
     _ADR NROT
     _BRAN 1b 
-3:  _ADR DROP 
+3:  _ABORQ 16, " number too big "
+4:  _ADR DROP 
     _ADR ONEM  // decrement a 
     _ADR RFROM 
     _ADR DROP 
@@ -2102,6 +2103,22 @@ NEGQ:
 	_ADR	BASE
 	_ADR	STORE
 	_UNNEST
+
+/********************************
+    NUMBER ( a -- int -1 | float -2 | a 0 )
+    parse number, integer or float 
+    if not a number return ( a 0 ) 
+    if integer return ( int -1 ) 
+    if float return ( float -2 )
+**********************************/
+    _HEADER NUMBER,6,"NUMBER"
+    _NEST 
+    _ADR INTQ
+    _ADR QDUP 
+    _QBRAN 2f 
+    _UNNEST 
+2:  _ADR FLOATQ
+    _UNNEST 
 
 
 /********************
@@ -2250,7 +2267,7 @@ DOTQP:
 	_HEADER UDOTR,3,"U.R"
 	_NEST
 	_ADR	SWAP 
-	_ADR 	STOD 
+	_DOLIT 	0 
 	_ADR	ROT 
 	_ADR	TOR
 	_ADR	BDIGS
@@ -2270,11 +2287,10 @@ DOTQP:
 ***************************/
 	_HEADER UDOT,2,"U."
 	_NEST
-	_ADR 	STOD 
+	_DOLIT  0 
 	_ADR	BDIGS
 	_ADR	DIGS
 	_ADR	EDIGS
-	_ADR	SPACE
 	_ADR	TYPEE
 	_UNNEST
 
@@ -2286,25 +2302,93 @@ DOTQP:
 **************************/
 	_HEADER DOT,1,"."
 	_NEST
+	_ADR    SPACE 
 	_ADR	BASE
 	_ADR	AT
-	_DOLIT 10
+	_ADR    DUPP 
+	_DOLIT  16 
+	_ADR    EQUAL 
+	_QBRAN  1f 
+	_DOLIT '$'
+	_ADR    EMIT
+1:  _ADR    DUPP 
+	_DOLIT  2 
+	_ADR    EQUAL 
+	_QBRAN  1f 
+	_DOLIT  '%'
+	_ADR    EMIT 	 
+1:	_DOLIT  10
 	_ADR	XORR			// ?decimal
 	_QBRAN	DOT1
 	_ADR	UDOT
 	_UNNEST			// no,display unsigned
 DOT1:
     _ADR	STRR
-	_ADR	SPACE
 	_ADR	TYPEE
 	_UNNEST			// yes, display signed
+
+/*************************
+  D>A ( buf size d -- p u)
+  convert double integer to 
+  ASCII string  
+input:
+	buf  pointer to buffer 
+	size length of buffer 
+	d    int64 to convert 
+output:
+	p     pointer to string  
+	u     string length 
+**************************/
+	_HEADER DTOA,3,"D>A" 
+	_NEST 
+	_ADR DTOR  // ( buf size r: d )
+	_ADR PLUS   
+	_ADR DUPP  // ( bend bend r: d )
+	_ADR HLD 
+	_ADR STORE 
+	_ADR DRFROM 
+    _ADR DUPP 
+	_ADR TOR 
+	_ADR DABS 
+	_ADR DIGS 
+	_ADR RFROM 
+	_ADR SIGN  
+	_ADR DROP  // ( buf -- )
+	_ADR BASE 
+	_ADR AT 
+	_DOLIT 16 
+	_ADR EQUAL 
+	_QBRAN 1f 
+	_DOLIT '$'
+	_ADR HOLD 
+1:  _ADR HLD
+	_ADR AT
+	_ADR SWAP 
+	_ADR OVER 
+	_ADR SUBB 
+	_UNNEST 
+
 
 /*************************
    D. ( d -- )
    display double integer 
 **************************/
 	_HEADER DDOT,2,"D."
-	_NEST 
+	_NEST
+	_ADR BASE 
+	_ADR AT 
+	_ADR DUPP 
+	_ADR TOR 
+	_DOLIT 10 
+	_ADR LESS 
+	_QBRAN 1f 
+	_DOLIT 10 
+	_ADR BASE 
+	_ADR STORE 
+1:  _ADR BASE 
+	_ADR AT 
+	_DOLIT 16 
+	_ADR EQUAL 	
 	_ADR DUPP 
 	_ADR TOR 
 	_ADR DABS 
@@ -2314,7 +2398,10 @@ DOT1:
 	_ADR SIGN 
 	_ADR EDIGS
 	_ADR SPACE 
-	_ADR TYPEE 
+	_ADR TYPEE
+	_ADR RFROM 
+	_ADR BASE 
+	_ADR STORE  
 	_UNNEST 
 
 
@@ -3822,7 +3909,7 @@ TDOT: // ( u -- )
 	_ADR TOR  
 	_ADR HLD 
 	_ADR STORE
-	_ADR STOD 
+	_DOLIT 0  
 	_ADR DIGS  
 	_ADR DROP
 	_DOLIT '$'
