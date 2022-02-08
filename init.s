@@ -196,18 +196,23 @@ fpu_exception:
   push {lr}
   mov r0,#FPU_IRQ 
   bl nvic_disable_irq 
+  _PUSH 
+  mov TOS,IP 
   ldr IP,=fpu_except
   b INEXT 
 fpu_except:  
-  _ADR PRESE
   _ADR CR 
   _ADR BASE 
   _ADR AT 
   _ADR TOR  
   _DOLIT 16 
   _ADR BASE 
-  _ADR STORE 
-  _DOTQP 21 , "fpu exception FPSCR: "
+  _ADR STORE
+  _DOLIT 4 
+  _ADR SUBB  
+  _DOTQP 4, "IP= "
+  _ADR DOT 
+  _DOTQP 23 , " ,fpu exception FPSCR: "
   _ADR FPSCR 
   _ADR DUPP 
   _ADR DOT
@@ -799,6 +804,7 @@ UZERO:
 	.word PS2_QKEY /* query for character */
   .word TV_EMIT  /* char output device */
   .word BASEE 	/*BASE */
+  .word -1      /*BCHAR*/ 
 	.word 0			/*tmp */
 	.word 0			/*SPAN */
 	.word 0			/*>IN */

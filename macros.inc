@@ -77,7 +77,8 @@
   .equ STDIN, BOOT+4   //character ouput device 
   .equ STDOUT, STDIN+4 // character input device 
   .equ NBASE, STDOUT+4  // numeric conversion base 
-  .equ TMP, NBASE+4   // temporary variable
+  .equ BCHAR, NBASE+4   // display base character flag 
+  .equ TMP, BCHAR+4   // temporary variable
   .equ CSPAN, TMP+4  // character count received by expect  
   .equ TOIN, CSPAN+4  // >IN  parse pointer in TIB
   .equ NTIBB, TOIN+4  // #TIB  characters in TIB 

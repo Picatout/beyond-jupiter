@@ -1,3 +1,13 @@
+2022-02-07
+
+*  Ajouter variable système **BCHAR** qui permet de désactiver l'affichage du caractère indicateur de la base lors des  impressions de nombres.
+
+* Corriger bogue dans commande **DUMP** 
+
+* Modifié **fpus_exception pour indiquer l'adress IP où s'est produite l'exception. 
+
+* Retravaillé les conversion entier vers ASCII. 
+
 2022-02-06
 
 * retraillé **PARSE_DIGITS** pour contrôler les débordements.

@@ -1121,6 +1121,16 @@ DOCON:
 	ADD	TOS,UP,#NBASE
 	_NEXT
 
+/***********************************************
+	BCHAR ( -- flag )
+	indicate if the base character must be output
+	with numeric conversion 
+************************************************/
+		_HEADER BCHR,5,"BCHAR"
+		_PUSH 
+		ADD TOS,UP,#BCHAR 
+		_NEXT 
+
 /*****************************************************
     temp	 ( -- a )
  	A temporary storage location used in parse and find.
@@ -2241,6 +2251,41 @@ DOTQP:
 	_ADR	DOTST
 	_UNNEST
 
+/*************************
+	LPAD  ( n+ -- )
+	emit n spaceS + 
+	base character  
+	16 -> $
+	 2 -> %
+	 other -> none 
+*************************/
+LPAD:
+	_NEST 
+	_ADR BCHR 
+	_ADR  AT 
+	_QBRAN 3f 
+	_ADR BASE 
+	_ADR AT 
+	_ADR DUPP 
+	_DOLIT 16
+	_ADR EQUAL 
+	_QBRAN 1f
+	_ADR DROP 
+	_DOLIT '$'
+0:	_ADR  SWAP 
+	_ADR  ONEM 
+	_ADR  SPACS 
+	_ADR  EMIT 
+	_UNNEST 
+1:  _DOLIT 2 
+	_ADR EQUAL 
+	_QBRAN 3f
+	_DOLIT '%'
+	_BRAN 0b   	
+3:	_ADR  SPACS 
+	_UNNEST 
+
+
 /******************************
     .R	  ( n +n -- )
  	Display an integer in a 
@@ -2250,13 +2295,15 @@ DOTQP:
 	_HEADER DOTR,2,".R"
 	_NEST
 	_ADR	TOR
-	_ADR	STRR
+	_ADR    STOD 
+	_ADR	DTOA 
 	_ADR	RFROM
 	_ADR	OVER
 	_ADR	SUBB
-	_ADR	SPACS
+	_ADR    LPAD  
 	_ADR	TYPEE
 	_UNNEST
+
 
 /*************************
     U.R	 ( u +n -- )
@@ -2266,19 +2313,16 @@ DOTQP:
 ***************************/
 	_HEADER UDOTR,3,"U.R"
 	_NEST
-	_ADR	SWAP 
-	_DOLIT 	0 
-	_ADR	ROT 
-	_ADR	TOR
-	_ADR	BDIGS
-	_ADR	DIGS
-	_ADR	EDIGS
+	_ADR    TOR 
+	_DOLIT  0
+	_ADR    DTOA 
 	_ADR	RFROM
 	_ADR	OVER
 	_ADR	SUBB
-	_ADR	SPACS
+	_ADR    LPAD  
 	_ADR	TYPEE
 	_UNNEST
+
 
 /************************
     U.	  ( u -- )
@@ -2291,8 +2335,11 @@ DOTQP:
 	_ADR	BDIGS
 	_ADR	DIGS
 	_ADR	EDIGS
+	_DOLIT  1 
+	_ADR	LPAD  
 	_ADR	TYPEE
 	_UNNEST
+
 
 /************************
     .	   ( w -- )
@@ -2305,67 +2352,40 @@ DOTQP:
 	_ADR    SPACE 
 	_ADR	BASE
 	_ADR	AT
-	_ADR    DUPP 
-	_DOLIT  16 
-	_ADR    EQUAL 
-	_QBRAN  1f 
-	_DOLIT '$'
-	_ADR    EMIT
-1:  _ADR    DUPP 
-	_DOLIT  2 
-	_ADR    EQUAL 
-	_QBRAN  1f 
-	_DOLIT  '%'
-	_ADR    EMIT 	 
 1:	_DOLIT  10
-	_ADR	XORR			// ?decimal
+	_ADR	XORR	// decimal base?
 	_QBRAN	DOT1
-	_ADR	UDOT
-	_UNNEST			// no,display unsigned
+	_ADR	UDOT    // no,display unsigned
+	_UNNEST			
 DOT1:
-    _ADR	STRR
-	_ADR	TYPEE
+	_ADR    STOD 
+    _ADR	DTOA
+	_DOLIT  1 
+	_ADR	LPAD  
+1:	_ADR	TYPEE
 	_UNNEST			// yes, display signed
 
+
 /*************************
-  D>A ( buf size d -- p u)
+  D>A ( d -- p u )
   convert double integer to 
-  ASCII string  
+  ASCII string in pad  
 input:
-	buf  pointer to buffer 
-	size length of buffer 
 	d    int64 to convert 
 output:
 	p     pointer to string  
 	u     string length 
 **************************/
 	_HEADER DTOA,3,"D>A" 
-	_NEST 
-	_ADR DTOR  // ( buf size r: d )
-	_ADR PLUS   
-	_ADR DUPP  // ( bend bend r: d )
-	_ADR HLD 
-	_ADR STORE 
-	_ADR DRFROM 
+	_NEST
     _ADR DUPP 
 	_ADR TOR 
 	_ADR DABS 
+	_ADR BDIGS
 	_ADR DIGS 
 	_ADR RFROM 
 	_ADR SIGN  
-	_ADR DROP  // ( buf -- )
-	_ADR BASE 
-	_ADR AT 
-	_DOLIT 16 
-	_ADR EQUAL 
-	_QBRAN 1f 
-	_DOLIT '$'
-	_ADR HOLD 
-1:  _ADR HLD
-	_ADR AT
-	_ADR SWAP 
-	_ADR OVER 
-	_ADR SUBB 
+	_ADR EDIGS 
 	_UNNEST 
 
 
@@ -2375,34 +2395,13 @@ output:
 **************************/
 	_HEADER DDOT,2,"D."
 	_NEST
-	_ADR BASE 
-	_ADR AT 
-	_ADR DUPP 
-	_ADR TOR 
-	_DOLIT 10 
-	_ADR LESS 
-	_QBRAN 1f 
-	_DOLIT 10 
-	_ADR BASE 
-	_ADR STORE 
-1:  _ADR BASE 
-	_ADR AT 
-	_DOLIT 16 
-	_ADR EQUAL 	
-	_ADR DUPP 
-	_ADR TOR 
-	_ADR DABS 
-	_ADR BDIGS
-	_ADR DIGS 
-	_ADR RFROM
-	_ADR SIGN 
-	_ADR EDIGS
 	_ADR SPACE 
+	_ADR DTOA 
+	_DOLIT 1
+	_ADR LPAD 
 	_ADR TYPEE
-	_ADR RFROM 
-	_ADR BASE 
-	_ADR STORE  
 	_UNNEST 
+
 
 
 /***********************
@@ -3820,27 +3819,36 @@ DEFER_NOP:
 
 /*************************
     dm+	 ( a u -- a )
- 	Dump u bytes from , 
+ 	Dump u bytes from a , 
 	leaving a+u on the stack.
-hidden word used by DUMP 
+	hidden word used by DUMP 
 ****************************/
 DMP:
 	_NEST
 	_ADR	OVER
 	_DOLIT	4
 	_ADR	UDOTR			// display address
+	_DOLIT  0         // don't show base char 
+	_ADR    BCHR
+	_ADR    DUPP
+	_ADR    AT 
+	_ADR    TOR      // save original value of BCHAR 
+	_ADR    STORE 
 	_ADR	SPACE
 	_ADR	TOR			// start count down loop
 	_BRAN	PDUM2			// skip first pass
 PDUM1:
-  _ADR	DUPP
+    _ADR	DUPP
 	_ADR	CAT
 	_DOLIT	3
 	_ADR	UDOTR			// display numeric data
 	_ADR	ONEP			// increment address
 PDUM2:
-  _ADR	DONXT
+    _ADR	DONXT
 	.word	PDUM1	// loop till done
+	_ADR    RFROM   // restore BCHAR value 
+	_ADR    BCHR 
+	_ADR    STORE 
 	_UNNEST
 	.p2align 2 
 //    DUMP	( a u -- )
