@@ -108,6 +108,7 @@
   .equ PEN_COLOR,BK_COLOR+4
   .equ VFPSW, PEN_COLOR+4 
   .equ VFBASE, VFPSW+4 
+  .equ TONE_DTMR, VFBASE+4 // tone duration timer 
 
 /***********************************************
 * MACROS

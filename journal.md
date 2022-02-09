@@ -1,4 +1,24 @@
+20022-02-09
+
+*  Ajout de **timer4_handler**  et du code d'initialisaton du TIMER4-CH1 dans [init.s](init.s)
+
+*  Ajout du mot **TONE (  d f -- )** dans [forth.s](forth.s).
+
+*  Ajout initialisation sortie audio dans [init.s](init.s)
+
+2022-02-08
+
+* Ajout du mot **JOYSTK** pour lire le port Atari Joystick 
+    * **A0** LEFT 
+    * **A1** RIGHT 
+    * **A2** UP 
+    * **A3** DOWN
+    * **A12** FIRE 
+
 2022-02-07
+
+* Modifié schématique pour ajouter sortie audio sur **PB6** utilisation de **T4-CH1** en mode PWM. 
+
 
 *  Ajouter variable système **BCHAR** qui permet de désactiver l'affichage du caractère indicateur de la base lors des  impressions de nombres.
 

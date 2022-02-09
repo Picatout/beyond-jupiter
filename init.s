@@ -85,7 +85,7 @@ isr_vectors:
   .word      default_handler /* IRQ27, TIM1 Capture Compare */                          
   .word      default_handler /* IRQ28, TIM2 */                   
   .word      tv_out_isr /* IRQ29, TIM3 */                   
-  .word      default_handler /* IRQ30, TIM4 */                   
+  .word      timer4_handler /* IRQ30, TIM4 */                   
   .word      default_handler /* IRQ31, I2C1 Event */                          
   .word      default_handler /* IRQ32, I2C1 Error */                          
   .word      default_handler /* IRQ33, I2C2 Event */                          
@@ -418,6 +418,32 @@ usagefault_hl:
   _ADR reset_mcu  
 
 
+/********************************
+    timer interrupt handler
+********************************/
+  .type timer4_handler, %function
+  .p2align 2
+  .global timer4_handler
+timer4_handler:
+    _MOV32 r3,UPP 
+    ldr r0,[r3,#TONE_DTMR]
+    cbnz r0, 1f 
+    // disable tone generator
+    _MOV32 r3,TIM4_BASE_ADR
+    ldr r0,[r3,#TIM_CR1]
+    and r0,#-2 
+    str r0,[r3,#TIM_CR1]
+//    ldr r0,[r3,#TIM_DIER]
+//    and r0,#-4
+//    str r0,[r3,#TIM_DIER]
+1:  // reset interrupt flags
+    _MOV32 r3,TIM4_BASE_ADR
+    ldr r0,[r3,#TIM_SR]
+    and r0,#-4
+    str r0,[r3,#TIM_SR]
+    bx lr 
+
+
 /*********************************
 	system milliseconds counter
 *********************************/	
@@ -429,6 +455,12 @@ systick_handler:
   ldr r0,[r3,#TICKS]  
   add r0,#1
   str r0,[r3,#TICKS]
+  // tone timer 
+  ldr r0,[r3,#TONE_DTMR]
+  cbz r0,1f
+  sub r0,#1 
+  str r0,[r3,#TONE_DTMR]
+1: // countdown timer 
   ldr r0,[r3,#CD_TIMER]
   cbz r0, systick_exit
   sub r0,#1
@@ -559,7 +591,7 @@ wait_sws:
 /* now sysclock is 96 Mhz */
 
 
-/* enable peripheral clock for GPIOA, GPIOC and USART1 */
+/* enable peripheral clock for GPIOA, GPIOB, GPIOC and USART1 */
   mov	r1, #0x9F		/* all GPIO clock */
   str	r1, [r0, #RCC_AHB1ENR]
   mov	r1, #(1<<4)+(1<<14)  /* USART1 + SYSCFG clock enable */
@@ -580,6 +612,44 @@ wait_sws:
     tst r0,#(1<<8)
 	beq 1b 	
 
+/* configure audio output 
+   PB6 Aout 
+   T4-CH1  PWM mode
+   Fck = 96Mhz/16  
+*/
+  _MOV32 r0,GPIOB_BASE_ADR // port 
+  // select AF02 on PB6 // T4-CH1 
+  ldr r1,[r0,#GPIO_AFRL]
+  orr r1,#(2<<24)
+  str r1,[r0,#GPIO_AFRL] 
+  mov r1,#6 // pin 
+  mov r2,#OUTPUT_AFPP  // mode 
+  _CALL gpio_config 
+// enable timer4 clock 
+  _MOV32 r2,RCC_BASE_ADR 
+  mov r0,#4
+  ldr r1,[r2,#RCC_APB1ENR]
+  orr r1,r0 
+  str r1,[r2,#RCC_APB1ENR]
+// configure TIMER4 CH1  pwm mode   
+  _MOV32 r2,TIM4_BASE_ADR
+// préscale / 16 
+  _MOV32 r0,TIM4_BASE_ADR
+  mov r1,#15 
+  str r1,[r0,#TIM_PSC] // div Fck/16
+// pwm mode 
+  mov r1,#7<<4 
+  str r1,[r0,#TIM_CCMR1]
+  ldr r1,[r0,TIM_CCER]
+  orr r1,#1
+  str r1,[r0,#TIM_CCER]
+  // enable interrupt 
+  ldr r1,[r0,#TIM_DIER]
+  orr r1,#1 
+  str r1,[r0,#TIM_DIER]
+  mov r0,#TIM4_IRQ 
+  _CALL  nvic_enable_irq
+
 
 /* configure systicks for 1msec ticks */
 // set priority to 15 (lowest)
@@ -593,7 +663,7 @@ wait_sws:
   str r1,[r0,STK_CTL]
   _RET  
 
-
+  
 /* copy system variables to RAM */ 
 	.type remap, %function 
     .global remap 
@@ -833,6 +903,7 @@ UZERO:
     .word 7 /* tv font color */
     .word 0 /* FPSW */
     .word 0 /* FBASE */ 
+    .word 0 /* TONE_DTMR */ 
     .word 0,0 
 ULAST:
 

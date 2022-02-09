@@ -271,8 +271,42 @@ ULED_OFF:
 	str T0,[T1,#GPIO_BSRR]
 	_NEXT    
 
+/**************************
+   JOYSTK  ( -- u )
+   read joystick port 
+**************************/
+	_HEADER JOYSTK,6,"JOYSTK"
+	_NEST 
+	_DOLIT (GPIOA_BASE_ADR+GPIO_IDR)
+	_ADR AT 
+	_DOLIT 0x100f 
+	_ADR ANDD 
+	_UNNEST 
 
-	
+/****************************
+	TONE ( msec freq -- )
+input:
+	freq  frequence hertz 
+	msec  durration in msec 
+*****************************/
+	_HEADER TONE,4,"TONE"
+	_MOV32 r0,6000000 // Fclk 
+	udiv r0,r0,TOS
+	_POP  
+	_MOV32 r1,TIM4_BASE_ADR
+	str r0,[r1,#TIM_ARR]
+	lsr r0,#1
+	str r0,[r1,#TIM_CCR1]
+	mov r0,#1 
+	str r0,[r1,#TIM_CCER]
+	str r0,[r1,#TIM_CR1]
+	ldr r0,[r1,#TIM_DIER]
+	str TOS,[UP,#TONE_DTMR]
+//	orr r0,#2
+//	str r0,[r1,#TIM_DIER]
+	_POP
+	_NEXT 
+
 /***************
 //  The kernel
 ***************/
