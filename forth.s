@@ -3290,8 +3290,10 @@ STRCQ:
 	_UNNEST 
 
 DOPLOOP: // ( n -- R: counter limit )
+	mov T2,TOS 
+	_POP 
 	ldmfd RSP!,{T0,T1}
-	add T0,TOS 
+	add T0,T2 
 	stmfd RSP!,{T0,T1}
 	cmp T0,T1 
 	bmi 9f 

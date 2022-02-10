@@ -202,9 +202,6 @@ FPART:
     _ADR SWAP 
     _ADR CSTOP 
     _ADR TOR // >r ( d f r: b ) 
-    // round to next digit 
-    _ADR OVER 
-    _ADR ROUND 
 1:  _ADR SWAP  
     _ADR QDUP 
     _QBRAN 2f
@@ -248,13 +245,20 @@ IPART:
     _DOLIT fone 
     _ADR FLESS 
     _QBRAN 1f 
+    _ADR SCALEUP // (  -- d m f )
+    _ADR SWAP 
+    _ADR NROT
+    _ADR OVER 
+    _ADR ROUND
+    _ADR DUPP 
+    _DOLIT fone 
+    _ADR FLESS 
+    _QBRAN 2f 
+    // first digit '0' 
     _DOLIT '0' 
     _ADR RFROM 
     _ADR CSTOP 
     _ADR TOR 
-    _ADR SCALEUP 
-    _ADR SWAP 
-    _ADR NROT 
     // decrement d 
     _ADR SWAP 
     _ADR ONEM 
@@ -262,7 +266,7 @@ IPART:
     _ADR RFROM // r> ( -- m d f b )  
     _UNNEST 
 1:  _ADR SCALEDOWN // ( -- m d f r: b)
-    _ADR DUPP  // ( -- m d f f r: b )
+2:  _ADR DUPP  // ( -- m d f f r: b )
     _ADR TRUNC // ( -- m d f i r: b )
     _ADR DUPP  // ( -- m d f i i r: b )
     _ADR TOR   // ( -- m d f i r: b i ) 
@@ -292,17 +296,28 @@ IPART:
 ****************************************/
     _HEADER FTOA,3,"F>A" // ( b d f -- b u )
     _NEST 
-    _ADR DUPP // dup ( -- d f b b )
+    _ADR OVER  
+    _ADR FEXP 
+    _DOLIT 128 
+    _ADR EQUAL 
+    _QBRAN 1f
+    _BRAN nan 
+1:  _ADR DUPP // dup ( -- d f b b )
     _ADR TOR // >r   ( d f b r: b )  
     // store space first buffer char. 
     _ADR BLANK   //  bl ( -- d f b c r: b )
     _ADR SWAP 
     _ADR CSTOP  // c!+ ( -- d f b+ r: b )
+    _ADR OVER 
+    _QBRAN zdz // 0.0 
     // check float sign 
     _ADR OVER  // over ( -- d f b f r: b ) 
     _ADR FSIGN // fsign ( -- d f b 0|-1 r: b )
     _QBRAN 1f  // 0branch 1f 
     // negative number add '-' to buffer 
+    _ADR SWAP 
+    _ADR FABS 
+    _ADR SWAP 
     _DOLIT '-'  // [char] - ( -- d f b+ c r: b )
     _ADR SWAP 
     _ADR CSTOP  // c!+  ( -- d f b+ r: b )
@@ -314,6 +329,62 @@ IPART:
     _ADR RFROM 
     _ADR SWAP 
     _UNNEST 
+zdz: // 0.0 
+     _ADR TOR 
+     _ADR DDROP
+     _ADR RFROM
+     _DOLIT '0'
+     _ADR SWAP 
+     _ADR CSTOP 
+     _DOLIT '.'
+     _ADR SWAP 
+     _ADR CSTOP 
+     _DOLIT '0'
+     _ADR SWAP 
+     _ADR CSTOP 
+     _ADR DROP  
+     _ADR RFROM 
+     _DOLIT 4 
+     _UNNEST  
+nan: // not a number or infinity
+    _ADR TOR   // ( d f r: b )
+    _ADR SWAP  // f d  
+    _ADR DROP  // f 
+    _ADR BLANK  // f c 
+    _ADR RAT    // f c b 
+    _ADR CSTOP  // f b+ 
+    _ADR SWAP   // b+ f 
+    _ADR FMANT  // b+ mant
+    _DOLIT 0x7FFFFF 
+    _ADR ANDD   
+    _QBRAN infinity 
+    _DOLIT 'N'  // b+ c 
+    _ADR SWAP   // c b+
+    _ADR CSTOP  // b+
+    _DOLIT 'a'  // b+ c
+    _ADR SWAP   // c b+ 
+    _ADR CSTOP  // b+
+    _DOLIT 'N'  // b+ c 
+    _ADR SWAP   // c b+ 
+    _ADR CSTOP  // b+
+    _BRAN 1f 
+infinity:
+    _DOLIT 'I'
+    _ADR SWAP 
+    _ADR CSTOP 
+    _DOLIT 'N'
+    _ADR SWAP 
+    _ADR CSTOP 
+    _DOLIT 'F'
+    _ADR SWAP 
+    _ADR CSTOP 
+1:
+    _ADR DROP 
+    _ADR RFROM 
+    _DOLIT 4 
+    _UNNEST 
+
+
 
 
 /***********************************
@@ -346,7 +417,8 @@ IPART:
     // free buffer 
     _DOLIT -16 
     _ADR ALLOT
-    _UNNEST 
+    _UNNEST
+
 
 
 

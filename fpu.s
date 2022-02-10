@@ -83,6 +83,27 @@ fpu_init:
    _RET
 
 /***************************
+    FDI ( -- )
+    disable fpu exception
+    interrupt
+***************************/
+    _HEADER FDI,3,"FDI"
+    mov r0,#FPU_IRQ 
+    _CALL nvic_disable_irq
+    _NEXT 
+
+/***************************
+    FEI ( -- )
+    enable fpu exception 
+    interrupt 
+**************************/
+    _HEADER FEI,3,"FEI"
+    mov r0,#FPU_IRQ
+    _CALL nvic_enable_irq
+    _NEXT 
+
+
+/***************************
    FPSCR ( -- u )
    stack fpu SCR register 
 ***************************/
@@ -94,12 +115,12 @@ fpu_init:
 
 
 /**************************
-   CLR_FPSCR ( mask -- )
+   CLR-FPSCR ( mask -- )
    clear FPSCR bits 
 input:
     mask  and mask 
 ************************/
-   _HEADER CLR_FPSCR,9,"CLR_FPSCR"
+   _HEADER CLR_FPSCR,9,"CLR-FPSCR"
    vmrs T0,FPSCR 
    dsb 
    and TOS,T0  

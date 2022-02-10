@@ -1,4 +1,22 @@
+20022-02-10
+
+* Modifié  **F>A** pour tenir compte des NaN et infinis. 
+
+* Autre problème dans **F>A**  0.0  7 f. résulte en une boucle infinie.
+
+* Corrigé bogue dans **F>A** du fichier [ftoa.s](ftoa.s). 
+
 20022-02-09
+
+*  Création du fichier [trigo.f](trigo.f)
+
+*  découvert bogue dans f.  le nombre $3f7fffff imprime 0.:0000 au lieu de 0.999999
+        
+         $3F7FFFFE 7 f. 0.:00000 
+         $3f7fffff 7 f. 0.:00000 ok
+
+
+*  Corrigé bogue dans **DOPLOOP**. 
 
 *  Ajout de **timer4_handler**  et du code d'initialisaton du TIMER4-CH1 dans [init.s](init.s)
 
