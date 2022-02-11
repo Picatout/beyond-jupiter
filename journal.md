@@ -1,4 +1,20 @@
+20022-02-11
+
+* Ajouté constantes **LN2** et **LN10** pour les logarithmes naturel de 2 et 10, fichier [fpu.s](fpu.s)
+
+* Ajouter au dictionnaire les mots **SCALEUP**  et **SCALEDONW** dans le fichier [ftoa.s](ftoa.s)
+
+* Modifié **SCALEUP** pour accepter une limite en paramètre.
+
+* Modifié **SCALEDOWN** 
+
+* Modifié **LN** dans [ln.f](ln.f)
+
+* Ajouté **LOG** dans [ln.f](ln.f)
+
 20022-02-10
+
+* Création du fichier [ln.f](ln.f) pour calcul du logarithme naturel.
 
 * Modifié  **F>A** pour tenir compte des NaN et infinis. 
 

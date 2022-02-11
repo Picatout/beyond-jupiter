@@ -207,6 +207,11 @@
 	.word \label
 	.endm 
 
+	.macro _TBRAN label 
+	_ADR TBRAN 
+	.word \label 
+	.endm 
+
 	.macro _DONXT label 
 	_ADR DONXT
 	.word \label 

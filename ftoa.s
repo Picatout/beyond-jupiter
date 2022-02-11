@@ -101,22 +101,24 @@ ITOA:
 
 
 /*************************
-\ SCALEUP ( f1 -- m f2 ) 
-\ multiply fraction until 
-\ f1 >= 0.1
-\ input: 
-\   f1  float
-\ output:
-\   m  log10 exponent 
-\   f2  >= 0.1 
+ SCALEUP ( f1 n -- f2 m ) 
+ multiply fraction until 
+ f1 >= 10^n 
+ input: 
+   f1  float to scale 
+   n  int 10^n limit  
+ output:
+   f2  scaled up float 
+   m  log10 exponent scale factor  
 *************************/
-//    _HEADER SCALEUP,7,"SCALEUP" 
-SCALEUP:
+    _HEADER SCALEUP,7,"SCALEUP" 
     _NEST 
+    _ADR PWR10 
+    _ADR TOR  // f2 r: f1 
     _DOLIT 0   // m 
-    _ADR SWAP  // m f1 
+    _ADR SWAP  // m f2 
 1:  _ADR DUPP 
-    _DOLIT onetenth 
+    _ADR RAT 
     _ADR FLESS
     _QBRAN 2f
     _DOLIT ten 
@@ -126,27 +128,33 @@ SCALEUP:
     _ADR ONEM 
     _ADR SWAP 
     _BRAN 1b
-2:  _UNNEST 
+2:  _ADR RFROM 
+    _ADR DROP 
+    _ADR SWAP 
+    _UNNEST 
+
 
 /******************************
-\ SCALEDOWN ( d f1 -- m d f2 )
-\ divide by 10.0 until 
-\ f < 10^d 
+ SCALEDOWN ( f1 n -- f2 m )
+ divide by 10.0 until 
+ f < 10^n  
+ input:
+    f1   float to scale 
+    n    int 10^n limit 
+ output:
+    f2   scaled down float 
+    m    log10 reduction factor
 ******************************/
-//    _HEADER SCALEDOWN,9,"SCALEDOWN"
-SCALEDOWN: // ( d f1 -- m d f2 )
+    _HEADER SCALEDOWN,9,"SCALEDOWN"
     _NEST 
-    _ADR OVER 
     _ADR PWR10
-    _DOLIT 0x31ABCC77 // 0.5e-8
-    _ADR FSUBB 
     _ADR TOR
     _DOLIT 0 
-    _ADR SWAP // d 0 f1 r: pwr10  
-1:  _ADR DUPP
-    _ADR RAT 
+    _ADR SWAP // 0 f1 r: pwr10  
+1:  _ADR RAT   
+    _ADR OVER 
     _ADR FGREAT 
-    _QBRAN 2f
+    _TBRAN 2f 
     _DOLIT ten 
     _ADR FSLH 
     // increment m 
@@ -156,8 +164,7 @@ SCALEDOWN: // ( d f1 -- m d f2 )
     _BRAN 1b   
 2:  _ADR RFROM 
     _ADR DROP
-    _ADR SWAP // ( -- d f m ) 
-    _ADR NROT // ( -- m d f )
+    _ADR SWAP 
     _UNNEST 
 
 
@@ -198,7 +205,14 @@ output:
 //    _HEADER FPART,5,"FPART"
 FPART:
     _NEST
-    _DOLIT '.' 
+    _DOLIT 2 
+    _ADR PICK 
+    _ADR ZLESS 
+    _QBRAN 1f 
+    _ADR TOR 
+    _ADR DROP 
+    _BRAN 2f 
+1:   _DOLIT '.' 
     _ADR SWAP 
     _ADR CSTOP 
     _ADR TOR // >r ( d f r: b ) 
@@ -244,9 +258,9 @@ IPART:
     _ADR DUPP 
     _DOLIT fone 
     _ADR FLESS 
-    _QBRAN 1f 
-    _ADR SCALEUP // (  -- d m f )
-    _ADR SWAP 
+    _QBRAN 1f
+    _DOLIT -1 
+    _ADR SCALEUP // ( d f -1 -- d f m  )
     _ADR NROT
     _ADR OVER 
     _ADR ROUND
@@ -265,7 +279,9 @@ IPART:
     _ADR SWAP 
     _ADR RFROM // r> ( -- m d f b )  
     _UNNEST 
-1:  _ADR SCALEDOWN // ( -- m d f r: b)
+1:  _ADR OVER 
+    _ADR SCALEDOWN // ( -- d f m r: b)
+    _ADR NROT   // m d f r: b 
 2:  _ADR DUPP  // ( -- m d f f r: b )
     _ADR TRUNC // ( -- m d f i r: b )
     _ADR DUPP  // ( -- m d f i i r: b )

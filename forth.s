@@ -375,6 +375,20 @@ QBRAN1:
 	_NEXT
 
 /***********************************
+	tbranch ( f -- )
+    branch if flag is true 
+***********************************/
+TBRAN:
+	MOVS TOS,TOS 
+	_POP 
+	BEQ 1f 
+	LDR IP,[IP]
+	_NEXT 
+1:  ADD IP,IP,#4
+	_NEXT 
+
+
+/***********************************
     branch	( -- )
  	Branch to an inline address.
 hidden word used by compiler 
