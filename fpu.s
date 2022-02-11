@@ -78,8 +78,8 @@ fpu_init:
    eor r1,r1 
    str r1,[r0,FPCCR]
    dsb
-   mov r0,#FPU_IRQ 
-   _CALL nvic_enable_irq
+//   mov r0,#FPU_IRQ 
+//   _CALL nvic_enable_irq
    _RET
 
 /***************************
