@@ -1,4 +1,6 @@
-* a faire: coder **PICK** en machine et ajouter **PUT**. 
+2022-02-12
+
+* Codé **PICK** en machine et ajouter **PUT**. 
 
 20022-02-11
 

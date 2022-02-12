@@ -1649,13 +1649,23 @@ TCHA1:
 	to tos.
 ******************************/
 	_HEADER PICK,4,"PICK"
-	_NEST
-	_ADR	ONEP
-	_ADR	CELLS
-	_ADR	SPAT
-	_ADR	PLUS
-	_ADR	AT
-	_UNNEST
+	lsl TOS,#2 
+	ldr TOS,[DSP,TOS]
+	_NEXT 
+
+/*****************************
+	PUT ( xn..x0 w i -- xi...x0 )
+	put value w at position 
+	xi on stack 
+	i in range [0..n] 
+*****************************/
+	_HEADER PUT,3,"PUT"
+	mov WP,TOS 
+	_POP 
+	lsl WP,#2 
+	str TOS,[DSP,WP]
+	_POP 
+	_NEXT 
 
 /*********************
   Memory access
