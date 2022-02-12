@@ -426,7 +426,7 @@ usagefault_hl:
   .global timer4_handler
 timer4_handler:
     _MOV32 r3,UPP 
-    ldr r0,[r3,#TONE_DTMR]
+    ldr r0,[r3,#BEEP_DTMR]
     cbnz r0, 1f 
     // disable tone generator
     _MOV32 r3,TIM4_BASE_ADR
@@ -456,10 +456,10 @@ systick_handler:
   add r0,#1
   str r0,[r3,#TICKS]
   // tone timer 
-  ldr r0,[r3,#TONE_DTMR]
+  ldr r0,[r3,#BEEP_DTMR]
   cbz r0,1f
   sub r0,#1 
-  str r0,[r3,#TONE_DTMR]
+  str r0,[r3,#BEEP_DTMR]
 1: // countdown timer 
   ldr r0,[r3,#CD_TIMER]
   cbz r0, systick_exit
@@ -903,7 +903,7 @@ UZERO:
     .word 7 /* tv font color */
     .word 0 /* FPSW */
     .word 0 /* FBASE */ 
-    .word 0 /* TONE_DTMR */ 
+    .word 0 /* BEEP_DTMR */ 
     .word 0,0 
 ULAST:
 

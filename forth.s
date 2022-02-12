@@ -81,7 +81,7 @@
 
 // hi level word enter
 NEST: 
-	STMFD	RSP!,{IP}
+	STMFD	RSP!,{IP} // save return address 
 	ADD IP,WP,#3
 // inner interprer
 INEXT: 
@@ -94,21 +94,22 @@ UNNEST: // exit hi level word
 
 	.p2align 2 
 
-// compile "BX 	INX" 
+// compile "BX INX\nNOP.N " 
 // this is the only way 
 // a colon defintion in RAM 
 // can jump to NEST
-// INX is initialized to NEST address 
+// INX register is initialized 
+// to NEST address 
 // and must be preserved   
 COMPI_NEST:
-	add T1,UP,#USER_CTOP 
-	ldr T1,[T1]
-	mov T2,#0x4700+(10<<3)
-	strh T2,[T1],#2
-	mov T2,#0xbf00 // NOP.N   
-	strh T2,[T1],#2 
+	add T1,UP,#USER_CTOP // pointer HERE 
+	ldr T1,[T1]     // address in here   
+	mov T2,#0x4700+(10<<3) // binary code for BX INX 
+	strh T2,[T1],#2    // store code at HERE, ptr+2   
+	mov T2,#0xbf00 // NOP.N   instruction 
+	strh T2,[T1],#2  // store code at HERE, ptr+2 
 	add T2,UP,#USER_CTOP 
-	str T1,[T2]
+	str T1,[T2]  // save update HERE value 
 	_NEXT  
 
 // ' STDIN 
@@ -129,7 +130,7 @@ TSTDOUT:
   CFSR ( -- u )
   stack CFSR register 
 ***************************/
-    _HEADER CFSR,6,"ATCFSR"
+    _HEADER CFSR,4,"CFSR"
     _MOV32 T0,SCB_BASE_ADR  
     _PUSH 
     ldr TOS,[T0,#SCB_CFSR]
@@ -141,7 +142,7 @@ TSTDOUT:
   BFAR ( -- u )
   stack BFAR register
 *****************************/
-    _HEADER BFAR,6,"ATBFAR"
+    _HEADER BFAR,4,"BFAR"
     _MOV32 T0,SCB_BASE_ADR  
 	_PUSH 
     ldr TOS,[T0,#SCB_BFAR]
@@ -284,12 +285,12 @@ ULED_OFF:
 	_UNNEST 
 
 /****************************
-	TONE ( msec freq -- )
+	BEEP ( msec freq -- )
 input:
 	freq  frequence hertz 
 	msec  durration in msec 
 *****************************/
-	_HEADER TONE,4,"TONE"
+	_HEADER BEEP,4,"BEEP"
 	_MOV32 r0,6000000 // Fclk 
 	udiv r0,r0,TOS
 	_POP  
@@ -301,11 +302,10 @@ input:
 	str r0,[r1,#TIM_CCER]
 	str r0,[r1,#TIM_CR1]
 	ldr r0,[r1,#TIM_DIER]
-	str TOS,[UP,#TONE_DTMR]
-//	orr r0,#2
-//	str r0,[r1,#TIM_DIER]
+	str TOS,[UP,#BEEP_DTMR]
 	_POP
 	_NEXT 
+
 
 /***************
 //  The kernel
@@ -620,7 +620,7 @@ BRAN:
 
 /****************************
     LSHIFT	 ( w # -- w )
- 	Right shift # bits.
+ 	left shift # bits.
 ****************************/
 	_HEADER LSHIFT,6,"LSHIFT"
 	LDR	WP,[DSP],#4
@@ -1171,8 +1171,9 @@ DOCON:
 
 /***********************************************
 	BCHAR ( -- flag )
-	indicate if the base character must be output
-	with numeric conversion 
+	boolean variable
+	if set base char include in convertion 
+	of integer to string.  
 ************************************************/
 		_HEADER BCHR,5,"BCHAR"
 		_PUSH 
@@ -1249,8 +1250,8 @@ CRRNT:
 
 /******************************
     CP	( -- a )
- 	Point to top name in RAM 
-	vocabulary.
+ 	Point to top free area  
+	in user RAM. 
 ******************************/
 	_HEADER CPP,2,"CP"
 	_PUSH
@@ -1270,7 +1271,7 @@ CRRNT:
 /***************************
     LAST	( -- a )
  	Point to the last name 
-	in the name dictionary.
+	in the dictionary.
 ***************************/
 	_HEADER LAST,4,"LAST"
 	_PUSH
@@ -1569,10 +1570,10 @@ MMOD3:
 	_UNNEST
 
 //******************************
-//  */MOD	( n1 n2 n3 -- r q )
-/* 	Multiply n1 and n2, then 
-	divide by n3. Return 
-	mod and quotient.
+//   */MOD	( n1 n2 n3 -- r q )
+/*   Multiply n1 and n2, then 
+   divide by n3. Return 
+   mod and quotient.
 ******************************/
 	_HEADER SSMOD,5,"*/MOD"
 	_NEST
@@ -4171,18 +4172,6 @@ DECOM2:
 	_UNNEST
 .endif 
 
-/**********************
-	VLIST ( -- )
-	WORDS alias 
-	+ display words count 
-**********************/
-	_HEADER VLIST,5,"VLIST"
-	_NEST 
-	_ADR WORDS
-	_ADR CR 
-	_ADR WC
-	_ADR DOT    
-	_UNNEST 
 
 /*********************
     WORDS	( -- )
@@ -4206,23 +4195,6 @@ WORS1:
 WORS2:
 	_UNNEST
 
-/*****************************
-	WC ( - n )
-	count words in dictionary 
-******************************/
-	_HEADER WC,2,"WC"
-	_NEST 
-	_DOLIT 0 
-	_ADR LAST
-1:	_ADR AT
-	_ADR QDUP
-	_QBRAN 9f
-	_ADR SWAP
-	_ADR ONEP
-	_ADR SWAP
-	_ADR CELLM
-	_BRAN 1b
-9:	_UNNEST 
 
 /*************************
 	MARK <string> ( -- )

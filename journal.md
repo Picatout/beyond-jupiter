@@ -1,4 +1,14 @@
+* a faire: coder **PICK** en machine et ajouter **PUT**. 
+
 20022-02-11
+
+* Renommé  **ATBFAR** **BFAR**.
+
+* Renommé  **ATCFSR** **CFSR**.
+
+* Renommé  **TONE** **BEEP**. 
+
+* Supprimé mots **VLIST** et **WC**. 
 
 * Ajouté constantes **LN2** et **LN10** pour les logarithmes naturel de 2 et 10, fichier [fpu.s](fpu.s)
 
