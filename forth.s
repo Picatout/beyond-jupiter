@@ -554,6 +554,21 @@ BRAN:
 	_NEXT 
 
 /***********************************
+	2SWAP ( d2 d1 -- d1 d2 )
+	swap double integer 
+***************************************/
+	_HEADER DSWAP,5,"2SWAP"
+	mov T0,TOS 
+	ldr T1,[DSP]
+	ldr TOS,[DSP,#4]
+	ldr WP,[DSP,#8]
+	str WP,[DSP]
+	str T0,[DSP,#4]
+	str T1,[DSP,#8]
+	_NEXT 
+
+
+/***********************************
     OVER	( w1 w2 -- w1 w2 w1 )
  	Copy second stack item to top.
 ***********************************/
@@ -561,6 +576,20 @@ BRAN:
 	_PUSH
 	LDR	TOS,[DSP,#4]
 	_NEXT 
+
+/***********************************
+	2OVER ( d2 d1 -- d2 d1 d2 )
+	copy a double integer to TOS 
+**********************************************/
+	_HEADER DOVER,5,"2OVER"
+	ldr T0,[DSP,#4]
+	ldr WP,[DSP,#8]
+	_PUSH 
+	mov TOS,WP 
+	_PUSH
+	mov TOS,T0 
+	_NEXT 
+
 
 /***********************************
     0<	  ( n -- t )
@@ -1067,7 +1096,7 @@ BRAN:
     2@	 ( a -- d )
  	Fetch double number.
 ************************/
-	_HEADER DAT,2,"D@"
+	_HEADER DAT,2,"2@"
 	LDR	WP,[TOS,#4]
 	STR	WP,[DSP,#-4]!
 	LDR	TOS,[TOS]
@@ -1998,7 +2027,7 @@ STRR:
 	_UNNEST
 
 /************************************
-  Numeric input, single precision
+  Numeric input
 ***********************************/
 
 /***********************************
@@ -2028,77 +2057,90 @@ DGTQ1:
 	_ADR	ULESS
 	_UNNEST
 
-/***********************************
- parse digits of positive integer 
-  d digits count 
-  n parsed integer
-  a+ updated pointer  
-************************************/
-PARSE_DIGITS: // ( d n a -- d+ n+ a+ )
-    _NEST
-    _ADR BASE 
-    _ADR AT 
-    _ADR TOR
-1:  _ADR COUNT 
-    _ADR RAT 
-    _ADR DIGTQ // d n a c f 
-    _QBRAN 4f
-    _ADR ROT 
-	_ADR RAT 
-    _ADR UMSTA 
-	_QBRAN 2f // overflow control
-	_BRAN 3f 
-2:	_ADR DUPP 
-	_ADR ZLESS // if 0< is overflow 
-	_QBRAN 2f 
-	_BRAN 3f 
-2:  _ADR PLUS // d a n 
-    _ADR SWAP // d n a  
-    _ADR ROT 
-    _ADR ONEP 
-    _ADR NROT
-    _BRAN 1b 
-3:  _ABORQ 16, " number too big "
-4:  _ADR DROP 
-    _ADR ONEM  // decrement a 
-    _ADR RFROM 
-    _ADR DROP 
-    _UNNEST 
+
+/*****************************************
+	>NUMBER ( ud1 adr1 u1 -- ud2 adr2 u2 )
+  convert unsigned double string 
+  to double integer adding to ud1 
+input:
+	ud1  unsiged double 
+	adr1  string address 
+	u1    string length 
+outpout:
+	ud2   modifield ud1 
+	adr2  point to char not converted 
+	u2    char left in string 
+**************************************/
+	_HEADER TONBR,7,">NUMBER"
+	_NEST 
+	_ADR DUPP 
+	_QBRAN 9f 
+1: 	_ADR OVER  // d a u a 
+	_ADR CAT   // d  a u c 
+	_ADR BASE   
+	_ADR AT      // d a u c base
+	_ADR DIGTQ   // d a u n flag 
+	_QBRAN 8f
+	_ADR TOR   	 
+	_ADR ONEM 
+	_ADR DSWAP // a u d 
+	_ADR BASE 
+	_ADR AT 
+	_ADR DSTAR 
+	_ADR RFROM 
+	_DOLIT 0    
+	_ADR DPLUS 
+	_ADR DSWAP 
+	_ADR SWAP 
+	_ADR ONEP
+	_ADR SWAP  
+	_BRAN 1b 
+8:  _ADR DROP
+9:	_UNNEST 
+
 
 /**************************
- CHAR? 
+ CHAR? ( a cnt c -- a+ cnt- t | a cnt f )
  check for charcter c 
  move pointer if *a==c  
 **************************/
-CHARQ: // ( a c -- a+ t | a f )
-    ldr T0,[DSP]
+CHARQ:
+    ldr T0,[DSP,#4]
     ldrb T1,[T0],#1 
     mov T2,TOS 
     eor TOS,TOS
     cmp T1,T2
     bne 1f 
-    str T0,[DSP]
+    str T0,[DSP,#4]
+	ldr T0,[DSP]
+	sub T0,#1 
+	str T0,[DSP]
     mvn TOS,TOS  
 1:  _NEXT
 
+
 /*********************************
-   NEG? ( a -- a|a+  f|t )
+   NEG? ( a cnt -- a cnt f |a+ cnt- t )
    skip '-'|'+' return -1 if '-' 
    else return 0 
 *********************************/
 NEGQ: 
-    _NEST 
-    _DOLIT '-' 
-    _ADR CHARQ
-    _ADR DUPP  
-    _QBRAN 1f
-    _BRAN 2f
-1:  _ADR SWAP 
-    _DOLIT '+'
-    _ADR CHARQ
-    _ADR DROP  
-	_ADR SWAP 
-2:  _UNNEST 
+	_PUSH 
+	eor TOS,TOS // false flag 
+	ldr T0,[DSP,#4]
+	ldrb T1,[T0],#1
+	cmp T1,#'-' 
+	beq 1f
+	cmp T1,#'+'
+	bne 3f 
+	b 2f 
+1:  mvn TOS,TOS  // true flag 
+2:	str T0,[DSP,#4]
+	ldr T0,[DSP]
+	sub T0,#1 
+	str T0,[DSP]
+3:	_NEXT 
+
 
 
 /**********************************
@@ -2120,67 +2162,53 @@ NEGQ:
 	_DOLIT	0      // a 0 
 	_ADR	OVER   // a 0 a 
 	_ADR	COUNT  // a 0 a+ cnt 
-	_ADR    SWAP   
 	_DOLIT  '$' 
 	_ADR    CHARQ 
 	_QBRAN  0f 
 // hexadecimal number 
 	_ADR    HEX
-	_BRAN   1f 
-0:  _DOLIT  '%'   // -- a 0 cnt a '%'
-	_ADR	CHARQ  // -- a 0 cnt a f 
+	_BRAN   2f 
+0:  _DOLIT  '%'   // -- a 0 a cnt '%'
+	_ADR	CHARQ  // -- a 0 a cnt f 
 	_QBRAN  2f
 	_ADR	BIN 
-1:	// decrement cnt 
-    _ADR	SWAP 
-	_ADR	ONEM 
-	_ADR	SWAP  // -- a 0 cnt- a  
 2: // check if negative number 
-	_ADR    DUPP 
 	_ADR    NEGQ 
-	_ADR	TOR  // -- a 0 cnt a a+  R: sign 
-	_ADR    DUPP 
-	_ADR    ROT  // a 0 cnt a+ a+ a 
-	_ADR    SUBB // -- a 0 cnt a+ diff 
-	_QBRAN  2f  
-	_ADR    SWAP  // -- a 0 a cnt 
-	_ADR    ONEM  // -- a 0 a cnt--
-	_ADR    SWAP   
-2:  _ADR    SWAP 
-	_ADR 	TOR  // a 0 a+  R: sign cnt 
+	_ADR	TOR  // -- a 0 a+ cnt- R: sign 
 	_DOLIT  0
 	_ADR	DUPP 
-	_ADR	ROT // a 0 0 0 a+ R: sign cnt 
-	_ADR	PARSE_DIGITS  // a 0 d n a+
-	_ADR	DROP // a 0 d n 
-	_ADR	SWAP  // a 0 n d 
-	_ADR	RFROM // a 0 n d cnt  
-	_ADR	EQUAL // d == cnt ? 
-	_QBRAN  5f // digits left, not an integer 
-2:	_ADR	RFROM  // sign 
-	_QBRAN  3f   // positive integer 
-	_ADR	NEGAT
-3:	
-	_ADR	NROT  // n a 0 
-	_ADR	DDROP // n  
-	_DOLIT  -1    // n -1 
-	_BRAN   7f  
-5:  _ADR	RFROM //  a 0 n sign      	 
-    _ADR	DDROP 
+	_ADR	DSWAP // a 0 0 0 a+ cnt- R: sign 
+	_ADR    TONBR // a 0 d a+ cnt 
+	_QBRAN  2f
+    // not an integer 
+	_ADR RFROM // a 0 d a sign  
+	_ADR DDROP 
+	_ADR DDROP 
+	_BRAN 7f 
+2: // valid integer 
+	_ADR	DROP // a 0 d
+	_ADR    DSWAP 
+	_ADR    DDROP 
+	_ADR    DROP  // d>s 
+	_ADR    RFROM // n sign 
+	_QBRAN  2f
+	_ADR    NEGAT   
+2:	_DOLIT  -1 
 7: // restore BASE 
 	_ADR	RFROM
 	_ADR	BASE
 	_ADR	STORE
 	_UNNEST
 
+
 /********************************
-    NUMBER ( a -- int -1 | float -2 | a 0 )
+    NUMBER? ( a -- int -1 | float -2 | a 0 )
     parse number, integer or float 
     if not a number return ( a 0 ) 
     if integer return ( int -1 ) 
     if float return ( float -2 )
 **********************************/
-    _HEADER NUMBER,6,"NUMBER"
+    _HEADER NUMBERQ,7,"NUMBER?"
     _NEST 
     _ADR INTQ
     _ADR QDUP 
@@ -3059,7 +3087,7 @@ ABORQ:
 	_ADR	EXECU
 	_UNNEST			// execute defined word
 INTE1:
-	_ADR	NUMBER 
+	_ADR	NUMBERQ
 	_QBRAN	INTE2
 	_UNNEST
 INTE2:
@@ -3627,7 +3655,7 @@ SCOM1:
 	_ADR	CALLC			// it's not immediate, compile
 	_UNNEST	
 SCOM2:
-	_ADR	NUMBER 
+	_ADR	NUMBERQ 
 	_QBRAN	SCOM3
 	_ADR	LITER
 	_UNNEST			// compile number as integer
@@ -4070,6 +4098,15 @@ RDOT:
 	_ADR RDOT 
 	_UNNEST 
 
+
+/****************************
+  >BODY  ( xt -- adr )
+  get parameter field address
+  from code field address 
+****************************/
+	_HEADER TOBODY,5,">BODY"
+	add TOS,#8 
+	_NEXT 		
 
 /*****************************
     >NAME	( ca -- na | F )

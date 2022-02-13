@@ -153,29 +153,52 @@ pos_exp: // positive exponent
     _UNNEST 
 
 
+/********************************
+    integer ( a cnt -- a+ cnt- f# )
+*********************************/
+integer:
+    _NEST 
+    _DOLIT 0 
+    _ADR DUPP 
+    _ADR DSWAP // 0 0 a cnt 
+    _ADR TONBR // d a+ cnt- 
+    _ADR DTOR 
+    _ADR DROP // drop hi word 
+    _ADR DRFROM // i a+ cnt-  
+    _ADR ROT  // a+ cnt- i
+    _ADR STOF 
+    _UNNEST 
+
+
 /*****************************
-   decimals ( a -- a+ fdec | a 0.0 )
+   decimals ( a cnt -- a+ cnt- fdec )
    parse digits after '.' 
    convert to float 
 *****************************/
 decimals:
     _NEST 
+    _ADR DUPP 
+    _ADR TOR 
     _DOLIT 0
     _ADR DUPP
-    _ADR ROT
-    _ADR PARSE_DIGITS // d n a+ 
-    _ADR NROT  // a d n 
-    _ADR STOF  // convert integer n to float 
-    _ADR SWAP
+    _ADR DSWAP 
+    _ADR TONBR // -- d a+ cnt-  
+    _ADR DSWAP  // a+ cnt- d
+    _ADR DROP   // a+ cnt- i 
+    _ADR STOF  // convert integer to float 
+    _ADR RFROM  // a+ cnt- f# cnt 
+    _DOLIT 2 
+    _ADR  PICK  
+    _ADR SUBB 
     _DOLIT 9 
     _ADR MIN 
-    _ADR PWR10 
-    _ADR FSLH 
+    _ADR PWR10
+    _ADR FSLH  // a+ cnt- fdec 
     _UNNEST 
 
 
 /************************************
-   exponent ( a -- exp a+ )
+   exponent ( a cnt -- a+ cnt- exp )
    parse float exponent 
 ************************************/
 exponent: 
@@ -184,16 +207,15 @@ exponent:
     _ADR TOR 
     _DOLIT 0 
     _ADR DUPP 
-    _ADR ROT 
-    _ADR PARSE_DIGITS // d n a  
-    _ADR NROT 
-    _ADR SWAP 
-    _ADR DROP 
+    _ADR DSWAP // 0 0 a cnt  
+    _ADR TONBR // d a cnt   
+    _ADR DSWAP
+    _ADR DROP  // hi word 
     _ADR RFROM 
     _QBRAN 1f 
     _ADR NEGAT 
-1:  _ADR SWAP 
-    _UNNEST  // -- exp a+  
+1:  
+    _UNNEST  // -- a+ cnt- exp   
 
 
 /**********************************
@@ -213,70 +235,48 @@ exponent:
 	_DOLIT	0      // failed flag   
 	_ADR	OVER   // a 0 a     R: base
     _ADR	COUNT  // a 0 a+ cnt  // cnt is length of string 
-    _ADR    DROP   // can drop cnt as there is a 0 at end of string 
 // check for '-'|'+' save sign on R: 
-    _ADR NEGQ 
-    _ADR   TOR // -- ... a  R: base sign 
-// if next char is digit parse integer part 
-    _ADR DUPP 
-    _ADR CAT 
-    _DOLIT 10 
-    _ADR DIGTQ // u t|f 
-    _ADR SWAP 
-    _ADR DROP  // drop u 
-    _QBRAN must_be_dot 
-// get integer part     
-    _DOLIT 0 
-    _ADR DUPP
-    _ADR ROT // a 0 0 0 a  
-    _ADR PARSE_DIGITS // a 0 d n a 
-    _ADR NROT // ... a d n 
-    _ADR STOF  // convert n to float 
-    _ADR TOR  //  -- a 0 a d R: base sign fint 
-    _ADR DROP // d not needed
+    _ADR   NEGQ
+    _ADR   TOR // -- a 0 a+ cnt-  R: base sign 
+    _ADR   DUPP 
+    _ADR   TOR  // a 0 a+ cnt r: base sign cnt 
+    _ADR  integer // a 0 a+ cnt- fint 
+    _ADR  OVER  
+    _ADR  RFROM  
+    _ADR  EQUAL
+    _ADR  SWAP
+    _ADR  TOR  //  a 0 a+ cnt- flag r: base sign fint  
+    _TBRAN expect_dot  
+// must be '.' or 'E'     
+    _DOLIT '.' 
+    _ADR CHARQ
+    _TBRAN get_fraction  
+    _DOLIT 'E'
+    _ADR  CHARQ 
+    _TBRAN get_exponent 
+    _BRAN error2
+expect_dot:
+    _DOLIT '.' 
+    _ADR CHARQ 
+    _QBRAN error2
+get_fraction:      
+    _ADR decimals 
+    _ADR  TOR    // a 0 a+ cnt- r: base sign fint ffrac 
 // if next char is 'E' get exponent 
     _DOLIT 'E' 
-    _ADR CHARQ 
-    _QBRAN 1f // next is decimal fraction  
-    _DOLIT fzero // no fraction 
-    _ADR TOR  // R: base sign fint 0.0
-    _BRAN 3f // get exponent   
-// no integer part, next character must be '.' 
-must_be_dot: 
-    _DOLIT fzero // integer part 0.0 
-    _ADR TOR  // R: base sign fint 
-1:  _DOLIT '.' 
-    _ADR CHARQ 
-    _QBRAN error1  // -- a 0 a R: base sign fint  
-    _ADR decimals // -- a 0 a fdec 
-    _ADR TOR // a 0 a R: base sign fint fdec 
-// if next char == 'E' there is an exponent 
-// else no exponent, float completed 
-    _DOLIT 'E' 
-    _ADR CHARQ 
-    _QBRAN 1f
-    _BRAN 3f 
-// no exponent, must be end of string 
-1:   _ADR CAT 
-    _QBRAN 1f 
-    _BRAN error2 // error not end of string 
-1:  _ADR TOR  // a 0 a R: base sign fint fdec exp 
-    _ADR DROP 
-    _BRAN build_float 
-3: // get exponent 
-    _ADR exponent // a 0 exp a+ 
-// must be end of string 
-    _ADR CAT 
-    _QBRAN 4f
-    _BRAN error2  // a 0 exp R: base sign fint fdec  
-4:  _ADR TOR   // a 0 R: base sign fint fdec exp 
+    _ADR CHARQ
+    _TBRAN get_exponent 
+    _DOLIT fzero 
+    _ADR TOR   // a 0 a+ cnt- r: base sign fint ffrac fexp 
+    _BRAN build_float
+get_exponent: 
+    _ADR exponent // -- a 0 a+ cnt- exp
+    _ADR TOR   // a 0 a+ cnt- r: base sign fint ffrac exp 
+    _ADR DUPP 
+    _TBRAN error4   // count must be 0 
+build_float: // a 0 a+ cnt- R: base sign fint fdec exp 
     _ADR DDROP 
-    _BRAN build_float     
-5: // no exponent 
-    _DOLIT 0 
-    _ADR TOR  // a 0 a R: base sign fn ffrac exp 
-    _ADR DROP 
-build_float: // a 0 R: base sign fint fdec exp 
+    _ADR DDROP 
     _ADR RFROM 
     _ADR DRFROM 
     _ADR FPLUS 
@@ -287,16 +287,20 @@ build_float: // a 0 R: base sign fint fdec exp
     _ADR FSTAR 
 1:  _DOLIT -2 
     _BRAN restore_base  
-error1: // a 0 a R: base sign fint 
-    _ADR DRFROM 
-    _ADR DDROP
-    _ADR DROP  
-    _BRAN restore_base  
-error2: // a 0 a R: base sign fint fdec  
-    _ADR DRFROM 
-    _ADR DDROP  // a 0 a R: base sign
-    _ADR RFROM  // a 0 a sign R: base  
+error2: // a 0 a cnt R: base sign fint 
     _ADR DDROP  
+    _BRAN e4  
+error3: // a 0 a cnt R: base sign fint fdec  
+    _ADR DDROP  // a 0 a R: base sign
+    _ADR RFROM 
+    _ADR DROP 
+    _BRAN e4  
+error4: // a 0 a+ cnt- r: base sign fint ffrac fexp  
+    _ADR DDROP 
+    _ADR DRFROM 
+    _ADR DDROP 
+e4: _ADR DRFROM 
+    _ADR DDROP 
 restore_base: 
     _ADR RFROM 
     _ADR BASE 

@@ -1,5 +1,15 @@
 2022-02-12
 
+*  Recodé  **INT?** et **FLOAT?** pour utiliser **&gt;NUMBER** au lieu de **PARSE_DIGITS**. Éliminer **PARSE_DIGITS**. 
+
+*  Ajout de **>NUMBER** pour se conformer au standard forth 2012.
+
+* Ajout de **&gt;BODY** 
+
+* Ajout de **2SWAP** et **2OVER**.
+
+* Renommé  **D@** **2@**.
+
 * Codé **PICK** en machine et ajouter **PUT**. 
 
 20022-02-11
