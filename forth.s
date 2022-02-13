@@ -1630,6 +1630,39 @@ MMOD3:
 *******************/
 
 /*************************
+	CHAR+ ( a -- a+ )
+	increment a by one 
+	char size unit. 
+*************************/
+	_HEADER CHARP,5,"CHAR+"
+	add TOS,#1
+	_NEXT 
+
+/*************************
+	CHARS ( n1 -- n1 )
+	address size of 
+	n1 character
+	same on this system 
+*************************/
+	_HEADER CHARS,5,"CHARS"
+	_NEXT 
+
+
+
+/*************************
+	ALIGN ( -- )
+	align data pointer 
+	to cell boundary 
+************************/
+	_HEADER ALIGN,5,"ALIGN"
+	ldr T0,[UP,#USER_CTOP]
+	add T0,#(CELLL-1)
+	and T0,#0xFFFFFFFC 
+	str T0,[UP,#USER_CTOP]
+	_NEXT 
+
+
+/*************************
     ALIGNED	( b -- a )
  	Align address to the 
 	cell boundary.
@@ -2748,7 +2781,7 @@ PARS8:
     Because of problem with .align 
 	directive that doesn't fill 
 	with zero's I had to change 
-	the "SAME?" and "FIND" 
+	the "SAME?" and "SEARCH" 
  	words  to do a byte by byte comparison. 
 ****************************************/
 	_HEADER SAMEQ,5,"SAME?"
@@ -2776,7 +2809,7 @@ SAME2:
 	_UNNEST	// strings equal
 
 /***********************************
-    FIND	( a na -- ca na | a F )
+    SEARCH	( a na -- ca na | a F )
  	Search a vocabulary for a string.
 	Return ca and na if succeeded.
 hidden word used by NAME?
@@ -2785,7 +2818,7 @@ hidden word used by NAME?
 	 Modified from original. 
    See comment for word "SAME?" 
 ************************************/
-FIND:
+SEARCH:
 	_NEST
 	_ADR	SWAP			// na a	
 	_ADR	COUNT			// na a+1 count
@@ -2794,40 +2827,40 @@ FIND:
 	_ADR	STORE			// na a+1 count 
 	_ADR  TOR		// na a+1  R: count  
 	_ADR	SWAP			// a+1 na
-FIND1:
+SEARCH1:
 	_ADR	DUPP			// a+1 na na
-	_QBRAN	FIND6	// end of vocabulary
+	_QBRAN	SEARCH6	// end of vocabulary
 	_ADR	DUPP			// a+1 na na
 	_ADR	CAT			// a+1 na name1
 	_DOLIT	MASKK
 	_ADR	ANDD
 	_ADR	RAT			// a+1 na name1 count 
 	_ADR	XORR			// a+1 na,  same length?
-	_QBRAN	FIND2
+	_QBRAN	SEARCH2
 	_ADR	CELLM			// a+1 la
 	_ADR	AT			// a+1 next_na
-	_BRAN	FIND1			// try next word
-FIND2:   
+	_BRAN	SEARCH1			// try next word
+SEARCH2:   
 	_ADR	ONEP			// a+1 na+1
 	_ADR	TEMP
 	_ADR	AT			// a+1 na+1 count
 	_ADR	SAMEQ		// a+1 na+1 ? 
-FIND3:	
-	_BRAN	FIND4
-FIND6:	
+SEARCH3:	
+	_BRAN	SEARCH4
+SEARCH6:	
 	_ADR	RFROM			// a+1 0 name1 -- , no match
 	_ADR	DROP			// a+1 0
 	_ADR	SWAP			// 0 a+1
 	_ADR	ONEM			// 0 a
 	_ADR	SWAP			// a 0 
 	_UNNEST			// return without a match
-FIND4:	
-	_QBRAN	FIND5			// a+1 na+1
+SEARCH4:	
+	_QBRAN	SEARCH5			// a+1 na+1
 	_ADR	ONEM			// a+1 na
 	_ADR	CELLM			// a+4 la
 	_ADR	AT			// a+1 next_na
-	_BRAN	FIND1			// compare next name
-FIND5:	
+	_BRAN	SEARCH1			// compare next name
+SEARCH5:	
 	_ADR	RFROM			// a+1 na+1 count
 	_ADR	DROP			// a+1 na+1
 	_ADR	SWAP			// na+1 a+1
@@ -2847,7 +2880,7 @@ FIND5:
 	_NEST
 	_ADR	CNTXT
 	_ADR	AT
-	_ADR	FIND
+	_ADR	SEARCH
 	_UNNEST
 
 /********************
@@ -3224,6 +3257,34 @@ QUIT2:
 	_UNNEST	// yes, push code address
 TICK1:	
 	_ADR ABORT	// no, error
+
+/***********************************
+	FIND ( c-adr -- c-adr 0 | xt 1 | xt -1 )
+	search all context for name at 
+	c-adr 
+input:
+	c-adr   name 
+output:
+	c-adr  0   not found 
+	xt 1   found word immediate 
+	xt -1  found normal word 
+***********************************/
+	_HEADER FIND,4,"FIND"
+	_NEST 
+	_ADR NAMEQ 
+	_ADR DUPP 
+	_QBRAN 9f
+	_ADR CAT 
+	_DOLIT IMEDD
+	_ADR ANDD 
+	_DOLIT 7 
+	_ADR RSHIFT  
+	_ADR DUPP 
+	_TBRAN 9f 
+	_ADR INVER 
+9:	_UNNEST 
+
+
 
 /***********************
     ALLOT	( n -- )

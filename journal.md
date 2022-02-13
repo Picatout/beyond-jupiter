@@ -1,3 +1,9 @@
+2022-02-13
+
+* A faire: Ajouter **ENVIRONMENT?**, **EVALUATE**,**SOURCE-ID**, . 
+
+* Ajout des mots **ALIGN** , **CHAR+**, **CHARS**, **FIND**  
+
 2022-02-12
 
 *  Recodé  **INT?** et **FLOAT?** pour utiliser **&gt;NUMBER** au lieu de **PARSE_DIGITS**. Éliminer **PARSE_DIGITS**. 
