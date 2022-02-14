@@ -640,11 +640,11 @@ BRAN:
 
 /*********************************
     RSHIFT	 ( w # -- w )
- 	arithmetic Right shift # bits.
+ 	logical Right shift # bits.
 **********************************/
 	_HEADER RSHIFT,6,"RSHIFT"
 	LDR	WP,[DSP],#4
-	MOV	TOS,WP,ASR TOS
+	MOV	TOS,WP,LSR TOS
 	_NEXT 
 
 /****************************
@@ -914,10 +914,10 @@ BRAN:
 9:	_NEXT 
 
 /*****************************
-    NOT	 ( w -- !w )
+    INVERT	 ( w -- !w )
  	1"s complement.
 *****************************/
-	_HEADER INVER,3,"NOT"
+	_HEADER INVER,6,"INVERT"
 	MVN	TOS,TOS
 	_NEXT
 
@@ -1386,12 +1386,12 @@ UMMOD2:
 	_NEXT
 
 /****************************
-    M/MOD	( d n -- r q )
+    FM/MOD	( d n -- r q )
  	Signed floored divide 
 	of double by single. 
 	Return mod and quotient.
 ****************************/
-	_HEADER MSMOD,5,"M/MOD"
+	_HEADER MSMOD,6,"FM/MOD"
 	_NEST
 	_ADR	DUPP
 	_ADR	ZLESS
@@ -2316,7 +2316,7 @@ TYPE2:
 	_UNNEST
 
 /******************************************
-  do_$	( -- a )
+  do_$	( -- a u )
   Return the address of a compiled string.
   adjust return address to skip over it.
 hidden word used by compiler. 
@@ -2334,10 +2334,11 @@ DOSTR:
 	_ADR	TOR		//  address after string { -- a1 a2 }
 	_ADR	SWAP	//  count tugged
 	_ADR	TOR     //  ( -- a2) is string address
+	_ADR    COUNT  //   ( a2 -- a2+1 cnt )
 	_UNNEST
 
 /******************************************
-    $"|	( -- a )
+    $"|	( -- a u )
  	Run time routine compiled by _". 
 	Return address of a compiled string.
 hidden word used by compiler
@@ -2347,17 +2348,6 @@ STRQP:
 	_ADR	DOSTR
 	_UNNEST			// force a call to dostr
 
-/*******************************
-    .$	( a -- )
- 	Run time routine of ." 
-	Output a compiled string.
-hidden word used by compiler
-*******************************/
-DOTST:
-	_NEST
-	_ADR	COUNT // ( -- a+1 c )
-	_ADR	TYPEE
-	_UNNEST
 
 /**********************
     ."|	( -- )
@@ -2368,7 +2358,7 @@ hidden word used by compiler
 DOTQP:
 	_NEST
 	_ADR	DOSTR
-	_ADR	DOTST
+	_ADR	TYPEE 
 	_UNNEST
 
 /*************************
@@ -3072,15 +3062,30 @@ ACCP4:
 **********************/
 	_HEADER ABORT,5,"ABORT"
 	_NEST
-ABORT1:
-	_ADR	SPACE
-	_ADR	COUNT
-	_ADR	TYPEE
-	_DOLIT	0X3F
-	_ADR	EMIT
-	_ADR	CR
+ABORT1: 
 	_ADR	PRESE
 	_BRAN	QUIT
+
+/*******************************
+	PRT_ABORT ( a -- )
+    print message and abort 
+input:
+	a   address of counted string 	
+
+hidden word 
+*******************************/
+PRT_ABORT:
+	_NEST 
+	_ADR SPACE 
+	_ADR COUNT 
+	_ADR TYPEE 
+	_DOLIT '?'
+	_ADR    EMIT 
+	_ADR    CR 
+	_BRAN   ABORT1 
+
+
+
 
 /*******************************
     _abort"	( f -- )
@@ -3091,12 +3096,18 @@ hidden used by compiler
 ABORQ:
 	_NEST
 	_ADR	DOSTR
-	_ADR	SWAP 
-	_QBRAN	1f	// text flag
-	_BRAN	ABORT1
+	_ADR	ROT  
+	_QBRAN	1f	// error flag
+	_ADR	SPACE
+	_ADR	TYPEE
+	_DOLIT	0X3F
+	_ADR	EMIT
+	_ADR	CR
+	_ADR    ABORT1
 1:
-	_ADR	DROP
-	_UNNEST			// drop error
+	_ADR	DDROP
+	_UNNEST			// drop message
+
 
 /************************
   The text interpreter
@@ -3124,7 +3135,7 @@ INTE1:
 	_QBRAN	INTE2
 	_UNNEST
 INTE2:
-	_ADR	ABORT	// error
+	_ADR	PRT_ABORT	// error
 
 /******************************
     [	   ( -- )
@@ -3245,6 +3256,17 @@ QUIT2:
 ******************/
 
 /**************************************
+	POSTPONE <name> ( -- )
+	use to compile immediate word 
+**************************************/
+	_HEADER POSTPONE,COMPO+IMEDD+8,"POSTPONE"
+	_NEST 
+	_ADR ITICK
+	_ADR CALLC  
+	_UNNEST 
+
+
+/**************************************
     '	   ( -- ca )
  	Search context vocabularies 
 	for the next word in input stream.
@@ -3255,8 +3277,18 @@ QUIT2:
 	_ADR	NAMEQ	// ?defined
 	_QBRAN	TICK1
 	_UNNEST	// yes, push code address
-TICK1:	
-	_ADR ABORT	// no, error
+TICK1:
+	_ADR PRT_ABORT	// error
+
+/*****************************************
+	['] ( -- ca )
+	immediate version of ' 
+****************************************/
+	_HEADER ITICK,COMPO+IMEDD+3,"[']"
+	_NEST 
+	_ADR TICK  
+	_UNNEST 
+
 
 /***********************************
 	FIND ( c-adr -- c-adr 0 | xt 1 | xt -1 )
@@ -3401,9 +3433,10 @@ STRCQ:
 	_COMPI TOR 
 	_COMPI TOR 
 	_ADR HERE 
+	_DOLIT 0  // end marker used by resolve_leave 
 	_UNNEST 
 
-DOPLOOP: // ( n -- R: counter limit )
+DOPLOOP: // ( n -- R: limit counter )
 	mov T2,TOS 
 	_POP 
 	ldmfd RSP!,{T0,T1}
@@ -3425,22 +3458,35 @@ DOPLOOP: // ( n -- R: counter limit )
 	_HEADER PLOOP,COMPO+IMEDD+5,"+LOOP"
 	_NEST 
 	_COMPI DOPLOOP 
+	_ADR resolve_leave 
 	_ADR COMMA
 	_UNNEST 
 
-DOLOOP: // ( -- R: counter limit )
+DOLOOP: // ( -- R: limit counter )
 	ldr T0,[RSP]
 	add T0,#1
 	str T0,[RSP]
 	ldr T1,[RSP,#4]
 	cmp T0,T1 
 	bmi 9f
-	add RSP,#8  // counter and limit  
+	add RSP,#8  // drop counter and limit  
 	add IP,IP,#4 // skip loop address 
 	_NEXT 
 9:  ldr IP,[IP]
 	_NEXT 
 
+
+resolve_leave:
+	_NEST
+1:	_ADR QDUP 
+	_QBRAN 2f 
+	_ADR HERE 
+	_ADR CELLP 
+	_ADR SWAP 
+	_ADR STORE 
+	_BRAN 1b 
+2:
+	_UNNEST 
 
 /********************************
 	LOOP ( a -- )
@@ -3450,8 +3496,32 @@ DOLOOP: // ( -- R: counter limit )
 	_HEADER LOOP,COMPO+IMEDD+4,"LOOP"
 	_NEST 
 	_COMPI DOLOOP
-	_ADR COMMA 
+	_ADR resolve_leave 
+	_ADR COMMA  // resolve loop branch 
 	_UNNEST 
+
+
+/*********************************
+	LEAVE ( -- ) ( R: loop-sys -- ) 
+	exit inner DO...LOOP 
+**********************************/
+	_HEADER LEAVE,COMPO+IMEDD+5,"LEAVE"
+	_NEST 
+	_COMPI DOLEAVE
+	_ADR HERE
+	_ADR OVER 
+	_QBRAN 1f
+	_ADR SWAP 
+1:	_DOLIT 0 
+	_ADR COMMA   
+	_UNNEST 
+
+// LEAVE runtime
+// remove limit and counter from rstack  
+DOLEAVE:
+	add RSP,#2*CELLL
+	ldr IP,[IP] 
+	_NEXT 
 
 
 /**********************
@@ -3620,11 +3690,11 @@ DOLOOP: // ( -- R: counter limit )
 	_UNNEST
 
 /******************************
-    $"	( -- //  string> )
+    S"	( -- //  string> )
  	Compile an inline 
 	word literal.
 *****************************/
-	_HEADER STRQ,IMEDD+COMPO+2,"$\""
+	_HEADER STRQ,IMEDD+COMPO+2,"S\""
 	_NEST
 	_COMPI	STRQP
 	_ADR	STRCQ
@@ -3693,7 +3763,7 @@ SNAM1:
 	_ADR	STRQP
 	.byte	7
 	.ascii " name? "
-	_ADR	ABORT
+	_ADR	PRT_ABORT
 
 /************************
     $COMPILE	( a -- )
@@ -3722,7 +3792,7 @@ SCOM2:
 	_UNNEST			// compile number as integer
 SCOM3: // compilation abort 
 	_ADR COLON_ABORT 
-	_ADR	ABORT			// error
+	_ADR	PRT_ABORT			// error
 
 /********************************
  before aborting a compilation 
@@ -3783,8 +3853,8 @@ COLON_ABORT:
 	_ADR	STORE
 	_UNNEST
 
-/*********************
-    BL.W	( ca -- )
+/****************************
+    CALLC	( ca -- )
  	compile ca.
 hidden word used by compiler
 *****************************/

@@ -1,14 +1,29 @@
 2022-02-13
 
-* A faire: Ajouter **ENVIRONMENT?**, **EVALUATE**,**SOURCE-ID**, . 
+* A faire: Ajouter **ENVIRONMENT?**, **EVALUATE**,**SOURCE-ID**,. 
 
 * Ajout des mots **ALIGN** , **CHAR+**, **CHARS**, **FIND**  
+
+* Renommé **M/MOD** en **FM/MOD** pour conformité avec forth std 2012. 
+
+* Renommé **NOT** en **INVERT** pour conformité avec forth std 2012. 
+
+* Ajout de **LEAVE**,  **POSTPONE**, **[']** .
+
+* Modifié **RSHIFT** pour LSR au lieu de ASR pour se conformer au standard.
+
+* Corrigé bogue dand **FLOAT?** acceptait la forme **.alpha..** comme float de valeur 0.0. 
+
+* Modifié **ABORT** Selon le standard ce mot n'affiche pas de message. Imprime __" ?"__.
+
+* Modifié **DOSTR**, **DOTQP** . Supprimé **DOTST**. 
+
 
 2022-02-12
 
 *  Recodé  **INT?** et **FLOAT?** pour utiliser **&gt;NUMBER** au lieu de **PARSE_DIGITS**. Éliminer **PARSE_DIGITS**. 
 
-*  Ajout de **>NUMBER** pour se conformer au standard forth 2012.
+*  Ajout de **>NUMBER** pour se conformer au standard forth std 2012.
 
 * Ajout de **&gt;BODY** 
 

@@ -259,7 +259,14 @@ expect_dot:
     _DOLIT '.' 
     _ADR CHARQ 
     _QBRAN error2
-get_fraction:      
+get_fraction:
+    _ADR OVER 
+    _ADR CAT 
+    _DOLIT 10
+    _ADR DIGTQ 
+    _ADR SWAP 
+    _ADR DROP 
+    _QBRAN error2       
     _ADR decimals 
     _ADR  TOR    // a 0 a+ cnt- r: base sign fint ffrac 
 // if next char is 'E' get exponent 
