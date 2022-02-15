@@ -1,6 +1,18 @@
+2022-02-14
+
+* A faire: Ajouter **ENVIRONMENT?**, **EVALUATE**, **SOURCE-ID**, **SOURCE**, **STATE**, 
+
+* Ajout des constantes système **MIN-INT**, **MAX-INT** et **MAX-UINT**. 
+
+* Ajout de la divsion double signée par simple signée symétrique **SM/REM**. 
+
+* Testé  **FM/MOD** et **SM/REM**. 
+
+* Ajouter **UNLOOP** pour conformance au standard forth 2012.
+
 2022-02-13
 
-* A faire: Ajouter **ENVIRONMENT?**, **EVALUATE**,**SOURCE-ID**,. 
+* A faire: Ajouter . 
 
 * Ajout des mots **ALIGN** , **CHAR+**, **CHARS**, **FIND**  
 

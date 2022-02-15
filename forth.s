@@ -402,7 +402,8 @@ BRAN:
  	Exit the currently executing command.
 ******************************************/
 	_HEADER EXIT,4,"EXIT"
-	_UNNEST
+	b UNNEST 
+
 
 /***********************************
     !	   ( w a -- )
@@ -1334,6 +1335,33 @@ USR_BGN_ADR:
 USER_END_ADR:
 	.word DEND 
 
+/********************************
+	MAX-INT ( -- n+ )
+	maximum integer 
+*******************************/
+	_HEADER MAXINT,7,"MAX-INT"
+	_PUSH 
+	_MOV32 TOS, 0x7FFFFFFF
+	_NEXT 
+
+/******************************
+	MIN-INT ( -- n- )
+	minimum integer 
+******************************/
+	_HEADER MININT,7,"MIN-INT"
+	_PUSH 
+	_MOV32 TOS, 0x80000000
+	_NEXT 
+
+/******************************
+	MAX-UINT ( -- u )
+	maximum unsigned integer 
+******************************/
+	_HEADER MAXUINT,8,"MAX-UINT"
+	_PUSH
+	_MOV32 TOS, 0xFFFFFFFF 
+	_NEXT 
+
 
 /* *********************
   Common functions
@@ -1419,6 +1447,50 @@ MMOD2:
 	_ADR	SWAP
 MMOD3:   
 	_UNNEST
+
+/****************************
+	SM/REM (d n1 -- n2 n3 )
+    symetric signed division 
+	double by single 
+input:
+	d   signed double 
+	n1  signed single 
+output: 
+	n2  signed remainder 
+	n3  signed quotient 
+****************************/
+	_HEADER SMSLSHREM,6,"SM/REM"
+	_NEST 
+	_ADR DUPP 
+	_ADR ZLESS 
+	_ADR DUPP 
+	_ADR TOR   // divisor sign 
+	_QBRAN 1f 
+	_ADR NEGAT 
+1:  _ADR OVER 
+	_ADR ZLESS 
+	_ADR DUPP 
+	_ADR TOR  // divident sign 
+	_QBRAN  1f 
+	_ADR TOR 
+	_ADR DNEGA
+	_ADR RFROM 
+1:  _ADR UMMOD  // rem quot  
+	_ADR RFROM 
+	_ADR RAT 
+	_ADR XORR
+	_QBRAN 1f
+	_ADR NEGAT 
+1:  _ADR DUPP 
+	_ADR ZLESS 
+	_ADR RFROM 
+	_ADR XORR 
+	_QBRAN 1f 
+	_ADR SWAP 
+	_ADR NEGAT 
+    _ADR SWAP 
+1:  _UNNEST 
+
 
 /****************************
 	S>D ( n -- d )
@@ -3499,6 +3571,14 @@ resolve_leave:
 	_ADR resolve_leave 
 	_ADR COMMA  // resolve loop branch 
 	_UNNEST 
+
+/************************************
+	UNLOOP ( -- ) ( R: limit count -- )
+	remove loop parameters from rstack 
+****************************************/
+	_HEADER UNLOOP,6,"UNLOOP"
+	add RSP,#2*CELLL 
+	_NEXT 
 
 
 /*********************************
