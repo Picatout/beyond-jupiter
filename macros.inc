@@ -44,10 +44,12 @@
   .equ UART, USART1_BASE_ADR 
 
 /* Forth specific constants */
-	.equ RPP ,	RAM_END-256	/*top of return stack (RP0) */
-	.equ TIBB ,	RPP-128	/*terminal input buffer (TIB) */
-	.equ SPP ,	RPP-128	/*top of data stack (SP0) */
-	.equ VID_BUFF, SPP-256-32000 /* video buffer */
+// exception stack is at RAM_END and reserve 128 bytes 
+	.equ RPP ,	RAM_END-128	/*top of return stack (RP0) reserve 128 bytes growing down */
+	.equ TIBB ,	RPP-208	/*terminal input buffer (TIB) reserve 80 bytes */
+	.equ TIB_SIZE, 80  // 80 bytes,  input transaction buffer size. 
+	.equ SPP ,	RPP-208	/*top of data stack (SP0) groing down */
+	.equ VID_BUFF, SPP-128-32000 /* video buffer */
 	.equ UPP ,	RAM_ADR	 /* start of user area (UP0) */
 	.equ DTOP,  RAM_ADR+0x512 
 	.equ DEND , VID_BUFF-4  /*usable RAM end */
@@ -81,8 +83,9 @@
   .equ TMP, BCHAR+4   // temporary variable
   .equ CSPAN, TMP+4  // character count received by expect  
   .equ TOIN, CSPAN+4  // >IN  parse pointer in TIB
-  .equ NTIBB, TOIN+4  // #TIB  characters in TIB 
-  .equ TIBUF, NTIBB+4   // TIB buffer address 
+  .equ SRC, TOIN+4    // SOURCE 
+  .equ NTIBB, SRC  // #TIB  characters in TIB 
+  .equ TIBUF, SRC+4   // TIB buffer address 
   .equ EVAL, TIBUF+4  // eval|compile vector 
   .equ VHOLD, EVAL+4   // hold pointer 
   .equ CTXT, VHOLD+4  // context pointer 
@@ -109,6 +112,7 @@
   .equ VFPSW, PEN_COLOR+4 
   .equ VFBASE, VFPSW+4 
   .equ BEEP_DTMR, VFBASE+4 // BEEP duration timer 
+  .equ CSTATE, BEEP_DTMR+4 // compilation state 
 
 /***********************************************
 * MACROS

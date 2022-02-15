@@ -1154,6 +1154,17 @@ DOCON:
   system variables 
 ***********************/
 
+/***********************
+	STATE ( -- a )
+	compilation state 
+	0 -> interpret
+	-1 -> compile 
+************************/
+	_HEADER STATE,5,"STATE"
+	_PUSH 
+	ADD TOS,UP,#CSTATE 
+	_NEXT 
+
 /**************************
  SEED ( -- a)
  return PRNG seed address 
@@ -1838,6 +1849,18 @@ TCHA1:
 	_PUSH
 	ldr TOS,[UP,#TIBUF]
 	_NEXT
+
+/***********************************
+	SOURCE ( -- a u )
+output:
+	a  address of transaction buffer 
+	u  # char in buffer 
+***********************************/
+	_HEADER SOURCE,6,"SOURCE"
+	_NEST 
+	_DOLIT  SRC 
+	_ADR   DAT 
+	_UNNEST 
 
 /*************************
     @EXECUTE	( a -- )
@@ -3135,8 +3158,10 @@ ACCP4:
 	_HEADER ABORT,5,"ABORT"
 	_NEST
 ABORT1: 
+	_ADR    LBRAC  
 	_ADR	PRESE
 	_BRAN	QUIT
+
 
 /*******************************
 	PRT_ABORT ( a -- )
@@ -3218,6 +3243,9 @@ INTE2:
 	_DOLIT	INTER
 	_ADR	TEVAL
 	_ADR	STORE
+	_DOLIT  0 
+	_ADR    STATE 
+	_ADR    STORE 
 	_UNNEST
 
 /**********************
@@ -3278,7 +3306,11 @@ EVAL2:
 	_HEADER PRESE,6,"PRESET"
 	_NEST 
 	_DOLIT SPP 
-	_ADR SPSTOR 
+	_ADR SPSTOR
+	_DOLIT TIBB        
+	_DOLIT 0   
+	_ADR   NTIB 
+	_ADR   DSTOR    
 	_UNNEST 
 
 /*********************
@@ -3931,6 +3963,9 @@ COLON_ABORT:
 	_DOLIT	SCOMP
 	_ADR	TEVAL
 	_ADR	STORE
+	_DOLIT  -1
+	_ADR    STATE 
+	_ADR    STORE 
 	_UNNEST
 
 /****************************
@@ -4083,6 +4118,8 @@ DEFER_NOP:
 	_ADR NOP 
 	_UNNEST 
 
+/*********************************
+	:NONAME  
 /******************************
     CREATE	( -- //  string> )
  	Compile a new array entry 

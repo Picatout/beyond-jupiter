@@ -903,7 +903,8 @@ UZERO:
     .word 7 /* tv font color */
     .word 0 /* FPSW */
     .word 0 /* FBASE */ 
-    .word 0 /* BEEP_DTMR */ 
+    .word 0 /* BEEP_DTMR */
+    .word 0 /* CSTATE */ 
     .word 0,0 
 ULAST:
 

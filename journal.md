@@ -1,6 +1,12 @@
-2022-02-14
+2022-02-15
 
-* A faire: Ajouter **ENVIRONMENT?**, **EVALUATE**, **SOURCE-ID**, **SOURCE**, **STATE**, 
+* A faire: Ajouter **ENVIRONMENT?**, **EVALUATE**, **SOURCE-ID**
+
+* Ajour de  **SOURCE** 
+
+* Ajout de la variable **STATE**  mise à -1 lorsqu'en mode compilation. À 0 autrement.
+
+2022-02-14
 
 * Ajout des constantes système **MIN-INT**, **MAX-INT** et **MAX-UINT**. 
 
@@ -10,9 +16,9 @@
 
 * Ajouter **UNLOOP** pour conformance au standard forth 2012.
 
-2022-02-13
+* Corrigé bogue mot **EXIT**. 
 
-* A faire: Ajouter . 
+2022-02-13
 
 * Ajout des mots **ALIGN** , **CHAR+**, **CHARS**, **FIND**  
 

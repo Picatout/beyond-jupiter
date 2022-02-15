@@ -11,11 +11,11 @@ _mstack_size = 0x80; /* main stack size used by exceptions and interrupts */
 _mstack = 0x20020000; /* main stack top */
 _rstack_size = 0x80; /* size of return stack */
 _rstack = 0x2001FF80;    /* growing down */
-_tib = 0x2001FE80; /* transaction input buffer */
+_tib = 0x2001FEB0; /* transaction input buffer */
 _tib_size = 0x50 ; /* tib buffer size */
 _dstack_size = 0x80; /* size of data stack */
-_dstack = 0x2001FE80; /* growing down */
-_vid_buffer = 0x20018100; /* video buffer */ 
+_dstack = 0x2001FEB0; /* growing down */
+_vid_buffer = 0x20018130; /* video buffer */ 
 _vid_buffer_size = 0x7d00 ; /* vide buffer size */ 
 
 
