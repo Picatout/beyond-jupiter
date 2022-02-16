@@ -2783,7 +2783,7 @@ PARS8:
  	Output following string 
 	up to next ) .
 ******************************/
-	_HEADER DOTPR,2,".("
+	_HEADER DOTPR,IMEDD+2,".("
 	_NEST
 	_DOLIT	')'
 	_ADR	PARSE
@@ -3858,6 +3858,20 @@ DOLEAVE:
 	_ADR	IFF
 	_ADR	SWAP
 	_UNNEST
+
+/**********************************
+	RECURSE ( -- )
+	compile recursive call to 
+	actual defined word 
+***********************************/
+	_HEADER RECURSE,COMPO+IMEDD+7,"RECURSE"
+	_NEST 
+	_ADR LAST
+	_ADR AT  
+	_ADR NAMET 
+	_ADR CALLC  
+	_UNNEST 
+
 
 /***********************************
     ABORT"	( -- //  string> )

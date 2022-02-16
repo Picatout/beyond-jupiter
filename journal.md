@@ -1,5 +1,11 @@
 2022-02-16
 
+* Ajouté et testé le mot **RECURSE**. Ceci complète le vocabulaire CORE du standard forth 2012.
+
+* Modifié le mot **.(** pour en faire un mot immédiat.
+
+* Ajout de **UD.** pour imprime entier double non signés. 
+
 * Ajouté **ENVIRONTMENT?**
 
 * Corrigé bogue dans **ABORQ** .
