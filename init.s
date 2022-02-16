@@ -880,6 +880,7 @@ UZERO:
 	.word 0			/*>IN */
 	.word 0			/*#TIB */
 	.word TIBB	/*TIBU */
+  .word 0     // SRCID 
 	.word INTER	/*'EVAL */
 	.word 0			/*HLD */
 	.word _LASTN	/*CONTEXT */

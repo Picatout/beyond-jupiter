@@ -86,7 +86,8 @@
   .equ SRC, TOIN+4    // SOURCE 
   .equ NTIBB, SRC  // #TIB  characters in TIB 
   .equ TIBUF, SRC+4   // TIB buffer address 
-  .equ EVAL, TIBUF+4  // eval|compile vector 
+  .equ SRCID, TIBUF+4  // evaluation source string or user interface
+  .equ EVAL, SRCID+4  // eval|compile vector 
   .equ VHOLD, EVAL+4   // hold pointer 
   .equ CTXT, VHOLD+4  // context pointer 
   .equ FORTH_CTOP, CTXT+4  // flash free dictionary address 

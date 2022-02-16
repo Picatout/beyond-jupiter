@@ -1,8 +1,8 @@
 2022-02-15
 
-* A faire: Ajouter **ENVIRONMENT?**, **EVALUATE**, **SOURCE-ID**
+* A faire: Ajouter **ENVIRONMENT?**
 
-* Ajour de  **SOURCE** 
+* Ajour de  **SOURCE**, **EVALUATE**, **SOURCE-ID** 
 
 * Ajout de la variable **STATE**  mise à -1 lorsqu'en mode compilation. À 0 autrement.
 

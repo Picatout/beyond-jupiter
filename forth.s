@@ -1850,6 +1850,18 @@ TCHA1:
 	ldr TOS,[UP,#TIBUF]
 	_NEXT
 
+/*************************
+	SOURCE-ID, ( -- 0 | -1 )
+output:
+	-1 	String (via EVALUATE)	
+	0 	User input device
+*****************************/
+	_HEADER SOURCID,9,"SOURCE-ID"
+	_PUSH 
+	ldr TOS,[UP,#SRCID]
+	_NEXT 
+
+
 /***********************************
 	SOURCE ( -- a u )
 output:
@@ -1858,7 +1870,7 @@ output:
 ***********************************/
 	_HEADER SOURCE,6,"SOURCE"
 	_NEST 
-	_DOLIT  SRC 
+	_DOLIT  UPP+SRC 
 	_ADR   DAT 
 	_UNNEST 
 
@@ -3298,6 +3310,49 @@ EVAL2:
 	_ADR	DOTOK
 	_UNNEST	// prompt
 
+
+/******************************
+	EVALUATE ( ix* a u -- jx* )
+    interpret string 
+input:
+    ix*  argument required 
+	a   address string to interpret 
+	u   str length 
+output:
+	jx*  evalution results 
+***********************************/
+	_HEADER EVALUATE,8,"EVALUATE"
+	_NEST 
+	// save original source specs
+	_DOLIT UPP+TOIN 
+	_ADR   DUPP 
+	_ADR  AT 
+	_ADR   TOR 
+	_DOLIT  0
+	_ADR  SWAP
+	_ADR   STORE 
+	_DOLIT UPP+SRC 
+	_ADR   DAT 
+	_ADR   DTOR 
+	_DOLIT -1
+	_DOLIT UPP+SRCID 
+	_ADR   STORE 
+	_DOLIT UPP+SRC 
+	_ADR   DSTOR
+	_ADR   EVAL 
+    // restore original source specs 
+	_ADR   DRFROM 
+	_DOLIT UPP+SRC 
+	_ADR   DSTOR 
+	_ADR   RFROM 
+	_DOLIT UPP+TOIN 
+	_ADR   STORE 
+	_DOLIT 0 
+	_DOLIT UPP+SRCID 
+	_ADR   STORE 
+	_UNNEST 
+
+
 /**********************************
     PRESET	( -- )
  	Reset data stack pointer 
@@ -3309,7 +3364,7 @@ EVAL2:
 	_ADR SPSTOR
 	_DOLIT TIBB        
 	_DOLIT 0   
-	_ADR   NTIB 
+	_DOLIT UPP+SRC  
 	_ADR   DSTOR    
 	_UNNEST 
 
