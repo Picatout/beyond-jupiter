@@ -1,5 +1,5 @@
 /**************************************************************************
- Copyright Jacques Deschênes 2021 
+ Copyright Jacques Deschênes 2021,2022 
  This file is part of beyond-Jupiter 
 
      beyond-Jupiter is free software: you can redistribute it and/or modify
@@ -2619,6 +2619,21 @@ output:
 	_ADR TYPEE
 	_UNNEST 
 
+/**************************
+	UD. ( d -- )
+	display unsigned double
+**************************/
+	_HEADER UDDOT,3,"UD."
+	_NEST
+	_ADR SPACE 
+	_ADR BDIGS
+	_ADR DIGS 
+	_ADR EDIGS 
+	_DOLIT 1
+	_ADR LPAD 
+	_ADR TYPEE
+	_UNNEST 
+
 
 
 /***********************
@@ -3188,6 +3203,7 @@ PRT_ABORT:
 	_ADR SPACE 
 	_ADR COUNT 
 	_ADR TYPEE 
+	_ADR  SPACE 
 	_DOLIT '?'
 	_ADR    EMIT 
 	_ADR    CR 
@@ -3207,12 +3223,10 @@ ABORQ:
 	_ADR	DOSTR
 	_ADR	ROT  
 	_QBRAN	1f	// error flag
-	_ADR	SPACE
-	_ADR	TYPEE
-	_DOLIT	0X3F
-	_ADR	EMIT
-	_ADR	CR
-	_ADR    ABORT1
+	_ADR    SPACE 
+	_ADR    TYPEE
+	_ADR    CR  
+	_BRAN   ABORT1
 1:
 	_ADR	DDROP
 	_UNNEST			// drop message
@@ -3557,13 +3571,13 @@ STRCQ:
 	_ADR	CPP
 	_ADR	PSTOR
 	_DOLIT	'\"'
-	_ADR	WORDD			// move word to code dictionary
+	_ADR	WORDD	// move word to code dictionary
 	_ADR	COUNT
 	_ADR	PLUS
-	_ADR	ALGND			// calculate aligned end of string
+	_ADR	ALGND	// calculate aligned end of string
 	_ADR	CPP
-	_ADR	STORE
-	_UNNEST 			// adjust the code pointer
+	_ADR	STORE   // adjust the code pointer
+	_UNNEST 			
 
 /*******************
    Structures
@@ -3850,7 +3864,7 @@ DOLEAVE:
  	Conditional abort with an 
 	error message.
 ***********************************/
-	_HEADER ABRTQ,IMEDD+6,"ABORT\""
+	_HEADER ABRTQ,IMEDD+COMPO+6,"ABORT\""
 	_NEST
 	_COMPI	ABORQ
 	_ADR	STRCQ
@@ -4175,6 +4189,9 @@ DEFER_NOP:
 
 /*********************************
 	:NONAME  
+*********************************/
+
+
 /******************************
     CREATE	( -- //  string> )
  	Compile a new array entry 

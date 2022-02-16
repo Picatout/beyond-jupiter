@@ -1,6 +1,10 @@
-2022-02-15
+2022-02-16
 
-* A faire: Ajouter **ENVIRONMENT?**
+* Ajouté **ENVIRONTMENT?**
+
+* Corrigé bogue dans **ABORQ** .
+
+2022-02-15
 
 * Ajour de  **SOURCE**, **EVALUATE**, **SOURCE-ID** 
 

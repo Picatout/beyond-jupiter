@@ -14,7 +14,7 @@ BUILD_DIR=build/
 LD_FILE=stm32f411ce.ld 
 LD_FLAGS=-mmcu=stm32f411re
 #sources
-SRC=init.s ser-term.s tvout.s ps2_kbd.s spi-flash.s fpu.s strtof.s ftoa.s forth.s 
+SRC=init.s environment.s ser-term.s tvout.s ps2_kbd.s spi-flash.s fpu.s strtof.s ftoa.s forth.s 
  
 # programmer
 VERSION=STLINKV2
