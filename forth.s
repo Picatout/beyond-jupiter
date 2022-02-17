@@ -600,6 +600,39 @@ BRAN:
 	ASR TOS,#31
 	_NEXT 
 
+/**********************************
+	0> ( n -- flag )
+	true if n > 0 
+**********************************/
+	_HEADER ZGREAT,2,"0>"
+	CBZ TOS, 1f
+	ASR TOS,#31 
+	MVN TOS,TOS 
+1:	_NEXT 
+
+
+/**********************************
+	0<> ( n -- flag )
+    true if n <> 0
+*********************************/
+	_HEADER ZNEQU,3,"0<>"
+	CBZ TOS,1f
+	MOV TOS,#-1
+1:	_NEXT
+
+
+/*********************************
+	<>  ( x1 x2 -- flag )
+	true fi x1 <> x2 
+********************************/
+	_HEADER NEQU,2,"<>"
+	LDR T0,[DSP],#CELLL 
+	EORS TOS,T0 
+	BEQ 1f
+	MOV TOS,#-1
+1:  _NEXT 
+
+
 /********************************
     AND	 ( w w -- w )
  	Bitwise AND.
@@ -4202,8 +4235,41 @@ DEFER_NOP:
 	_UNNEST 
 
 /*********************************
-	:NONAME  
+	:NONAME  ( -- xt )
+	create a colon word without 
+	name. 
+output:
+	xt  exécution token of 
+	new definition
 *********************************/
+	_HEADER NONAME,7,":NONAME"
+	_NEST 
+	_ADR 	HERE 
+	_ADR	COMPI_NEST 
+	_ADR 	RBRAC
+	_UNNEST 
+
+/*******************************
+	IS cccc ( xt -- )
+input:
+   cccc  defered word name 
+   xt    execution token 
+   to be affected to the 
+   defered word.
+********************************/
+	_HEADER IS,IMEDD+2,"IS"
+	_NEST
+	_ADR STATE 
+	_ADR AT 
+	_QBRAN 1f 
+	_DOLIT ITICK
+	_ADR CALLC  
+	_DOLIT DEFERSTO
+	_ADR CALLC
+	_BRAN 2f    
+1:  _ADR TICK 
+	_ADR DEFERSTO 
+2:	_UNNEST 
 
 
 /******************************

@@ -1,3 +1,9 @@
+2022-02-17 
+
+* Ajout des mots __0&gt;__, __0&tl;&gt;__ et __&lt;&gt;__. 
+
+* Ajout des mots  __:NONAME__ et __IS__. 
+ 
 2022-02-16
 
 * Ajouté et testé le mot **RECURSE**. Ceci complète le vocabulaire CORE du standard forth 2012.
