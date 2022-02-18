@@ -99,7 +99,7 @@ Disassembly of section .text:
  800020e:	f002 bf51 	b.w	80030b4 <INEXT>
 
 08000212 <dh>:
- 8000212:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
+ 8000212:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
  8000216:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
  800021a:	65786517 	ldrbvs	r6, [r8, #-1303]!	; 0xfffffae9
  800021e:	6f697470 	svcvs	0x00697470
@@ -274,7 +274,7 @@ Disassembly of section .text:
  8000468:	f002 be24 	b.w	80030b4 <INEXT>
 
 0800046c <nmi_hl>:
- 800046c:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
+ 800046c:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
  8000470:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
  8000474:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
  8000478:	746f6e19 	strbtvc	r6, [pc], #-3609	; 8000480 <nmi_hl+0x14>
@@ -295,7 +295,7 @@ Disassembly of section .text:
  80004aa:	f002 be03 	b.w	80030b4 <INEXT>
 
 080004ae <hardfault_hl>:
- 80004ae:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
+ 80004ae:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
  80004b2:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
  80004b6:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
  80004ba:	72616814 	rsbvc	r6, r1, #20, 16	; 0x140000
@@ -315,7 +315,7 @@ Disassembly of section .text:
  80004e6:	f002 bde5 	b.w	80030b4 <INEXT>
 
 080004ea <memfault_hl>:
- 80004ea:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
+ 80004ea:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
  80004ee:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
  80004f2:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
  80004f6:	6d656d21 	stclvs	13, cr6, [r5, #-132]!	; 0xffffff7c
@@ -347,7 +347,7 @@ Disassembly of section .text:
  8000552:	f002 bdaf 	b.w	80030b4 <INEXT>
 
 08000556 <busfault_hl>:
- 8000556:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
+ 8000556:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
  800055a:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
  800055e:	00000001 	andeq	r0, r0, r1
  8000562:	08003249 	stmdaeq	r0, {r0, r3, r6, r9, ip, sp}
@@ -389,7 +389,7 @@ Disassembly of section .text:
  80005e6:	f002 bd65 	b.w	80030b4 <INEXT>
 
 080005ea <usagefault_hl>:
- 80005ea:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
+ 80005ea:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
  80005ee:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
  80005f2:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
  80005f6:	61737517 	cmnvs	r3, r7, lsl r5
@@ -454,7 +454,7 @@ Disassembly of section .text:
  80006a4:	f002 bd06 	b.w	80030b4 <INEXT>
 
 080006a8 <ur>:
- 80006a8:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
+ 80006a8:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
  80006ac:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
  80006b0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
  80006b4:	080006c4 	stmdaeq	r0, {r2, r6, r7, r9, sl}
@@ -499,7 +499,7 @@ Disassembly of section .text:
  8000728:	f000 fc26 	bl	8000f78 <tv_init>
  800072c:	f001 f9fa 	bl	8001b24 <kbd_init>
  8000730:	f001 fc02 	bl	8001f38 <flash_spi_init>
- 8000734:	f005 bd20 	b.w	8006178 <COLD>
+ 8000734:	f005 bd16 	b.w	8006164 <COLD>
 
 08000738 <forth_init>:
  8000738:	f04f 0400 	mov.w	r4, #0
@@ -789,7 +789,7 @@ Disassembly of section .text:
  8000a64:	00000000 	andeq	r0, r0, r0
  8000a68:	aa55aa55 	bge	956b3c4 <OPTKEY1+0x13d8989>
 	...
- 8000a74:	08006088 	stmdaeq	r0, {r3, r7, sp, lr}
+ 8000a74:	08006074 	stmdaeq	r0, {r2, r4, r5, r6, sp, lr}
  8000a78:	08001c20 	stmdaeq	r0, {r5, sl, fp, ip}
  8000a7c:	080014e8 	stmdaeq	r0, {r3, r5, r6, r7, sl, ip}
  8000a80:	0000000a 	andeq	r0, r0, sl
@@ -797,12 +797,12 @@ Disassembly of section .text:
 	...
  8000a98:	2001feb0 			; <UNDEFINED> instruction: 0x2001feb0
  8000a9c:	00000000 	andeq	r0, r0, r0
- 8000aa0:	08004fac 	stmdaeq	r0, {r2, r3, r5, r7, r8, r9, sl, fp, lr}
+ 8000aa0:	08004f90 	stmdaeq	r0, {r4, r7, r8, r9, sl, fp, lr}
  8000aa4:	00000000 	andeq	r0, r0, r0
- 8000aa8:	08006170 	stmdaeq	r0, {r4, r5, r6, r8, sp, lr}
- 8000aac:	080061dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r8, sp, lr}
- 8000ab0:	20005778 	andcs	r5, r0, r8, ror r7
- 8000ab4:	08006170 	stmdaeq	r0, {r4, r5, r6, r8, sp, lr}
+ 8000aa8:	0800615c 	stmdaeq	r0, {r2, r3, r4, r6, r8, sp, lr}
+ 8000aac:	080061c8 	stmdaeq	r0, {r3, r6, r7, r8, sp, lr}
+ 8000ab0:	20005764 	andcs	r5, r0, r4, ror #14
+ 8000ab4:	0800615c 	stmdaeq	r0, {r2, r3, r4, r6, r8, sp, lr}
 	...
  8000adc:	20018130 	andcs	r8, r1, r0, lsr r1
 	...
@@ -812,7 +812,7 @@ Disassembly of section .text:
 08000b24 <ULAST>:
  8000b24:	08000212 	stmdaeq	r0, {r1, r4, r9}
  8000b28:	080002c8 	stmdaeq	r0, {r3, r6, r7, r9}
- 8000b2c:	080051a0 	stmdaeq	r0, {r5, r7, r8, ip, lr}
+ 8000b2c:	08005184 	stmdaeq	r0, {r2, r7, r8, ip, lr}
  8000b30:	0800046c 	stmdaeq	r0, {r2, r3, r5, r6, sl}
  8000b34:	080004ae 	stmdaeq	r0, {r1, r2, r3, r5, r7, sl}
  8000b38:	080004ea 	stmdaeq	r0, {r1, r3, r5, r6, r7, sl}
@@ -1936,7 +1936,7 @@ Disassembly of section .text:
  8001768:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
  800176c:	08003381 	stmdaeq	r0, {r0, r7, r8, r9, ip, sp}
  8001770:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8001774:	080061e4 	stmdaeq	r0, {r2, r5, r6, r7, r8, sp, lr}
+ 8001774:	080061d0 	stmdaeq	r0, {r4, r6, r7, r8, sp, lr}
  8001778:	08001290 	stmdaeq	r0, {r4, r7, r9, ip}
  800177c:	08001348 	stmdaeq	r0, {r3, r6, r8, r9, ip}
 
@@ -4098,7 +4098,7 @@ Disassembly of section .text:
  8003068:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
  800306c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
  8003070:	00000010 	andeq	r0, r0, r0, lsl r0
- 8003074:	080052cd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r9, ip, lr}
+ 8003074:	080052b1 	stmdaeq	r0, {r0, r4, r5, r7, r9, ip, lr}
  8003078:	080033d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, r9, ip, sp}
  800307c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
  8003080:	00000010 	andeq	r0, r0, r0, lsl r0
@@ -4110,7 +4110,7 @@ Disassembly of section .text:
  8003098:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
  800309c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
  80030a0:	fffffff0 			; <UNDEFINED> instruction: 0xfffffff0
- 80030a4:	080052cd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r9, ip, lr}
+ 80030a4:	080052b1 	stmdaeq	r0, {r0, r4, r5, r7, r9, ip, lr}
  80030a8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
 080030ac <NEST>:
@@ -6850,7 +6850,7 @@ Disassembly of section .text:
  8004ad4:	4750      	bx	sl
  8004ad6:	bf00      	nop
  8004ad8:	08004ab1 	stmdaeq	r0, {r0, r4, r5, r7, r9, fp, lr}
- 8004adc:	08005369 	stmdaeq	r0, {r0, r3, r5, r6, r8, r9, ip, lr}
+ 8004adc:	0800534d 	stmdaeq	r0, {r0, r2, r3, r6, r8, r9, ip, lr}
  8004ae0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
  8004ae4:	08004acc 	stmdaeq	r0, {r2, r3, r6, r7, r9, fp, lr}
 
@@ -7214,1869 +7214,1866 @@ Disassembly of section .text:
  8004f12:	bf00      	nop
 
 08004f14 <ABORT1>:
- 8004f14:	08005009 	stmdaeq	r0, {r0, r3, ip, lr}
- 8004f18:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
- 8004f1c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8004f20:	00000000 	andeq	r0, r0, r0
- 8004f24:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8004f28:	2001feb0 			; <UNDEFINED> instruction: 0x2001feb0
- 8004f2c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8004f30:	20000030 	andcs	r0, r0, r0, lsr r0
- 8004f34:	08003919 	stmdaeq	r0, {r0, r3, r4, r8, fp, ip, sp}
- 8004f38:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8004f3c:	080051a0 	stmdaeq	r0, {r5, r7, r8, ip, lr}
+ 8004f14:	08004fed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r8, r9, sl, fp, lr}
+ 8004f18:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
+ 8004f1c:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8004f20:	08005184 	stmdaeq	r0, {r2, r7, r8, ip, lr}
 
-08004f40 <PRT_ABORT>:
- 8004f40:	4750      	bx	sl
- 8004f42:	bf00      	nop
- 8004f44:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
- 8004f48:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
- 8004f4c:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
- 8004f50:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
- 8004f54:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8004f58:	0000003f 	andeq	r0, r0, pc, lsr r0
- 8004f5c:	0800317d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, ip, sp}
- 8004f60:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8004f64:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8004f68:	08004f14 	stmdaeq	r0, {r2, r4, r8, r9, sl, fp, lr}
+08004f24 <PRT_ABORT>:
+ 8004f24:	4750      	bx	sl
+ 8004f26:	bf00      	nop
+ 8004f28:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
+ 8004f2c:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
+ 8004f30:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
+ 8004f34:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
+ 8004f38:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8004f3c:	0000003f 	andeq	r0, r0, pc, lsr r0
+ 8004f40:	0800317d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, ip, sp}
+ 8004f44:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8004f48:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8004f4c:	08004f14 	stmdaeq	r0, {r2, r4, r8, r9, sl, fp, lr}
 
-08004f6c <ABORQ>:
- 8004f6c:	4750      	bx	sl
- 8004f6e:	bf00      	nop
- 8004f70:	08004631 	stmdaeq	r0, {r0, r4, r5, r9, sl, lr}
- 8004f74:	080036c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, sl, ip, sp}
- 8004f78:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8004f7c:	08004f94 	stmdaeq	r0, {r2, r4, r7, r8, r9, sl, fp, lr}
- 8004f80:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
- 8004f84:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
- 8004f88:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8004f8c:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8004f90:	08004f14 	stmdaeq	r0, {r2, r4, r8, r9, sl, fp, lr}
- 8004f94:	080036f1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r9, sl, ip, sp}
- 8004f98:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8004f9c:	08004f08 	stmdaeq	r0, {r3, r8, r9, sl, fp, lr}
+08004f50 <ABORQ>:
+ 8004f50:	4750      	bx	sl
+ 8004f52:	bf00      	nop
+ 8004f54:	08004631 	stmdaeq	r0, {r0, r4, r5, r9, sl, lr}
+ 8004f58:	080036c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, sl, ip, sp}
+ 8004f5c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8004f60:	08004f78 	stmdaeq	r0, {r3, r4, r5, r6, r8, r9, sl, fp, lr}
+ 8004f64:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
+ 8004f68:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
+ 8004f6c:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8004f70:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8004f74:	08004f14 	stmdaeq	r0, {r2, r4, r8, r9, sl, fp, lr}
+ 8004f78:	080036f1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r9, sl, ip, sp}
+ 8004f7c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8004f80:	08004f08 	stmdaeq	r0, {r3, r8, r9, sl, fp, lr}
 
-08004fa0 <_INTER>:
- 8004fa0:	4e49240a 	cdpmi	4, 4, cr2, cr9, cr10, {0}
- 8004fa4:	50524554 	subspl	r4, r2, r4, asr r5
- 8004fa8:	00544552 	subseq	r4, r4, r2, asr r5
+08004f84 <_INTER>:
+ 8004f84:	4e49240a 	cdpmi	4, 4, cr2, cr9, cr10, {0}
+ 8004f88:	50524554 	subspl	r4, r2, r4, asr r5
+ 8004f8c:	00544552 	subseq	r4, r4, r2, asr r5
 
-08004fac <INTER>:
- 8004fac:	4750      	bx	sl
- 8004fae:	bf00      	nop
- 8004fb0:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
- 8004fb4:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
- 8004fb8:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8004fbc:	08004fec 	stmdaeq	r0, {r2, r3, r5, r6, r7, r8, r9, sl, fp, lr}
- 8004fc0:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8004fc4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8004fc8:	00000040 	andeq	r0, r0, r0, asr #32
- 8004fcc:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
- 8004fd0:	08004f6d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, r9, sl, fp, lr}
- 8004fd4:	6f63200d 	svcvs	0x0063200d
- 8004fd8:	6c69706d 	stclvs	0, cr7, [r9], #-436	; 0xfffffe4c
- 8004fdc:	6e6f2065 	cdpvs	0, 6, cr2, cr15, cr5, {3}
- 8004fe0:	bf00796c 	svclt	0x0000796c
- 8004fe4:	080032f5 	stmdaeq	r0, {r0, r2, r4, r5, r6, r7, r9, ip, sp}
- 8004fe8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08004f90 <INTER>:
+ 8004f90:	4750      	bx	sl
+ 8004f92:	bf00      	nop
+ 8004f94:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
+ 8004f98:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
+ 8004f9c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8004fa0:	08004fd0 	stmdaeq	r0, {r4, r6, r7, r8, r9, sl, fp, lr}
+ 8004fa4:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8004fa8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8004fac:	00000040 	andeq	r0, r0, r0, asr #32
+ 8004fb0:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
+ 8004fb4:	08004f51 	stmdaeq	r0, {r0, r4, r6, r8, r9, sl, fp, lr}
+ 8004fb8:	6f63200d 	svcvs	0x0063200d
+ 8004fbc:	6c69706d 	stclvs	0, cr7, [r9], #-436	; 0xfffffe4c
+ 8004fc0:	6e6f2065 	cdpvs	0, 6, cr2, cr15, cr5, {3}
+ 8004fc4:	bf00796c 	svclt	0x0000796c
+ 8004fc8:	080032f5 	stmdaeq	r0, {r0, r2, r4, r5, r6, r7, r9, ip, sp}
+ 8004fcc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08004fec <INTE1>:
- 8004fec:	0800455d 	stmdaeq	r0, {r0, r2, r3, r4, r6, r8, sl, lr}
- 8004ff0:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8004ff4:	08004ffc 	stmdaeq	r0, {r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
- 8004ff8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08004fd0 <INTE1>:
+ 8004fd0:	0800455d 	stmdaeq	r0, {r0, r2, r3, r4, r6, r8, sl, lr}
+ 8004fd4:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8004fd8:	08004fe0 	stmdaeq	r0, {r5, r6, r7, r8, r9, sl, fp, lr}
+ 8004fdc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08004ffc <INTE2>:
- 8004ffc:	08004f41 	stmdaeq	r0, {r0, r6, r8, r9, sl, fp, lr}
- 8005000:	08004fa0 	stmdaeq	r0, {r5, r7, r8, r9, sl, fp, lr}
+08004fe0 <INTE2>:
+ 8004fe0:	08004f25 	stmdaeq	r0, {r0, r2, r5, r8, r9, sl, fp, lr}
+ 8004fe4:	08004f84 	stmdaeq	r0, {r2, r7, r8, r9, sl, fp, lr}
 
-08005004 <_LBRAC>:
- 8005004:	bf005b81 	svclt	0x00005b81
+08004fe8 <_LBRAC>:
+ 8004fe8:	bf005b81 	svclt	0x00005b81
 
-08005008 <LBRAC>:
- 8005008:	4750      	bx	sl
- 800500a:	bf00      	nop
- 800500c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005010:	08004fac 	stmdaeq	r0, {r2, r3, r5, r7, r8, r9, sl, fp, lr}
- 8005014:	08003a81 	stmdaeq	r0, {r0, r7, r9, fp, ip, sp}
- 8005018:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 800501c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005020:	00000000 	andeq	r0, r0, r0
- 8005024:	08003989 	stmdaeq	r0, {r0, r3, r7, r8, fp, ip, sp}
- 8005028:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 800502c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005030:	08005004 	stmdaeq	r0, {r2, ip, lr}
+08004fec <LBRAC>:
+ 8004fec:	4750      	bx	sl
+ 8004fee:	bf00      	nop
+ 8004ff0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8004ff4:	08004f90 	stmdaeq	r0, {r4, r7, r8, r9, sl, fp, lr}
+ 8004ff8:	08003a81 	stmdaeq	r0, {r0, r7, r9, fp, ip, sp}
+ 8004ffc:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005000:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005004:	00000000 	andeq	r0, r0, r0
+ 8005008:	08003989 	stmdaeq	r0, {r0, r3, r7, r8, fp, ip, sp}
+ 800500c:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005010:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005014:	08004fe8 	stmdaeq	r0, {r3, r5, r6, r7, r8, r9, sl, fp, lr}
 
-08005034 <_DOTOK>:
- 8005034:	4b4f2e03 	blmi	93d0848 <OPTKEY1+0x123de0d>
+08005018 <_DOTOK>:
+ 8005018:	4b4f2e03 	blmi	93d082c <OPTKEY1+0x123ddf1>
 
-08005038 <DOTOK>:
- 8005038:	4750      	bx	sl
- 800503a:	bf00      	nop
- 800503c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005040:	08004fac 	stmdaeq	r0, {r2, r3, r5, r7, r8, r9, sl, fp, lr}
- 8005044:	08003a81 	stmdaeq	r0, {r0, r7, r9, fp, ip, sp}
- 8005048:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 800504c:	08003831 	stmdaeq	r0, {r0, r4, r5, fp, ip, sp}
- 8005050:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005054:	08005060 	stmdaeq	r0, {r5, r6, ip, lr}
- 8005058:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
- 800505c:	6b6f2003 	blvs	9bcd070 <OPTKEY1+0x1a3a635>
+0800501c <DOTOK>:
+ 800501c:	4750      	bx	sl
+ 800501e:	bf00      	nop
+ 8005020:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005024:	08004f90 	stmdaeq	r0, {r4, r7, r8, r9, sl, fp, lr}
+ 8005028:	08003a81 	stmdaeq	r0, {r0, r7, r9, fp, ip, sp}
+ 800502c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005030:	08003831 	stmdaeq	r0, {r0, r4, r5, fp, ip, sp}
+ 8005034:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005038:	08005044 	stmdaeq	r0, {r2, r6, ip, lr}
+ 800503c:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
+ 8005040:	6b6f2003 	blvs	9bcd054 <OPTKEY1+0x1a3a619>
 
-08005060 <DOTO1>:
- 8005060:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8005064:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005068:	08005034 	stmdaeq	r0, {r2, r4, r5, ip, lr}
+08005044 <DOTO1>:
+ 8005044:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8005048:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 800504c:	08005018 	stmdaeq	r0, {r3, r4, ip, lr}
 
-0800506c <_QSTAC>:
- 800506c:	54533f06 	ldrbpl	r3, [r3], #-3846	; 0xfffff0fa
- 8005070:	004b4341 	subeq	r4, fp, r1, asr #6
+08005050 <_QSTAC>:
+ 8005050:	54533f06 	ldrbpl	r3, [r3], #-3846	; 0xfffff0fa
+ 8005054:	004b4341 	subeq	r4, fp, r1, asr #6
 
-08005074 <QSTAC>:
- 8005074:	4750      	bx	sl
- 8005076:	bf00      	nop
- 8005078:	08003f75 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, sl, fp, ip, sp}
- 800507c:	080034d9 	stmdaeq	r0, {r0, r3, r4, r6, r7, sl, ip, sp}
- 8005080:	08004f6d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, r9, sl, fp, lr}
- 8005084:	646e7509 	strbtvs	r7, [lr], #-1289	; 0xfffffaf7
- 8005088:	6c667265 	sfmvs	f7, 2, [r6], #-404	; 0xfffffe6c
- 800508c:	bf00776f 	svclt	0x0000776f
- 8005090:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005094:	0800506c 	stmdaeq	r0, {r2, r3, r5, r6, ip, lr}
+08005058 <QSTAC>:
+ 8005058:	4750      	bx	sl
+ 800505a:	bf00      	nop
+ 800505c:	08003f75 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, sl, fp, ip, sp}
+ 8005060:	080034d9 	stmdaeq	r0, {r0, r3, r4, r6, r7, sl, ip, sp}
+ 8005064:	08004f51 	stmdaeq	r0, {r0, r4, r6, r8, r9, sl, fp, lr}
+ 8005068:	646e7509 	strbtvs	r7, [lr], #-1289	; 0xfffffaf7
+ 800506c:	6c667265 	sfmvs	f7, 2, [r6], #-404	; 0xfffffe6c
+ 8005070:	bf00776f 	svclt	0x0000776f
+ 8005074:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005078:	08005050 	stmdaeq	r0, {r4, r6, ip, lr}
 
-08005098 <_EVAL>:
- 8005098:	41564504 	cmpmi	r6, r4, lsl #10
- 800509c:	bf00004c 	svclt	0x0000004c
+0800507c <_EVAL>:
+ 800507c:	41564504 	cmpmi	r6, r4, lsl #10
+ 8005080:	bf00004c 	svclt	0x0000004c
 
-080050a0 <EVAL>:
- 80050a0:	4750      	bx	sl
- 80050a2:	bf00      	nop
+08005084 <EVAL>:
+ 8005084:	4750      	bx	sl
+ 8005086:	bf00      	nop
 
-080050a4 <EVAL1>:
- 80050a4:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
- 80050a8:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 80050ac:	08003395 	stmdaeq	r0, {r0, r2, r4, r7, r8, r9, ip, sp}
- 80050b0:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 80050b4:	080050cc 	stmdaeq	r0, {r2, r3, r6, r7, ip, lr}
- 80050b8:	08003a81 	stmdaeq	r0, {r0, r7, r9, fp, ip, sp}
- 80050bc:	08004059 	stmdaeq	r0, {r0, r3, r4, r6, lr}
- 80050c0:	08005075 	stmdaeq	r0, {r0, r2, r4, r5, r6, ip, lr}
- 80050c4:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 80050c8:	080050a4 	stmdaeq	r0, {r2, r5, r7, ip, lr}
+08005088 <EVAL1>:
+ 8005088:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
+ 800508c:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005090:	08003395 	stmdaeq	r0, {r0, r2, r4, r7, r8, r9, ip, sp}
+ 8005094:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005098:	080050b0 	stmdaeq	r0, {r4, r5, r7, ip, lr}
+ 800509c:	08003a81 	stmdaeq	r0, {r0, r7, r9, fp, ip, sp}
+ 80050a0:	08004059 	stmdaeq	r0, {r0, r3, r4, r6, lr}
+ 80050a4:	08005059 	stmdaeq	r0, {r0, r3, r4, r6, ip, lr}
+ 80050a8:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 80050ac:	08005088 	stmdaeq	r0, {r3, r7, ip, lr}
 
-080050cc <EVAL2>:
- 80050cc:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
- 80050d0:	08005039 	stmdaeq	r0, {r0, r3, r4, r5, ip, lr}
- 80050d4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80050d8:	08005098 	stmdaeq	r0, {r3, r4, r7, ip, lr}
+080050b0 <EVAL2>:
+ 80050b0:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
+ 80050b4:	0800501d 	stmdaeq	r0, {r0, r2, r3, r4, ip, lr}
+ 80050b8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80050bc:	0800507c 	stmdaeq	r0, {r2, r3, r4, r5, r6, ip, lr}
 
-080050dc <_EVALUATE>:
- 80050dc:	41564508 	cmpmi	r6, r8, lsl #10
- 80050e0:	5441554c 	strbpl	r5, [r1], #-1356	; 0xfffffab4
- 80050e4:	bf000045 	svclt	0x00000045
+080050c0 <_EVALUATE>:
+ 80050c0:	41564508 	cmpmi	r6, r8, lsl #10
+ 80050c4:	5441554c 	strbpl	r5, [r1], #-1356	; 0xfffffab4
+ 80050c8:	bf000045 	svclt	0x00000045
 
-080050e8 <EVALUATE>:
- 80050e8:	4750      	bx	sl
- 80050ea:	bf00      	nop
- 80050ec:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80050f0:	2000002c 	andcs	r0, r0, ip, lsr #32
- 80050f4:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 80050f8:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 80050fc:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005100:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005104:	00000000 	andeq	r0, r0, r0
- 8005108:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 800510c:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005110:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005114:	20000030 	andcs	r0, r0, r0, lsr r0
- 8005118:	08003939 	stmdaeq	r0, {r0, r3, r4, r5, r8, fp, ip, sp}
- 800511c:	080033f9 	stmdaeq	r0, {r0, r3, r4, r5, r6, r7, r8, r9, ip, sp}
- 8005120:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005124:	ffffffff 			; <UNDEFINED> instruction: 0xffffffff
- 8005128:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800512c:	20000038 	andcs	r0, r0, r8, lsr r0
- 8005130:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005134:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005138:	20000030 	andcs	r0, r0, r0, lsr r0
- 800513c:	08003919 	stmdaeq	r0, {r0, r3, r4, r8, fp, ip, sp}
- 8005140:	080050a1 	stmdaeq	r0, {r0, r5, r7, ip, lr}
- 8005144:	080033b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, r9, ip, sp}
+080050cc <EVALUATE>:
+ 80050cc:	4750      	bx	sl
+ 80050ce:	bf00      	nop
+ 80050d0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80050d4:	2000002c 	andcs	r0, r0, ip, lsr #32
+ 80050d8:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 80050dc:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 80050e0:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 80050e4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80050e8:	00000000 	andeq	r0, r0, r0
+ 80050ec:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
+ 80050f0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80050f4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80050f8:	20000030 	andcs	r0, r0, r0, lsr r0
+ 80050fc:	08003939 	stmdaeq	r0, {r0, r3, r4, r5, r8, fp, ip, sp}
+ 8005100:	080033f9 	stmdaeq	r0, {r0, r3, r4, r5, r6, r7, r8, r9, ip, sp}
+ 8005104:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005108:	ffffffff 			; <UNDEFINED> instruction: 0xffffffff
+ 800510c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005110:	20000038 	andcs	r0, r0, r8, lsr r0
+ 8005114:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005118:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 800511c:	20000030 	andcs	r0, r0, r0, lsr r0
+ 8005120:	08003919 	stmdaeq	r0, {r0, r3, r4, r8, fp, ip, sp}
+ 8005124:	08005085 	stmdaeq	r0, {r0, r2, r7, ip, lr}
+ 8005128:	080033b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, r9, ip, sp}
+ 800512c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005130:	20000030 	andcs	r0, r0, r0, lsr r0
+ 8005134:	08003919 	stmdaeq	r0, {r0, r3, r4, r8, fp, ip, sp}
+ 8005138:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 800513c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005140:	2000002c 	andcs	r0, r0, ip, lsr #32
+ 8005144:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
  8005148:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800514c:	20000030 	andcs	r0, r0, r0, lsr r0
- 8005150:	08003919 	stmdaeq	r0, {r0, r3, r4, r8, fp, ip, sp}
- 8005154:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005158:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800515c:	2000002c 	andcs	r0, r0, ip, lsr #32
- 8005160:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005164:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005168:	00000000 	andeq	r0, r0, r0
- 800516c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005170:	20000038 	andcs	r0, r0, r8, lsr r0
- 8005174:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005178:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 800517c:	080050dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, ip, lr}
+ 800514c:	00000000 	andeq	r0, r0, r0
+ 8005150:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005154:	20000038 	andcs	r0, r0, r8, lsr r0
+ 8005158:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 800515c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005160:	080050c0 	stmdaeq	r0, {r6, r7, ip, lr}
 
-08005180 <_PRESE>:
- 8005180:	45525006 	ldrbmi	r5, [r2, #-6]
- 8005184:	00544553 	subseq	r4, r4, r3, asr r5
+08005164 <_PRESE>:
+ 8005164:	45525006 	ldrbmi	r5, [r2, #-6]
+ 8005168:	00544553 	subseq	r4, r4, r3, asr r5
 
-08005188 <PRESE>:
- 8005188:	f64f 67b0 	movw	r7, #65200	; 0xfeb0
- 800518c:	f2c2 0701 	movt	r7, #8193	; 0x2001
- 8005190:	f7fd bf90 	b.w	80030b4 <INEXT>
- 8005194:	08005180 	stmdaeq	r0, {r7, r8, ip, lr}
+0800516c <PRESE>:
+ 800516c:	f64f 67b0 	movw	r7, #65200	; 0xfeb0
+ 8005170:	f2c2 0701 	movt	r7, #8193	; 0x2001
+ 8005174:	f7fd bf9e 	b.w	80030b4 <INEXT>
+ 8005178:	08005164 	stmdaeq	r0, {r2, r5, r6, r8, ip, lr}
 
-08005198 <_QUIT>:
- 8005198:	49555104 	ldmdbmi	r5, {r2, r8, ip, lr}^
- 800519c:	bf000054 	svclt	0x00000054
+0800517c <_QUIT>:
+ 800517c:	49555104 	ldmdbmi	r5, {r2, r8, ip, lr}^
+ 8005180:	bf000054 	svclt	0x00000054
 
-080051a0 <QUIT>:
- 80051a0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80051a4:	2001ff80 	andcs	pc, r1, r0, lsl #31
- 80051a8:	08003415 	stmdaeq	r0, {r0, r2, r4, sl, ip, sp}
+08005184 <QUIT>:
+ 8005184:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005188:	2001ff80 	andcs	pc, r1, r0, lsl #31
+ 800518c:	08003415 	stmdaeq	r0, {r0, r2, r4, sl, ip, sp}
 
-080051ac <QUIT1>:
- 80051ac:	08005009 	stmdaeq	r0, {r0, r3, ip, lr}
+08005190 <QUIT1>:
+ 8005190:	08004fed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r8, r9, sl, fp, lr}
 
-080051b0 <QUIT2>:
- 80051b0:	08004ed1 	stmdaeq	r0, {r0, r4, r6, r7, r9, sl, fp, lr}
- 80051b4:	080050a1 	stmdaeq	r0, {r0, r5, r7, ip, lr}
- 80051b8:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 80051bc:	080051b0 	stmdaeq	r0, {r4, r5, r7, r8, ip, lr}
- 80051c0:	08005198 	stmdaeq	r0, {r3, r4, r7, r8, ip, lr}
+08005194 <QUIT2>:
+ 8005194:	08004ed1 	stmdaeq	r0, {r0, r4, r6, r7, r9, sl, fp, lr}
+ 8005198:	08005085 	stmdaeq	r0, {r0, r2, r7, ip, lr}
+ 800519c:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 80051a0:	08005194 	stmdaeq	r0, {r2, r4, r7, r8, ip, lr}
+ 80051a4:	0800517c 	stmdaeq	r0, {r2, r3, r4, r5, r6, r8, ip, lr}
 
-080051c4 <_FORGET>:
- 80051c4:	524f4606 	subpl	r4, pc, #6291456	; 0x600000
- 80051c8:	00544547 	subseq	r4, r4, r7, asr #10
+080051a8 <_FORGET>:
+ 80051a8:	524f4606 	subpl	r4, pc, #6291456	; 0x600000
+ 80051ac:	00544547 	subseq	r4, r4, r7, asr #10
 
-080051cc <FORGET>:
- 80051cc:	4750      	bx	sl
- 80051ce:	bf00      	nop
- 80051d0:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
- 80051d4:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 80051d8:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 80051dc:	08005214 	stmdaeq	r0, {r2, r4, r9, ip, lr}
- 80051e0:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
- 80051e4:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
- 80051e8:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 80051ec:	08005210 	stmdaeq	r0, {r4, r9, ip, lr}
- 80051f0:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
- 80051f4:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 80051f8:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 80051fc:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005200:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005204:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 8005208:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 800520c:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 8005210:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
- 8005214:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005218:	080051c4 	stmdaeq	r0, {r2, r6, r7, r8, ip, lr}
+080051b0 <FORGET>:
+ 80051b0:	4750      	bx	sl
+ 80051b2:	bf00      	nop
+ 80051b4:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
+ 80051b8:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 80051bc:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 80051c0:	080051f8 	stmdaeq	r0, {r3, r4, r5, r6, r7, r8, ip, lr}
+ 80051c4:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
+ 80051c8:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
+ 80051cc:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 80051d0:	080051f4 	stmdaeq	r0, {r2, r4, r5, r6, r7, r8, ip, lr}
+ 80051d4:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
+ 80051d8:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 80051dc:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 80051e0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80051e4:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 80051e8:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 80051ec:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80051f0:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 80051f4:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
+ 80051f8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80051fc:	080051a8 	stmdaeq	r0, {r3, r5, r7, r8, ip, lr}
 
-0800521c <_POSTPONE>:
- 800521c:	534f50c8 	movtpl	r5, #61640	; 0xf0c8
- 8005220:	4e4f5054 	mcrmi	0, 2, r5, cr15, cr4, {2}
- 8005224:	bf000045 	svclt	0x00000045
+08005200 <_POSTPONE>:
+ 8005200:	534f50c8 	movtpl	r5, #61640	; 0xf0c8
+ 8005204:	4e4f5054 	mcrmi	0, 2, r5, cr15, cr4, {2}
+ 8005208:	bf000045 	svclt	0x00000045
 
-08005228 <POSTPONE>:
- 8005228:	4750      	bx	sl
- 800522a:	bf00      	nop
- 800522c:	08005265 	stmdaeq	r0, {r0, r2, r5, r6, r9, ip, lr}
- 8005230:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005234:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005238:	0800521c 	stmdaeq	r0, {r2, r3, r4, r9, ip, lr}
+0800520c <POSTPONE>:
+ 800520c:	4750      	bx	sl
+ 800520e:	bf00      	nop
+ 8005210:	08005249 	stmdaeq	r0, {r0, r3, r6, r9, ip, lr}
+ 8005214:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005218:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 800521c:	08005200 	stmdaeq	r0, {r9, ip, lr}
 
-0800523c <_TICK>:
- 800523c:	bf002701 	svclt	0x00002701
+08005220 <_TICK>:
+ 8005220:	bf002701 	svclt	0x00002701
 
-08005240 <TICK>:
- 8005240:	4750      	bx	sl
- 8005242:	bf00      	nop
- 8005244:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
- 8005248:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
- 800524c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005250:	08005258 	stmdaeq	r0, {r3, r4, r6, r9, ip, lr}
- 8005254:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005224 <TICK>:
+ 8005224:	4750      	bx	sl
+ 8005226:	bf00      	nop
+ 8005228:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
+ 800522c:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
+ 8005230:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005234:	0800523c 	stmdaeq	r0, {r2, r3, r4, r5, r9, ip, lr}
+ 8005238:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005258 <TICK1>:
- 8005258:	08004f41 	stmdaeq	r0, {r0, r6, r8, r9, sl, fp, lr}
- 800525c:	0800523c 	stmdaeq	r0, {r2, r3, r4, r5, r9, ip, lr}
+0800523c <TICK1>:
+ 800523c:	08004f25 	stmdaeq	r0, {r0, r2, r5, r8, r9, sl, fp, lr}
+ 8005240:	08005220 	stmdaeq	r0, {r5, r9, ip, lr}
 
-08005260 <_ITICK>:
- 8005260:	5d275bc3 	fstmdbxpl	r7!, {d5-d101}	;@ Deprecated
+08005244 <_ITICK>:
+ 8005244:	5d275bc3 	fstmdbxpl	r7!, {d5-d101}	;@ Deprecated
 
-08005264 <ITICK>:
- 8005264:	4750      	bx	sl
- 8005266:	bf00      	nop
- 8005268:	08005241 	stmdaeq	r0, {r0, r6, r9, ip, lr}
- 800526c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005270:	08005260 	stmdaeq	r0, {r5, r6, r9, ip, lr}
+08005248 <ITICK>:
+ 8005248:	4750      	bx	sl
+ 800524a:	bf00      	nop
+ 800524c:	08005225 	stmdaeq	r0, {r0, r2, r5, r9, ip, lr}
+ 8005250:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005254:	08005244 	stmdaeq	r0, {r2, r6, r9, ip, lr}
 
-08005274 <_FIND>:
- 8005274:	4e494604 	cdpmi	6, 4, cr4, cr9, cr4, {0}
- 8005278:	bf000044 	svclt	0x00000044
+08005258 <_FIND>:
+ 8005258:	4e494604 	cdpmi	6, 4, cr4, cr9, cr4, {0}
+ 800525c:	bf000044 	svclt	0x00000044
 
-0800527c <FIND>:
- 800527c:	4750      	bx	sl
- 800527e:	bf00      	nop
- 8005280:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
- 8005284:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005288:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 800528c:	080052bc 	stmdaeq	r0, {r2, r3, r4, r5, r7, r9, ip, lr}
- 8005290:	08003395 	stmdaeq	r0, {r0, r2, r4, r7, r8, r9, ip, sp}
- 8005294:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005298:	00000080 	andeq	r0, r0, r0, lsl #1
- 800529c:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
- 80052a0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80052a4:	00000007 	andeq	r0, r0, r7
- 80052a8:	0800357d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, sl, ip, sp}
- 80052ac:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 80052b0:	08003333 	stmdaeq	r0, {r0, r1, r4, r5, r8, r9, ip, sp}
- 80052b4:	080052bc 	stmdaeq	r0, {r2, r3, r4, r5, r7, r9, ip, lr}
- 80052b8:	080037b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, r9, sl, ip, sp}
+08005260 <FIND>:
+ 8005260:	4750      	bx	sl
+ 8005262:	bf00      	nop
+ 8005264:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
+ 8005268:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 800526c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005270:	080052a0 	stmdaeq	r0, {r5, r7, r9, ip, lr}
+ 8005274:	08003395 	stmdaeq	r0, {r0, r2, r4, r7, r8, r9, ip, sp}
+ 8005278:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 800527c:	00000080 	andeq	r0, r0, r0, lsl #1
+ 8005280:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
+ 8005284:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005288:	00000007 	andeq	r0, r0, r7
+ 800528c:	0800357d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, sl, ip, sp}
+ 8005290:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005294:	08003333 	stmdaeq	r0, {r0, r1, r4, r5, r8, r9, ip, sp}
+ 8005298:	080052a0 	stmdaeq	r0, {r5, r7, r9, ip, lr}
+ 800529c:	080037b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, r9, sl, ip, sp}
+ 80052a0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80052a4:	08005258 	stmdaeq	r0, {r3, r4, r6, r9, ip, lr}
+
+080052a8 <_ALLOT>:
+ 80052a8:	4c4c4105 	stfmie	f4, [ip], {5}
+ 80052ac:	bf00544f 	svclt	0x0000544f
+
+080052b0 <ALLOT>:
+ 80052b0:	4750      	bx	sl
+ 80052b2:	bf00      	nop
+ 80052b4:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 80052b8:	080038fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, sp}
  80052bc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80052c0:	08005274 	stmdaeq	r0, {r2, r4, r5, r6, r9, ip, lr}
+ 80052c0:	080052a8 	stmdaeq	r0, {r3, r5, r7, r9, ip, lr}
 
-080052c4 <_ALLOT>:
- 80052c4:	4c4c4105 	stfmie	f4, [ip], {5}
- 80052c8:	bf00544f 	svclt	0x0000544f
+080052c4 <_COMMA>:
+ 80052c4:	bf002c01 	svclt	0x00002c01
 
-080052cc <ALLOT>:
- 80052cc:	4750      	bx	sl
- 80052ce:	bf00      	nop
- 80052d0:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 80052d4:	080038fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, sp}
- 80052d8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80052dc:	080052c4 	stmdaeq	r0, {r2, r6, r7, r9, ip, lr}
+080052c8 <COMMA>:
+ 80052c8:	4750      	bx	sl
+ 80052ca:	bf00      	nop
+ 80052cc:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 80052d0:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 80052d4:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
+ 80052d8:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 80052dc:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80052e0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80052e4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80052e8:	080052c4 	stmdaeq	r0, {r2, r6, r7, r9, ip, lr}
 
-080052e0 <_COMMA>:
- 80052e0:	bf002c01 	svclt	0x00002c01
+080052ec <_BCOMP>:
+ 80052ec:	4f435b89 	svcmi	0x00435b89
+ 80052f0:	4c49504d 	mcrrmi	0, 4, r5, r9, cr13
+ 80052f4:	bf005d45 	svclt	0x00005d45
 
-080052e4 <COMMA>:
- 80052e4:	4750      	bx	sl
- 80052e6:	bf00      	nop
- 80052e8:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 80052ec:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 80052f0:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
- 80052f4:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 80052f8:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 80052fc:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005300:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005304:	080052e0 	stmdaeq	r0, {r5, r6, r7, r9, ip, lr}
+080052f8 <BCOMP>:
+ 80052f8:	4750      	bx	sl
+ 80052fa:	bf00      	nop
+ 80052fc:	08005225 	stmdaeq	r0, {r0, r2, r5, r9, ip, lr}
+ 8005300:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 8005304:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005308:	080052ec 	stmdaeq	r0, {r2, r3, r5, r6, r7, r9, ip, lr}
 
-08005308 <_BCOMP>:
- 8005308:	4f435b89 	svcmi	0x00435b89
- 800530c:	4c49504d 	mcrrmi	0, 4, r5, r9, cr13
- 8005310:	bf005d45 	svclt	0x00005d45
+0800530c <_COMPI>:
+ 800530c:	4d4f4347 	stclmi	3, cr4, [pc, #-284]	; 80051f8 <FORGET+0x48>
+ 8005310:	454c4950 	strbmi	r4, [ip, #-2384]	; 0xfffff6b0
 
-08005314 <BCOMP>:
+08005314 <COMPI>:
  8005314:	4750      	bx	sl
  8005316:	bf00      	nop
- 8005318:	08005241 	stmdaeq	r0, {r0, r6, r9, ip, lr}
- 800531c:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 8005320:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005324:	08005308 	stmdaeq	r0, {r3, r8, r9, ip, lr}
+ 8005318:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 800531c:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005320:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005324:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005328:	00000001 	andeq	r0, r0, r1
+ 800532c:	08003539 	stmdaeq	r0, {r0, r3, r4, r5, r8, sl, ip, sp}
+ 8005330:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 8005334:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
+ 8005338:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 800533c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005340:	0800530c 	stmdaeq	r0, {r2, r3, r8, r9, ip, lr}
 
-08005328 <_COMPI>:
- 8005328:	4d4f4347 	stclmi	3, cr4, [pc, #-284]	; 8005214 <FORGET+0x48>
- 800532c:	454c4950 	strbmi	r4, [ip, #-2384]	; 0xfffff6b0
+08005344 <_LITER>:
+ 8005344:	54494c87 	strbpl	r4, [r9], #-3207	; 0xfffff379
+ 8005348:	4c415245 	sfmmi	f5, 2, [r1], {69}	; 0x45
 
-08005330 <COMPI>:
- 8005330:	4750      	bx	sl
- 8005332:	bf00      	nop
- 8005334:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005338:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 800533c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005340:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005344:	00000001 	andeq	r0, r0, r1
- 8005348:	08003539 	stmdaeq	r0, {r0, r3, r4, r5, r8, sl, ip, sp}
- 800534c:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 8005350:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
- 8005354:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005358:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 800535c:	08005328 	stmdaeq	r0, {r3, r5, r8, r9, ip, lr}
+0800534c <LITER>:
+ 800534c:	4750      	bx	sl
+ 800534e:	bf00      	nop
+ 8005350:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005354:	080032de 	stmdaeq	r0, {r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005358:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 800535c:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 8005360:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005360 <_LITER>:
- 8005360:	54494c87 	strbpl	r4, [r9], #-3207	; 0xfffff379
- 8005364:	4c415245 	sfmmi	f5, 2, [r1], {69}	; 0x45
+08005364 <STRCQ>:
+ 8005364:	4750      	bx	sl
+ 8005366:	bf00      	nop
+ 8005368:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 800536c:	fffffffc 			; <UNDEFINED> instruction: 0xfffffffc
+ 8005370:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 8005374:	080038fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, sp}
+ 8005378:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 800537c:	00000022 	andeq	r0, r0, r2, lsr #32
+ 8005380:	08004af1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r9, fp, lr}
+ 8005384:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
+ 8005388:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
+ 800538c:	08003f0d 	stmdaeq	r0, {r0, r2, r3, r8, r9, sl, fp, ip, sp}
+ 8005390:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 8005394:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005398:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 800539c:	08005344 	stmdaeq	r0, {r2, r6, r8, r9, ip, lr}
 
-08005368 <LITER>:
- 8005368:	4750      	bx	sl
- 800536a:	bf00      	nop
- 800536c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005370:	080032de 	stmdaeq	r0, {r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005374:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005378:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 800537c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+080053a0 <_FOR>:
+ 80053a0:	524f46c3 	subpl	r4, pc, #204472320	; 0xc300000
 
-08005380 <STRCQ>:
- 8005380:	4750      	bx	sl
- 8005382:	bf00      	nop
- 8005384:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005388:	fffffffc 			; <UNDEFINED> instruction: 0xfffffffc
- 800538c:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 8005390:	080038fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, sp}
- 8005394:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005398:	00000022 	andeq	r0, r0, r2, lsr #32
- 800539c:	08004af1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r9, fp, lr}
- 80053a0:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
- 80053a4:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
- 80053a8:	08003f0d 	stmdaeq	r0, {r0, r2, r3, r8, r9, sl, fp, ip, sp}
- 80053ac:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 80053b0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 80053b4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80053b8:	08005360 	stmdaeq	r0, {r5, r6, r8, r9, ip, lr}
+080053a4 <FOR>:
+ 80053a4:	4750      	bx	sl
+ 80053a6:	bf00      	nop
+ 80053a8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80053ac:	080033e4 	stmdaeq	r0, {r2, r5, r6, r7, r8, r9, ip, sp}
+ 80053b0:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80053b4:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 80053b8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80053bc:	080053a0 	stmdaeq	r0, {r5, r7, r8, r9, ip, lr}
 
-080053bc <_FOR>:
- 80053bc:	524f46c3 	subpl	r4, pc, #204472320	; 0xc300000
+080053c0 <_DO>:
+ 80053c0:	004f44c2 	subeq	r4, pc, r2, asr #9
 
-080053c0 <FOR>:
- 80053c0:	4750      	bx	sl
- 80053c2:	bf00      	nop
- 80053c4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80053c8:	080033e4 	stmdaeq	r0, {r2, r5, r6, r7, r8, r9, ip, sp}
- 80053cc:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80053d0:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 80053d4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80053d8:	080053bc 	stmdaeq	r0, {r2, r3, r4, r5, r7, r8, r9, ip, lr}
-
-080053dc <_DO>:
- 80053dc:	004f44c2 	subeq	r4, pc, r2, asr #9
-
-080053e0 <DO>:
- 80053e0:	4750      	bx	sl
- 80053e2:	bf00      	nop
- 80053e4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80053e8:	08003478 	stmdaeq	r0, {r3, r4, r5, r6, sl, ip, sp}
- 80053ec:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
+080053c4 <DO>:
+ 80053c4:	4750      	bx	sl
+ 80053c6:	bf00      	nop
+ 80053c8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80053cc:	08003478 	stmdaeq	r0, {r3, r4, r5, r6, sl, ip, sp}
+ 80053d0:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80053d4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80053d8:	080033e4 	stmdaeq	r0, {r2, r5, r6, r7, r8, r9, ip, sp}
+ 80053dc:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80053e0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80053e4:	080033e4 	stmdaeq	r0, {r2, r5, r6, r7, r8, r9, ip, sp}
+ 80053e8:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80053ec:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
  80053f0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80053f4:	080033e4 	stmdaeq	r0, {r2, r5, r6, r7, r8, r9, ip, sp}
- 80053f8:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80053fc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005400:	080033e4 	stmdaeq	r0, {r2, r5, r6, r7, r8, r9, ip, sp}
- 8005404:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005408:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 800540c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005410:	00000000 	andeq	r0, r0, r0
- 8005414:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80053f4:	00000000 	andeq	r0, r0, r0
+ 80053f8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005418 <DOPLOOP>:
- 8005418:	4632      	mov	r2, r6
- 800541a:	f857 6b04 	ldr.w	r6, [r7], #4
- 800541e:	e8b8 0003 	ldmia.w	r8!, {r0, r1}
- 8005422:	4410      	add	r0, r2
- 8005424:	e928 0003 	stmdb	r8!, {r0, r1}
- 8005428:	4288      	cmp	r0, r1
- 800542a:	d405      	bmi.n	8005438 <DOPLOOP+0x20>
- 800542c:	f108 0808 	add.w	r8, r8, #8
- 8005430:	f10c 0c04 	add.w	ip, ip, #4
- 8005434:	f7fd be3e 	b.w	80030b4 <INEXT>
- 8005438:	f8dc c000 	ldr.w	ip, [ip]
- 800543c:	f7fd be3a 	b.w	80030b4 <INEXT>
- 8005440:	080053dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r8, r9, ip, lr}
+080053fc <DOPLOOP>:
+ 80053fc:	4632      	mov	r2, r6
+ 80053fe:	f857 6b04 	ldr.w	r6, [r7], #4
+ 8005402:	e8b8 0003 	ldmia.w	r8!, {r0, r1}
+ 8005406:	4410      	add	r0, r2
+ 8005408:	e928 0003 	stmdb	r8!, {r0, r1}
+ 800540c:	4288      	cmp	r0, r1
+ 800540e:	d405      	bmi.n	800541c <DOPLOOP+0x20>
+ 8005410:	f108 0808 	add.w	r8, r8, #8
+ 8005414:	f10c 0c04 	add.w	ip, ip, #4
+ 8005418:	f7fd be4c 	b.w	80030b4 <INEXT>
+ 800541c:	f8dc c000 	ldr.w	ip, [ip]
+ 8005420:	f7fd be48 	b.w	80030b4 <INEXT>
+ 8005424:	080053c0 	stmdaeq	r0, {r6, r7, r8, r9, ip, lr}
 
-08005444 <_PLOOP>:
- 8005444:	4f4c2bc5 	svcmi	0x004c2bc5
- 8005448:	bf00504f 	svclt	0x0000504f
+08005428 <_PLOOP>:
+ 8005428:	4f4c2bc5 	svcmi	0x004c2bc5
+ 800542c:	bf00504f 	svclt	0x0000504f
 
-0800544c <PLOOP>:
- 800544c:	4750      	bx	sl
- 800544e:	bf00      	nop
- 8005450:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005454:	08005418 	stmdaeq	r0, {r3, r4, sl, ip, lr}
- 8005458:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 800545c:	08005491 	stmdaeq	r0, {r0, r4, r7, sl, ip, lr}
- 8005460:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 8005464:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005430 <PLOOP>:
+ 8005430:	4750      	bx	sl
+ 8005432:	bf00      	nop
+ 8005434:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005438:	080053fc 	stmdaeq	r0, {r2, r3, r4, r5, r6, r7, r8, r9, ip, lr}
+ 800543c:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005440:	08005475 	stmdaeq	r0, {r0, r2, r4, r5, r6, sl, ip, lr}
+ 8005444:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 8005448:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005468 <DOLOOP>:
- 8005468:	f8d8 0000 	ldr.w	r0, [r8]
- 800546c:	f100 0001 	add.w	r0, r0, #1
- 8005470:	f8c8 0000 	str.w	r0, [r8]
- 8005474:	f8d8 1004 	ldr.w	r1, [r8, #4]
- 8005478:	4288      	cmp	r0, r1
- 800547a:	d405      	bmi.n	8005488 <DOLOOP+0x20>
- 800547c:	f108 0808 	add.w	r8, r8, #8
- 8005480:	f10c 0c04 	add.w	ip, ip, #4
- 8005484:	f7fd be16 	b.w	80030b4 <INEXT>
- 8005488:	f8dc c000 	ldr.w	ip, [ip]
- 800548c:	f7fd be12 	b.w	80030b4 <INEXT>
+0800544c <DOLOOP>:
+ 800544c:	f8d8 0000 	ldr.w	r0, [r8]
+ 8005450:	f100 0001 	add.w	r0, r0, #1
+ 8005454:	f8c8 0000 	str.w	r0, [r8]
+ 8005458:	f8d8 1004 	ldr.w	r1, [r8, #4]
+ 800545c:	4288      	cmp	r0, r1
+ 800545e:	d405      	bmi.n	800546c <DOLOOP+0x20>
+ 8005460:	f108 0808 	add.w	r8, r8, #8
+ 8005464:	f10c 0c04 	add.w	ip, ip, #4
+ 8005468:	f7fd be24 	b.w	80030b4 <INEXT>
+ 800546c:	f8dc c000 	ldr.w	ip, [ip]
+ 8005470:	f7fd be20 	b.w	80030b4 <INEXT>
 
-08005490 <resolve_leave>:
- 8005490:	4750      	bx	sl
- 8005492:	bf00      	nop
- 8005494:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
- 8005498:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 800549c:	080054b8 	stmdaeq	r0, {r3, r4, r5, r7, sl, ip, lr}
- 80054a0:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 80054a4:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
- 80054a8:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 80054ac:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 80054b0:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 80054b4:	08005494 	stmdaeq	r0, {r2, r4, r7, sl, ip, lr}
- 80054b8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80054bc:	08005444 	stmdaeq	r0, {r2, r6, sl, ip, lr}
+08005474 <resolve_leave>:
+ 8005474:	4750      	bx	sl
+ 8005476:	bf00      	nop
+ 8005478:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
+ 800547c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005480:	0800549c 	stmdaeq	r0, {r2, r3, r4, r7, sl, ip, lr}
+ 8005484:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 8005488:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
+ 800548c:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
+ 8005490:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005494:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8005498:	08005478 	stmdaeq	r0, {r3, r4, r5, r6, sl, ip, lr}
+ 800549c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80054a0:	08005428 	stmdaeq	r0, {r3, r5, sl, ip, lr}
 
-080054c0 <_LOOP>:
- 80054c0:	4f4f4cc4 	svcmi	0x004f4cc4
- 80054c4:	bf000050 	svclt	0x00000050
+080054a4 <_LOOP>:
+ 80054a4:	4f4f4cc4 	svcmi	0x004f4cc4
+ 80054a8:	bf000050 	svclt	0x00000050
 
-080054c8 <LOOP>:
- 80054c8:	4750      	bx	sl
- 80054ca:	bf00      	nop
- 80054cc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80054d0:	08005468 	stmdaeq	r0, {r3, r5, r6, sl, ip, lr}
- 80054d4:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80054d8:	08005491 	stmdaeq	r0, {r0, r4, r7, sl, ip, lr}
- 80054dc:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 80054e0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80054e4:	080054c0 	stmdaeq	r0, {r6, r7, sl, ip, lr}
+080054ac <LOOP>:
+ 80054ac:	4750      	bx	sl
+ 80054ae:	bf00      	nop
+ 80054b0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80054b4:	0800544c 	stmdaeq	r0, {r2, r3, r6, sl, ip, lr}
+ 80054b8:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80054bc:	08005475 	stmdaeq	r0, {r0, r2, r4, r5, r6, sl, ip, lr}
+ 80054c0:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 80054c4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80054c8:	080054a4 	stmdaeq	r0, {r2, r5, r7, sl, ip, lr}
 
-080054e8 <_UNLOOP>:
- 80054e8:	4c4e5506 	cfstr64mi	mvdx5, [lr], {6}
- 80054ec:	00504f4f 	subseq	r4, r0, pc, asr #30
+080054cc <_UNLOOP>:
+ 80054cc:	4c4e5506 	cfstr64mi	mvdx5, [lr], {6}
+ 80054d0:	00504f4f 	subseq	r4, r0, pc, asr #30
 
-080054f0 <UNLOOP>:
- 80054f0:	f108 0808 	add.w	r8, r8, #8
- 80054f4:	f7fd bdde 	b.w	80030b4 <INEXT>
- 80054f8:	080054e8 	stmdaeq	r0, {r3, r5, r6, r7, sl, ip, lr}
+080054d4 <UNLOOP>:
+ 80054d4:	f108 0808 	add.w	r8, r8, #8
+ 80054d8:	f7fd bdec 	b.w	80030b4 <INEXT>
+ 80054dc:	080054cc 	stmdaeq	r0, {r2, r3, r6, r7, sl, ip, lr}
 
-080054fc <_LEAVE>:
- 80054fc:	41454cc5 	smlalbtmi	r4, r5, r5, ip
- 8005500:	bf004556 	svclt	0x00004556
+080054e0 <_LEAVE>:
+ 80054e0:	41454cc5 	smlalbtmi	r4, r5, r5, ip
+ 80054e4:	bf004556 	svclt	0x00004556
 
-08005504 <LEAVE>:
- 8005504:	4750      	bx	sl
- 8005506:	bf00      	nop
- 8005508:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800550c:	08005538 	stmdaeq	r0, {r3, r4, r5, r8, sl, ip, lr}
- 8005510:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005514:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 8005518:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
- 800551c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005520:	08005528 	stmdaeq	r0, {r3, r5, r8, sl, ip, lr}
- 8005524:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 8005528:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800552c:	00000000 	andeq	r0, r0, r0
- 8005530:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 8005534:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+080054e8 <LEAVE>:
+ 80054e8:	4750      	bx	sl
+ 80054ea:	bf00      	nop
+ 80054ec:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80054f0:	0800551c 	stmdaeq	r0, {r2, r3, r4, r8, sl, ip, lr}
+ 80054f4:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80054f8:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 80054fc:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
+ 8005500:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005504:	0800550c 	stmdaeq	r0, {r2, r3, r8, sl, ip, lr}
+ 8005508:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
+ 800550c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005510:	00000000 	andeq	r0, r0, r0
+ 8005514:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 8005518:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005538 <DOLEAVE>:
- 8005538:	f108 0808 	add.w	r8, r8, #8
- 800553c:	f8dc c000 	ldr.w	ip, [ip]
- 8005540:	f7fd bdb8 	b.w	80030b4 <INEXT>
- 8005544:	080054fc 	stmdaeq	r0, {r2, r3, r4, r5, r6, r7, sl, ip, lr}
+0800551c <DOLEAVE>:
+ 800551c:	f108 0808 	add.w	r8, r8, #8
+ 8005520:	f8dc c000 	ldr.w	ip, [ip]
+ 8005524:	f7fd bdc6 	b.w	80030b4 <INEXT>
+ 8005528:	080054e0 	stmdaeq	r0, {r5, r6, r7, sl, ip, lr}
 
-08005548 <_BEGIN>:
- 8005548:	474542c5 	strbmi	r4, [r5, -r5, asr #5]
- 800554c:	bf004e49 	svclt	0x00004e49
+0800552c <_BEGIN>:
+ 800552c:	474542c5 	strbmi	r4, [r5, -r5, asr #5]
+ 8005530:	bf004e49 	svclt	0x00004e49
 
-08005550 <BEGIN>:
- 8005550:	4750      	bx	sl
- 8005552:	bf00      	nop
- 8005554:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 8005558:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 800555c:	08005548 	stmdaeq	r0, {r3, r6, r8, sl, ip, lr}
+08005534 <BEGIN>:
+ 8005534:	4750      	bx	sl
+ 8005536:	bf00      	nop
+ 8005538:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 800553c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005540:	0800552c 	stmdaeq	r0, {r2, r3, r5, r8, sl, ip, lr}
 
-08005560 <_FNEXT>:
- 8005560:	58454ec4 	stmdapl	r5, {r2, r6, r7, r9, sl, fp, lr}^
- 8005564:	bf000054 	svclt	0x00000054
+08005544 <_FNEXT>:
+ 8005544:	58454ec4 	stmdapl	r5, {r2, r6, r7, r9, sl, fp, lr}^
+ 8005548:	bf000054 	svclt	0x00000054
 
-08005568 <FNEXT>:
- 8005568:	4750      	bx	sl
- 800556a:	bf00      	nop
- 800556c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005570:	08003300 	stmdaeq	r0, {r8, r9, ip, sp}
- 8005574:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005578:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 800557c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005580:	08005560 	stmdaeq	r0, {r5, r6, r8, sl, ip, lr}
+0800554c <FNEXT>:
+ 800554c:	4750      	bx	sl
+ 800554e:	bf00      	nop
+ 8005550:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005554:	08003300 	stmdaeq	r0, {r8, r9, ip, sp}
+ 8005558:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 800555c:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 8005560:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005564:	08005544 	stmdaeq	r0, {r2, r6, r8, sl, ip, lr}
 
-08005584 <_I>:
- 8005584:	bf004941 	svclt	0x00004941
+08005568 <_I>:
+ 8005568:	bf004941 	svclt	0x00004941
 
-08005588 <I>:
- 8005588:	f847 6d04 	str.w	r6, [r7, #-4]!
- 800558c:	f8d8 6000 	ldr.w	r6, [r8]
- 8005590:	f7fd bd90 	b.w	80030b4 <INEXT>
- 8005594:	08005584 	stmdaeq	r0, {r2, r7, r8, sl, ip, lr}
+0800556c <I>:
+ 800556c:	f847 6d04 	str.w	r6, [r7, #-4]!
+ 8005570:	f8d8 6000 	ldr.w	r6, [r8]
+ 8005574:	f7fd bd9e 	b.w	80030b4 <INEXT>
+ 8005578:	08005568 	stmdaeq	r0, {r3, r5, r6, r8, sl, ip, lr}
 
-08005598 <_J>:
- 8005598:	bf004a01 	svclt	0x00004a01
+0800557c <_J>:
+ 800557c:	bf004a01 	svclt	0x00004a01
 
-0800559c <J>:
- 800559c:	f847 6d04 	str.w	r6, [r7, #-4]!
- 80055a0:	f8d8 6004 	ldr.w	r6, [r8, #4]
- 80055a4:	f7fd bd86 	b.w	80030b4 <INEXT>
- 80055a8:	08005598 	stmdaeq	r0, {r3, r4, r7, r8, sl, ip, lr}
+08005580 <J>:
+ 8005580:	f847 6d04 	str.w	r6, [r7, #-4]!
+ 8005584:	f8d8 6004 	ldr.w	r6, [r8, #4]
+ 8005588:	f7fd bd94 	b.w	80030b4 <INEXT>
+ 800558c:	0800557c 	stmdaeq	r0, {r2, r3, r4, r5, r6, r8, sl, ip, lr}
 
-080055ac <_UNTIL>:
- 80055ac:	544e55c5 	strbpl	r5, [lr], #-1477	; 0xfffffa3b
- 80055b0:	bf004c49 	svclt	0x00004c49
+08005590 <_UNTIL>:
+ 8005590:	544e55c5 	strbpl	r5, [lr], #-1477	; 0xfffffa3b
+ 8005594:	bf004c49 	svclt	0x00004c49
 
-080055b4 <UNTIL>:
- 80055b4:	4750      	bx	sl
- 80055b6:	bf00      	nop
- 80055b8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80055bc:	0800331e 	stmdaeq	r0, {r1, r2, r3, r4, r8, r9, ip, sp}
- 80055c0:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80055c4:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 80055c8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80055cc:	080055ac 	stmdaeq	r0, {r2, r3, r5, r7, r8, sl, ip, lr}
+08005598 <UNTIL>:
+ 8005598:	4750      	bx	sl
+ 800559a:	bf00      	nop
+ 800559c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80055a0:	0800331e 	stmdaeq	r0, {r1, r2, r3, r4, r8, r9, ip, sp}
+ 80055a4:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80055a8:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 80055ac:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80055b0:	08005590 	stmdaeq	r0, {r4, r7, r8, sl, ip, lr}
 
-080055d0 <_AGAIN>:
- 80055d0:	414741c5 	smlalbtmi	r4, r7, r5, r1
- 80055d4:	bf004e49 	svclt	0x00004e49
+080055b4 <_AGAIN>:
+ 80055b4:	414741c5 	smlalbtmi	r4, r7, r5, r1
+ 80055b8:	bf004e49 	svclt	0x00004e49
 
-080055d8 <AGAIN>:
- 80055d8:	4750      	bx	sl
- 80055da:	bf00      	nop
- 80055dc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80055e0:	08003346 	stmdaeq	r0, {r1, r2, r6, r8, r9, ip, sp}
- 80055e4:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80055e8:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 80055ec:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80055f0:	080055d0 	stmdaeq	r0, {r4, r6, r7, r8, sl, ip, lr}
+080055bc <AGAIN>:
+ 80055bc:	4750      	bx	sl
+ 80055be:	bf00      	nop
+ 80055c0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80055c4:	08003346 	stmdaeq	r0, {r1, r2, r6, r8, r9, ip, sp}
+ 80055c8:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80055cc:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 80055d0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80055d4:	080055b4 	stmdaeq	r0, {r2, r4, r5, r7, r8, sl, ip, lr}
 
-080055f4 <_IFF>:
- 80055f4:	004649c2 	subeq	r4, r6, r2, asr #19
+080055d8 <_IFF>:
+ 80055d8:	004649c2 	subeq	r4, r6, r2, asr #19
 
-080055f8 <IFF>:
- 80055f8:	4750      	bx	sl
- 80055fa:	bf00      	nop
- 80055fc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005600:	0800331e 	stmdaeq	r0, {r1, r2, r3, r4, r8, r9, ip, sp}
- 8005604:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005608:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 800560c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005610:	00000004 	andeq	r0, r0, r4
- 8005614:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 8005618:	080038fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, sp}
- 800561c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005620:	080055f4 	stmdaeq	r0, {r2, r4, r5, r6, r7, r8, sl, ip, lr}
+080055dc <IFF>:
+ 80055dc:	4750      	bx	sl
+ 80055de:	bf00      	nop
+ 80055e0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80055e4:	0800331e 	stmdaeq	r0, {r1, r2, r3, r4, r8, r9, ip, sp}
+ 80055e8:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80055ec:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 80055f0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80055f4:	00000004 	andeq	r0, r0, r4
+ 80055f8:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 80055fc:	080038fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, sp}
+ 8005600:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005604:	080055d8 	stmdaeq	r0, {r3, r4, r6, r7, r8, sl, ip, lr}
 
-08005624 <_AHEAD>:
- 8005624:	454841c5 	strbmi	r4, [r8, #-453]	; 0xfffffe3b
- 8005628:	bf004441 	svclt	0x00004441
+08005608 <_AHEAD>:
+ 8005608:	454841c5 	strbmi	r4, [r8, #-453]	; 0xfffffe3b
+ 800560c:	bf004441 	svclt	0x00004441
 
-0800562c <AHEAD>:
- 800562c:	4750      	bx	sl
- 800562e:	bf00      	nop
- 8005630:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005634:	08003346 	stmdaeq	r0, {r1, r2, r6, r8, r9, ip, sp}
- 8005638:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 800563c:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 8005640:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005644:	00000004 	andeq	r0, r0, r4
- 8005648:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 800564c:	080038fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, sp}
- 8005650:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005654:	08005624 	stmdaeq	r0, {r2, r5, r9, sl, ip, lr}
+08005610 <AHEAD>:
+ 8005610:	4750      	bx	sl
+ 8005612:	bf00      	nop
+ 8005614:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005618:	08003346 	stmdaeq	r0, {r1, r2, r6, r8, r9, ip, sp}
+ 800561c:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005620:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 8005624:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005628:	00000004 	andeq	r0, r0, r4
+ 800562c:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 8005630:	080038fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, sp}
+ 8005634:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005638:	08005608 	stmdaeq	r0, {r3, r9, sl, ip, lr}
 
-08005658 <_REPEA>:
- 8005658:	504552c6 	subpl	r5, r5, r6, asr #5
- 800565c:	00544145 	subseq	r4, r4, r5, asr #2
+0800563c <_REPEA>:
+ 800563c:	504552c6 	subpl	r5, r5, r6, asr #5
+ 8005640:	00544145 	subseq	r4, r4, r5, asr #2
 
-08005660 <REPEA>:
- 8005660:	4750      	bx	sl
- 8005662:	bf00      	nop
- 8005664:	080055d9 	stmdaeq	r0, {r0, r3, r4, r6, r7, r8, sl, ip, lr}
- 8005668:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 800566c:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 8005670:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005674:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005678:	08005658 	stmdaeq	r0, {r3, r4, r6, r9, sl, ip, lr}
+08005644 <REPEA>:
+ 8005644:	4750      	bx	sl
+ 8005646:	bf00      	nop
+ 8005648:	080055bd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r7, r8, sl, ip, lr}
+ 800564c:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 8005650:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
+ 8005654:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005658:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 800565c:	0800563c 	stmdaeq	r0, {r2, r3, r4, r5, r9, sl, ip, lr}
 
-0800567c <_THENN>:
- 800567c:	454854c4 	strbmi	r5, [r8, #-1220]	; 0xfffffb3c
- 8005680:	bf00004e 	svclt	0x0000004e
+08005660 <_THENN>:
+ 8005660:	454854c4 	strbmi	r5, [r8, #-1220]	; 0xfffffb3c
+ 8005664:	bf00004e 	svclt	0x0000004e
 
-08005684 <THENN>:
+08005668 <THENN>:
+ 8005668:	4750      	bx	sl
+ 800566a:	bf00      	nop
+ 800566c:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 8005670:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
+ 8005674:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005678:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 800567c:	08005660 	stmdaeq	r0, {r5, r6, r9, sl, ip, lr}
+
+08005680 <_AFT>:
+ 8005680:	544641c3 	strbpl	r4, [r6], #-451	; 0xfffffe3d
+
+08005684 <AFT>:
  8005684:	4750      	bx	sl
  8005686:	bf00      	nop
- 8005688:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 800568c:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 8005690:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005694:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005698:	0800567c 	stmdaeq	r0, {r2, r3, r4, r5, r6, r9, sl, ip, lr}
+ 8005688:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
+ 800568c:	08005611 	stmdaeq	r0, {r0, r4, r9, sl, ip, lr}
+ 8005690:	08005535 	stmdaeq	r0, {r0, r2, r4, r5, r8, sl, ip, lr}
+ 8005694:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
+ 8005698:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 800569c:	08005680 	stmdaeq	r0, {r7, r9, sl, ip, lr}
 
-0800569c <_AFT>:
- 800569c:	544641c3 	strbpl	r4, [r6], #-451	; 0xfffffe3d
+080056a0 <_ELSEE>:
+ 80056a0:	534c45c4 	movtpl	r4, #50628	; 0xc5c4
+ 80056a4:	bf000045 	svclt	0x00000045
 
-080056a0 <AFT>:
- 80056a0:	4750      	bx	sl
- 80056a2:	bf00      	nop
- 80056a4:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
- 80056a8:	0800562d 	stmdaeq	r0, {r0, r2, r3, r5, r9, sl, ip, lr}
- 80056ac:	08005551 	stmdaeq	r0, {r0, r4, r6, r8, sl, ip, lr}
+080056a8 <ELSEE>:
+ 80056a8:	4750      	bx	sl
+ 80056aa:	bf00      	nop
+ 80056ac:	08005611 	stmdaeq	r0, {r0, r4, r9, sl, ip, lr}
  80056b0:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 80056b4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80056b8:	0800569c 	stmdaeq	r0, {r2, r3, r4, r7, r9, sl, ip, lr}
+ 80056b4:	08005669 	stmdaeq	r0, {r0, r3, r5, r6, r9, sl, ip, lr}
+ 80056b8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80056bc:	080056a0 	stmdaeq	r0, {r5, r7, r9, sl, ip, lr}
 
-080056bc <_ELSEE>:
- 80056bc:	534c45c4 	movtpl	r4, #50628	; 0xc5c4
- 80056c0:	bf000045 	svclt	0x00000045
+080056c0 <_WHILE>:
+ 80056c0:	494857c5 	stmdbmi	r8, {r0, r2, r6, r7, r8, r9, sl, ip, lr}^
+ 80056c4:	bf00454c 	svclt	0x0000454c
 
-080056c4 <ELSEE>:
- 80056c4:	4750      	bx	sl
- 80056c6:	bf00      	nop
- 80056c8:	0800562d 	stmdaeq	r0, {r0, r2, r3, r5, r9, sl, ip, lr}
- 80056cc:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 80056d0:	08005685 	stmdaeq	r0, {r0, r2, r7, r9, sl, ip, lr}
+080056c8 <WHILE>:
+ 80056c8:	4750      	bx	sl
+ 80056ca:	bf00      	nop
+ 80056cc:	080055dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, ip, lr}
+ 80056d0:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
  80056d4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80056d8:	080056bc 	stmdaeq	r0, {r2, r3, r4, r5, r7, r9, sl, ip, lr}
+ 80056d8:	080056c0 	stmdaeq	r0, {r6, r7, r9, sl, ip, lr}
 
-080056dc <_WHILE>:
- 80056dc:	494857c5 	stmdbmi	r8, {r0, r2, r6, r7, r8, r9, sl, ip, lr}^
- 80056e0:	bf00454c 	svclt	0x0000454c
+080056dc <_RECURSE>:
+ 80056dc:	434552c7 	movtmi	r5, #21191	; 0x52c7
+ 80056e0:	45535255 	ldrbmi	r5, [r3, #-597]	; 0xfffffdab
 
-080056e4 <WHILE>:
+080056e4 <RECURSE>:
  80056e4:	4750      	bx	sl
  80056e6:	bf00      	nop
- 80056e8:	080055f9 	stmdaeq	r0, {r0, r3, r4, r5, r6, r7, r8, sl, ip, lr}
- 80056ec:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 80056f0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80056f4:	080056dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r9, sl, ip, lr}
+ 80056e8:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 80056ec:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 80056f0:	08004b35 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, fp, lr}
+ 80056f4:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80056f8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80056fc:	080056dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r9, sl, ip, lr}
 
-080056f8 <_RECURSE>:
- 80056f8:	434552c7 	movtmi	r5, #21191	; 0x52c7
- 80056fc:	45535255 	ldrbmi	r5, [r3, #-597]	; 0xfffffdab
+08005700 <_ABRTQ>:
+ 8005700:	4f4241c6 	svcmi	0x004241c6
+ 8005704:	00225452 	eoreq	r5, r2, r2, asr r4
 
-08005700 <RECURSE>:
- 8005700:	4750      	bx	sl
- 8005702:	bf00      	nop
- 8005704:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 8005708:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 800570c:	08004b35 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, fp, lr}
- 8005710:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005714:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005718:	080056f8 	stmdaeq	r0, {r3, r4, r5, r6, r7, r9, sl, ip, lr}
+08005708 <ABRTQ>:
+ 8005708:	4750      	bx	sl
+ 800570a:	bf00      	nop
+ 800570c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005710:	08004f50 	stmdaeq	r0, {r4, r6, r8, r9, sl, fp, lr}
+ 8005714:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005718:	08005365 	stmdaeq	r0, {r0, r2, r5, r6, r8, r9, ip, lr}
+ 800571c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005720:	08005700 	stmdaeq	r0, {r8, r9, sl, ip, lr}
 
-0800571c <_ABRTQ>:
- 800571c:	4f4241c6 	svcmi	0x004241c6
- 8005720:	00225452 	eoreq	r5, r2, r2, asr r4
+08005724 <_STRQ>:
+ 8005724:	002253c2 	eoreq	r5, r2, r2, asr #7
 
-08005724 <ABRTQ>:
- 8005724:	4750      	bx	sl
- 8005726:	bf00      	nop
- 8005728:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800572c:	08004f6c 	stmdaeq	r0, {r2, r3, r5, r6, r8, r9, sl, fp, lr}
- 8005730:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005734:	08005381 	stmdaeq	r0, {r0, r7, r8, r9, ip, lr}
- 8005738:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 800573c:	0800571c 	stmdaeq	r0, {r2, r3, r4, r8, r9, sl, ip, lr}
+08005728 <STRQ>:
+ 8005728:	4750      	bx	sl
+ 800572a:	bf00      	nop
+ 800572c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005730:	08004660 	stmdaeq	r0, {r5, r6, r9, sl, lr}
+ 8005734:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005738:	08005365 	stmdaeq	r0, {r0, r2, r5, r6, r8, r9, ip, lr}
+ 800573c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005740:	08005724 	stmdaeq	r0, {r2, r5, r8, r9, sl, ip, lr}
 
-08005740 <_STRQ>:
- 8005740:	002253c2 	eoreq	r5, r2, r2, asr #7
+08005744 <_DOTQ>:
+ 8005744:	00222ec2 	eoreq	r2, r2, r2, asr #29
 
-08005744 <STRQ>:
- 8005744:	4750      	bx	sl
- 8005746:	bf00      	nop
- 8005748:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800574c:	08004660 	stmdaeq	r0, {r5, r6, r9, sl, lr}
- 8005750:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005754:	08005381 	stmdaeq	r0, {r0, r7, r8, r9, ip, lr}
- 8005758:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 800575c:	08005740 	stmdaeq	r0, {r6, r8, r9, sl, ip, lr}
+08005748 <DOTQ>:
+ 8005748:	4750      	bx	sl
+ 800574a:	bf00      	nop
+ 800574c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005750:	0800466c 	stmdaeq	r0, {r2, r3, r5, r6, r9, sl, lr}
+ 8005754:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005758:	08005365 	stmdaeq	r0, {r0, r2, r5, r6, r8, r9, ip, lr}
+ 800575c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005760:	08005744 	stmdaeq	r0, {r2, r6, r8, r9, sl, ip, lr}
 
-08005760 <_DOTQ>:
- 8005760:	00222ec2 	eoreq	r2, r2, r2, asr #29
+08005764 <_UNIQU>:
+ 8005764:	4e553f07 	cdpmi	15, 5, cr3, cr5, cr7, {0}
+ 8005768:	45555149 	ldrbmi	r5, [r5, #-329]	; 0xfffffeb7
 
-08005764 <DOTQ>:
- 8005764:	4750      	bx	sl
- 8005766:	bf00      	nop
- 8005768:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800576c:	0800466c 	stmdaeq	r0, {r2, r3, r5, r6, r9, sl, lr}
- 8005770:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005774:	08005381 	stmdaeq	r0, {r0, r7, r8, r9, ip, lr}
- 8005778:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 800577c:	08005760 	stmdaeq	r0, {r5, r6, r8, r9, sl, ip, lr}
+0800576c <UNIQU>:
+ 800576c:	4750      	bx	sl
+ 800576e:	bf00      	nop
+ 8005770:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005774:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
+ 8005778:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 800577c:	08005798 	stmdaeq	r0, {r3, r4, r7, r8, r9, sl, ip, lr}
+ 8005780:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
+ 8005784:	65722007 	ldrbvs	r2, [r2, #-7]!
+ 8005788:	20666544 	rsbcs	r6, r6, r4, asr #10
+ 800578c:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
+ 8005790:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
+ 8005794:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
 
-08005780 <_UNIQU>:
- 8005780:	4e553f07 	cdpmi	15, 5, cr3, cr5, cr7, {0}
- 8005784:	45555149 	ldrbmi	r5, [r5, #-329]	; 0xfffffeb7
+08005798 <UNIQ1>:
+ 8005798:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
+ 800579c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005788 <UNIQU>:
- 8005788:	4750      	bx	sl
- 800578a:	bf00      	nop
- 800578c:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005790:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
- 8005794:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005798:	080057b4 	stmdaeq	r0, {r2, r4, r5, r7, r8, r9, sl, ip, lr}
- 800579c:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
- 80057a0:	65722007 	ldrbvs	r2, [r2, #-7]!
- 80057a4:	20666544 	rsbcs	r6, r6, r4, asr #10
- 80057a8:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
- 80057ac:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
- 80057b0:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
+080057a0 <SNAME>:
+ 80057a0:	4750      	bx	sl
+ 80057a2:	bf00      	nop
+ 80057a4:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 80057a8:	08003395 	stmdaeq	r0, {r0, r2, r4, r7, r8, r9, ip, sp}
+ 80057ac:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 80057b0:	080057e8 	stmdaeq	r0, {r3, r5, r6, r7, r8, r9, sl, ip, lr}
+ 80057b4:	0800576d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, r9, sl, ip, lr}
+ 80057b8:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 80057bc:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 80057c0:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 80057c4:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 80057c8:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 80057cc:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80057d0:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
+ 80057d4:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
+ 80057d8:	08003f0d 	stmdaeq	r0, {r0, r2, r3, r8, r9, sl, fp, ip, sp}
+ 80057dc:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 80057e0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80057e4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-080057b4 <UNIQ1>:
- 80057b4:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
- 80057b8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+080057e8 <SNAM1>:
+ 80057e8:	08004661 	stmdaeq	r0, {r0, r5, r6, r9, sl, lr}
+ 80057ec:	616e2007 	cmnvs	lr, r7
+ 80057f0:	203f656d 	eorscs	r6, pc, sp, ror #10
+ 80057f4:	08004f25 	stmdaeq	r0, {r0, r2, r5, r8, r9, sl, fp, lr}
+ 80057f8:	08005764 	stmdaeq	r0, {r2, r5, r6, r8, r9, sl, ip, lr}
 
-080057bc <SNAME>:
- 80057bc:	4750      	bx	sl
- 80057be:	bf00      	nop
- 80057c0:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 80057c4:	08003395 	stmdaeq	r0, {r0, r2, r4, r7, r8, r9, ip, sp}
- 80057c8:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 80057cc:	08005804 	stmdaeq	r0, {r2, fp, ip, lr}
- 80057d0:	08005789 	stmdaeq	r0, {r0, r3, r7, r8, r9, sl, ip, lr}
- 80057d4:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 80057d8:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 80057dc:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 80057e0:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 80057e4:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 80057e8:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 80057ec:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
- 80057f0:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
- 80057f4:	08003f0d 	stmdaeq	r0, {r0, r2, r3, r8, r9, sl, fp, ip, sp}
- 80057f8:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 80057fc:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005800:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+080057fc <_SCOMP>:
+ 80057fc:	4f432408 	svcmi	0x00432408
+ 8005800:	4c49504d 	mcrrmi	0, 4, r5, r9, cr13
+ 8005804:	bf000045 	svclt	0x00000045
 
-08005804 <SNAM1>:
- 8005804:	08004661 	stmdaeq	r0, {r0, r5, r6, r9, sl, lr}
- 8005808:	616e2007 	cmnvs	lr, r7
- 800580c:	203f656d 	eorscs	r6, pc, sp, ror #10
- 8005810:	08004f41 	stmdaeq	r0, {r0, r6, r8, r9, sl, fp, lr}
- 8005814:	08005780 	stmdaeq	r0, {r7, r8, r9, sl, ip, lr}
+08005808 <SCOMP>:
+ 8005808:	4750      	bx	sl
+ 800580a:	bf00      	nop
+ 800580c:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
+ 8005810:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
+ 8005814:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005818:	08005844 	stmdaeq	r0, {r2, r6, fp, ip, lr}
+ 800581c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005820:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005824:	00000080 	andeq	r0, r0, r0, lsl #1
+ 8005828:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
+ 800582c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005830:	0800583c 	stmdaeq	r0, {r2, r3, r4, r5, fp, ip, lr}
+ 8005834:	080032f5 	stmdaeq	r0, {r0, r2, r4, r5, r6, r7, r9, ip, sp}
+ 8005838:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005818 <_SCOMP>:
- 8005818:	4f432408 	svcmi	0x00432408
- 800581c:	4c49504d 	mcrrmi	0, 4, r5, r9, cr13
- 8005820:	bf000045 	svclt	0x00000045
+0800583c <SCOM1>:
+ 800583c:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005840:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005824 <SCOMP>:
- 8005824:	4750      	bx	sl
- 8005826:	bf00      	nop
- 8005828:	08004c9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, sl, fp, lr}
- 800582c:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
- 8005830:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005834:	08005860 	stmdaeq	r0, {r5, r6, fp, ip, lr}
- 8005838:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 800583c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005840:	00000080 	andeq	r0, r0, r0, lsl #1
- 8005844:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
+08005844 <SCOM2>:
+ 8005844:	0800455d 	stmdaeq	r0, {r0, r2, r3, r4, r6, r8, sl, lr}
  8005848:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
  800584c:	08005858 	stmdaeq	r0, {r3, r4, r6, fp, ip, lr}
- 8005850:	080032f5 	stmdaeq	r0, {r0, r2, r4, r5, r6, r7, r9, ip, sp}
+ 8005850:	0800534d 	stmdaeq	r0, {r0, r2, r3, r6, r8, r9, ip, lr}
  8005854:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005858 <SCOM1>:
- 8005858:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 800585c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005858 <SCOM3>:
+ 8005858:	08005861 	stmdaeq	r0, {r0, r5, r6, fp, ip, lr}
+ 800585c:	08004f25 	stmdaeq	r0, {r0, r2, r5, r8, r9, sl, fp, lr}
 
-08005860 <SCOM2>:
- 8005860:	0800455d 	stmdaeq	r0, {r0, r2, r3, r4, r6, r8, sl, lr}
- 8005864:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005868:	08005874 	stmdaeq	r0, {r2, r4, r5, r6, fp, ip, lr}
- 800586c:	08005369 	stmdaeq	r0, {r0, r3, r5, r6, r8, r9, ip, lr}
- 8005870:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
-
-08005874 <SCOM3>:
- 8005874:	0800587d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, fp, ip, lr}
- 8005878:	08004f41 	stmdaeq	r0, {r0, r6, r8, r9, sl, fp, lr}
-
-0800587c <COLON_ABORT>:
- 800587c:	4750      	bx	sl
- 800587e:	bf00      	nop
+08005860 <COLON_ABORT>:
+ 8005860:	4750      	bx	sl
+ 8005862:	bf00      	nop
+ 8005864:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 8005868:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 800586c:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
+ 8005870:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005874:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
+ 8005878:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 800587c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
  8005880:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 8005884:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005888:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
- 800588c:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005890:	08003ac1 	stmdaeq	r0, {r0, r6, r7, r9, fp, ip, sp}
- 8005894:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005898:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 800589c:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 80058a0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 80058a4:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 80058a8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80058ac:	08005818 	stmdaeq	r0, {r3, r4, fp, ip, lr}
+ 8005884:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005888:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 800588c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005890:	080057fc 	stmdaeq	r0, {r2, r3, r4, r5, r6, r7, r8, r9, sl, ip, lr}
 
-080058b0 <_OVERT>:
- 80058b0:	45564f05 	ldrbmi	r4, [r6, #-3845]	; 0xfffff0fb
- 80058b4:	bf005452 	svclt	0x00005452
+08005894 <_OVERT>:
+ 8005894:	45564f05 	ldrbmi	r4, [r6, #-3845]	; 0xfffff0fb
+ 8005898:	bf005452 	svclt	0x00005452
 
-080058b8 <OVERT>:
- 80058b8:	4750      	bx	sl
- 80058ba:	bf00      	nop
- 80058bc:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 80058c0:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 80058c4:	08003aad 	stmdaeq	r0, {r0, r2, r3, r5, r7, r9, fp, ip, sp}
- 80058c8:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 80058cc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80058d0:	080058b0 	stmdaeq	r0, {r4, r5, r7, fp, ip, lr}
+0800589c <OVERT>:
+ 800589c:	4750      	bx	sl
+ 800589e:	bf00      	nop
+ 80058a0:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 80058a4:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 80058a8:	08003aad 	stmdaeq	r0, {r0, r2, r3, r5, r7, r9, fp, ip, sp}
+ 80058ac:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80058b0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80058b4:	08005894 	stmdaeq	r0, {r2, r4, r7, fp, ip, lr}
 
-080058d4 <_SEMIS>:
- 80058d4:	bf003bc1 	svclt	0x00003bc1
+080058b8 <_SEMIS>:
+ 80058b8:	bf003bc1 	svclt	0x00003bc1
 
-080058d8 <SEMIS>:
- 80058d8:	4750      	bx	sl
- 80058da:	bf00      	nop
- 80058dc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80058e0:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
- 80058e4:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80058e8:	08005009 	stmdaeq	r0, {r0, r3, ip, lr}
- 80058ec:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 80058f0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80058f4:	080058d4 	stmdaeq	r0, {r2, r4, r6, r7, fp, ip, lr}
+080058bc <SEMIS>:
+ 80058bc:	4750      	bx	sl
+ 80058be:	bf00      	nop
+ 80058c0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80058c4:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
+ 80058c8:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80058cc:	08004fed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r8, r9, sl, fp, lr}
+ 80058d0:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 80058d4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80058d8:	080058b8 	stmdaeq	r0, {r3, r4, r5, r7, fp, ip, lr}
 
-080058f8 <_RBRAC>:
- 80058f8:	bf005d01 	svclt	0x00005d01
+080058dc <_RBRAC>:
+ 80058dc:	bf005d01 	svclt	0x00005d01
 
-080058fc <RBRAC>:
- 80058fc:	4750      	bx	sl
- 80058fe:	bf00      	nop
- 8005900:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005904:	08005824 	stmdaeq	r0, {r2, r5, fp, ip, lr}
- 8005908:	08003a81 	stmdaeq	r0, {r0, r7, r9, fp, ip, sp}
- 800590c:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005910:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005914:	ffffffff 			; <UNDEFINED> instruction: 0xffffffff
- 8005918:	08003989 	stmdaeq	r0, {r0, r3, r7, r8, fp, ip, sp}
- 800591c:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005920:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+080058e0 <RBRAC>:
+ 80058e0:	4750      	bx	sl
+ 80058e2:	bf00      	nop
+ 80058e4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80058e8:	08005808 	stmdaeq	r0, {r3, fp, ip, lr}
+ 80058ec:	08003a81 	stmdaeq	r0, {r0, r7, r9, fp, ip, sp}
+ 80058f0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80058f4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80058f8:	ffffffff 			; <UNDEFINED> instruction: 0xffffffff
+ 80058fc:	08003989 	stmdaeq	r0, {r0, r3, r7, r8, fp, ip, sp}
+ 8005900:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005904:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005924 <CALLC>:
- 8005924:	4750      	bx	sl
- 8005926:	bf00      	nop
- 8005928:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800592c:	00000001 	andeq	r0, r0, r1
- 8005930:	08003539 	stmdaeq	r0, {r0, r3, r4, r5, r8, sl, ip, sp}
- 8005934:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 8005938:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 800593c:	080058f8 	stmdaeq	r0, {r3, r4, r5, r6, r7, fp, ip, lr}
+08005908 <CALLC>:
+ 8005908:	4750      	bx	sl
+ 800590a:	bf00      	nop
+ 800590c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005910:	00000001 	andeq	r0, r0, r1
+ 8005914:	08003539 	stmdaeq	r0, {r0, r3, r4, r5, r8, sl, ip, sp}
+ 8005918:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 800591c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005920:	080058dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, fp, ip, lr}
 
-08005940 <_COLON>:
- 8005940:	bf003a01 	svclt	0x00003a01
+08005924 <_COLON>:
+ 8005924:	bf003a01 	svclt	0x00003a01
 
-08005944 <COLON>:
- 8005944:	4750      	bx	sl
- 8005946:	bf00      	nop
- 8005948:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
- 800594c:	080057bd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r7, r8, r9, sl, ip, lr}
- 8005950:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 8005954:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
- 8005958:	080058fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, lr}
- 800595c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005960:	08005940 	stmdaeq	r0, {r6, r8, fp, ip, lr}
+08005928 <COLON>:
+ 8005928:	4750      	bx	sl
+ 800592a:	bf00      	nop
+ 800592c:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
+ 8005930:	080057a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, sl, ip, lr}
+ 8005934:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 8005938:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
+ 800593c:	080058e1 	stmdaeq	r0, {r0, r5, r6, r7, fp, ip, lr}
+ 8005940:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005944:	08005924 	stmdaeq	r0, {r2, r5, r8, fp, ip, lr}
 
-08005964 <_IMMED>:
- 8005964:	4d4d4909 	vstrmi.16	s9, [sp, #-18]	; 0xffffffee	; <UNPREDICTABLE>
- 8005968:	41494445 	cmpmi	r9, r5, asr #8
- 800596c:	bf004554 	svclt	0x00004554
+08005948 <_IMMED>:
+ 8005948:	4d4d4909 	vstrmi.16	s9, [sp, #-18]	; 0xffffffee	; <UNPREDICTABLE>
+ 800594c:	41494445 	cmpmi	r9, r5, asr #8
+ 8005950:	bf004554 	svclt	0x00004554
 
-08005970 <IMMED>:
- 8005970:	4750      	bx	sl
- 8005972:	bf00      	nop
- 8005974:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005978:	00000080 	andeq	r0, r0, r0, lsl #1
- 800597c:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 8005980:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005984:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005988:	08003539 	stmdaeq	r0, {r0, r3, r4, r5, r8, sl, ip, sp}
- 800598c:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 8005990:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005994:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005998:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005954 <IMMED>:
+ 8005954:	4750      	bx	sl
+ 8005956:	bf00      	nop
+ 8005958:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 800595c:	00000080 	andeq	r0, r0, r0, lsl #1
+ 8005960:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 8005964:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005968:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 800596c:	08003539 	stmdaeq	r0, {r0, r3, r4, r5, r8, sl, ip, sp}
+ 8005970:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 8005974:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005978:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 800597c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-0800599c <DODOES>:
- 800599c:	4750      	bx	sl
- 800599e:	bf00      	nop
- 80059a0:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 80059a4:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
- 80059a8:	08003601 	stmdaeq	r0, {r0, r9, sl, ip, sp}
- 80059ac:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 80059b0:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 80059b4:	08004b35 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, fp, lr}
- 80059b8:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
- 80059bc:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 80059c0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 80059c4:	08005964 	stmdaeq	r0, {r2, r5, r6, r8, fp, ip, lr}
+08005980 <DODOES>:
+ 8005980:	4750      	bx	sl
+ 8005982:	bf00      	nop
+ 8005984:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005988:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
+ 800598c:	08003601 	stmdaeq	r0, {r0, r9, sl, ip, sp}
+ 8005990:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 8005994:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005998:	08004b35 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, fp, lr}
+ 800599c:	08005e49 	stmdaeq	r0, {r0, r3, r6, r9, sl, fp, ip, lr}
+ 80059a0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 80059a4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80059a8:	08005948 	stmdaeq	r0, {r3, r6, r8, fp, ip, lr}
 
-080059c8 <_DOES>:
- 80059c8:	454f44c5 	strbmi	r4, [pc, #-1221]	; 800550b <LEAVE+0x7>
- 80059cc:	bf003e53 	svclt	0x00003e53
+080059ac <_DOES>:
+ 80059ac:	454f44c5 	strbmi	r4, [pc, #-1221]	; 80054ef <LEAVE+0x7>
+ 80059b0:	bf003e53 	svclt	0x00003e53
 
-080059d0 <DOES>:
- 80059d0:	4750      	bx	sl
- 80059d2:	bf00      	nop
- 80059d4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80059d8:	0800599c 	stmdaeq	r0, {r2, r3, r4, r7, r8, fp, ip, lr}
- 80059dc:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80059e0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80059e4:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
- 80059e8:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80059ec:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
- 80059f0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80059f4:	080033a0 	stmdaeq	r0, {r5, r7, r8, r9, ip, sp}
- 80059f8:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 80059fc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005a00:	080059c8 	stmdaeq	r0, {r3, r6, r7, r8, fp, ip, lr}
+080059b4 <DOES>:
+ 80059b4:	4750      	bx	sl
+ 80059b6:	bf00      	nop
+ 80059b8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80059bc:	08005980 	stmdaeq	r0, {r7, r8, fp, ip, lr}
+ 80059c0:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80059c4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80059c8:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
+ 80059cc:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 80059d0:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
+ 80059d4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80059d8:	080059ac 	stmdaeq	r0, {r2, r3, r5, r7, r8, fp, ip, lr}
 
-08005a04 <_DEFERAT>:
- 8005a04:	46454406 	strbmi	r4, [r5], -r6, lsl #8
- 8005a08:	00405245 	subeq	r5, r0, r5, asr #4
+080059dc <_DEFERAT>:
+ 80059dc:	46454406 	strbmi	r4, [r5], -r6, lsl #8
+ 80059e0:	00405245 	subeq	r5, r0, r5, asr #4
 
-08005a0c <DEFERAT>:
- 8005a0c:	4750      	bx	sl
- 8005a0e:	bf00      	nop
- 8005a10:	08005e5d 	stmdaeq	r0, {r0, r2, r3, r4, r6, r9, sl, fp, ip, lr}
- 8005a14:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005a18:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005a1c:	08005a04 	stmdaeq	r0, {r2, r9, fp, ip, lr}
+080059e4 <DEFERAT>:
+ 80059e4:	4750      	bx	sl
+ 80059e6:	bf00      	nop
+ 80059e8:	08005e41 	stmdaeq	r0, {r0, r6, r9, sl, fp, ip, lr}
+ 80059ec:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 80059f0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80059f4:	080059dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r8, fp, ip, lr}
 
-08005a20 <_DEFERSTO>:
- 8005a20:	46454406 	strbmi	r4, [r5], -r6, lsl #8
- 8005a24:	00215245 	eoreq	r5, r1, r5, asr #4
+080059f8 <_DEFERSTO>:
+ 80059f8:	46454406 	strbmi	r4, [r5], -r6, lsl #8
+ 80059fc:	00215245 	eoreq	r5, r1, r5, asr #4
 
-08005a28 <DEFERSTO>:
- 8005a28:	4750      	bx	sl
- 8005a2a:	bf00      	nop
- 8005a2c:	08005e5d 	stmdaeq	r0, {r0, r2, r3, r4, r6, r9, sl, fp, ip, lr}
- 8005a30:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005a34:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005a38:	08005a20 	stmdaeq	r0, {r5, r9, fp, ip, lr}
+08005a00 <DEFERSTO>:
+ 8005a00:	4750      	bx	sl
+ 8005a02:	bf00      	nop
+ 8005a04:	08005e41 	stmdaeq	r0, {r0, r6, r9, sl, fp, ip, lr}
+ 8005a08:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005a0c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005a10:	080059f8 	stmdaeq	r0, {r3, r4, r5, r6, r7, r8, fp, ip, lr}
 
-08005a3c <_DEFER>:
- 8005a3c:	46454405 	strbmi	r4, [r5], -r5, lsl #8
- 8005a40:	bf005245 	svclt	0x00005245
+08005a14 <_DEFER>:
+ 8005a14:	46454405 	strbmi	r4, [r5], -r5, lsl #8
+ 8005a18:	bf005245 	svclt	0x00005245
 
-08005a44 <DEFER>:
- 8005a44:	4750      	bx	sl
- 8005a46:	bf00      	nop
- 8005a48:	08005af5 	stmdaeq	r0, {r0, r2, r4, r5, r6, r7, r9, fp, ip, lr}
- 8005a4c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005a50:	080032dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r9, ip, sp}
- 8005a54:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005a58:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005a5c:	08003374 	stmdaeq	r0, {r2, r4, r5, r6, r8, r9, ip, sp}
- 8005a60:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005a64:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005a68:	080032f4 	stmdaeq	r0, {r2, r4, r5, r6, r7, r9, ip, sp}
- 8005a6c:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005a70:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005a74:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
- 8005a78:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005a7c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005a80:	08005a3c 	stmdaeq	r0, {r2, r3, r4, r5, r9, fp, ip, lr}
+08005a1c <DEFER>:
+ 8005a1c:	4750      	bx	sl
+ 8005a1e:	bf00      	nop
+ 8005a20:	08005acd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r9, fp, ip, lr}
+ 8005a24:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005a28:	080032dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005a2c:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005a30:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005a34:	08003374 	stmdaeq	r0, {r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005a38:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005a3c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005a40:	080032f4 	stmdaeq	r0, {r2, r4, r5, r6, r7, r9, ip, sp}
+ 8005a44:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005a48:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005a4c:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
+ 8005a50:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005a54:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005a58:	08005a14 	stmdaeq	r0, {r2, r4, r9, fp, ip, lr}
 
-08005a84 <_NONAME>:
- 8005a84:	4f4e3a07 	svcmi	0x004e3a07
- 8005a88:	454d414e 	strbmi	r4, [sp, #-334]	; 0xfffffeb2
+08005a5c <_NONAME>:
+ 8005a5c:	4f4e3a07 	svcmi	0x004e3a07
+ 8005a60:	454d414e 	strbmi	r4, [sp, #-334]	; 0xfffffeb2
 
-08005a8c <NONAME>:
- 8005a8c:	4750      	bx	sl
- 8005a8e:	bf00      	nop
- 8005a90:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
- 8005a94:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
- 8005a98:	080058fd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r7, fp, ip, lr}
- 8005a9c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005aa0:	08005a84 	stmdaeq	r0, {r2, r7, r9, fp, ip, lr}
+08005a64 <NONAME>:
+ 8005a64:	4750      	bx	sl
+ 8005a66:	bf00      	nop
+ 8005a68:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 8005a6c:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
+ 8005a70:	080058e1 	stmdaeq	r0, {r0, r5, r6, r7, fp, ip, lr}
+ 8005a74:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005a78:	08005a5c 	stmdaeq	r0, {r2, r3, r4, r6, r9, fp, ip, lr}
 
-08005aa4 <_IS>:
- 8005aa4:	00534982 	subseq	r4, r3, r2, lsl #19
+08005a7c <_IS>:
+ 8005a7c:	00534982 	subseq	r4, r3, r2, lsl #19
 
-08005aa8 <IS>:
- 8005aa8:	4750      	bx	sl
- 8005aaa:	bf00      	nop
- 8005aac:	08003989 	stmdaeq	r0, {r0, r3, r7, r8, fp, ip, sp}
- 8005ab0:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005ab4:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005ab8:	08005adc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r9, fp, ip, lr}
- 8005abc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005ac0:	08005264 	stmdaeq	r0, {r2, r5, r6, r9, ip, lr}
- 8005ac4:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005ac8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005acc:	08005a28 	stmdaeq	r0, {r3, r5, r9, fp, ip, lr}
- 8005ad0:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005ad4:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8005ad8:	08005ae4 	stmdaeq	r0, {r2, r5, r6, r7, r9, fp, ip, lr}
- 8005adc:	08005241 	stmdaeq	r0, {r0, r6, r9, ip, lr}
- 8005ae0:	08005a29 	stmdaeq	r0, {r0, r3, r5, r9, fp, ip, lr}
- 8005ae4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005ae8:	08005aa4 	stmdaeq	r0, {r2, r5, r7, r9, fp, ip, lr}
+08005a80 <IS>:
+ 8005a80:	4750      	bx	sl
+ 8005a82:	bf00      	nop
+ 8005a84:	08003989 	stmdaeq	r0, {r0, r3, r7, r8, fp, ip, sp}
+ 8005a88:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005a8c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005a90:	08005ab4 	stmdaeq	r0, {r2, r4, r5, r7, r9, fp, ip, lr}
+ 8005a94:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005a98:	08005248 	stmdaeq	r0, {r3, r6, r9, ip, lr}
+ 8005a9c:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005aa0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005aa4:	08005a00 	stmdaeq	r0, {r9, fp, ip, lr}
+ 8005aa8:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005aac:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8005ab0:	08005abc 	stmdaeq	r0, {r2, r3, r4, r5, r7, r9, fp, ip, lr}
+ 8005ab4:	08005225 	stmdaeq	r0, {r0, r2, r5, r9, ip, lr}
+ 8005ab8:	08005a01 	stmdaeq	r0, {r0, r9, fp, ip, lr}
+ 8005abc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005ac0:	08005a7c 	stmdaeq	r0, {r2, r3, r4, r5, r6, r9, fp, ip, lr}
 
-08005aec <_CREAT>:
- 8005aec:	45524306 	ldrbmi	r4, [r2, #-774]	; 0xfffffcfa
- 8005af0:	00455441 	subeq	r5, r5, r1, asr #8
+08005ac4 <_CREAT>:
+ 8005ac4:	45524306 	ldrbmi	r4, [r2, #-774]	; 0xfffffcfa
+ 8005ac8:	00455441 	subeq	r5, r5, r1, asr #8
 
-08005af4 <CREAT>:
- 8005af4:	4750      	bx	sl
- 8005af6:	bf00      	nop
- 8005af8:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
- 8005afc:	080057bd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r7, r8, r9, sl, ip, lr}
- 8005b00:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 8005b04:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
- 8005b08:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005b0c:	08005b18 	stmdaeq	r0, {r3, r4, r8, r9, fp, ip, lr}
- 8005b10:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005b14:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005acc <CREAT>:
+ 8005acc:	4750      	bx	sl
+ 8005ace:	bf00      	nop
+ 8005ad0:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
+ 8005ad4:	080057a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, sl, ip, lr}
+ 8005ad8:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 8005adc:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
+ 8005ae0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005ae4:	08005b08 	stmdaeq	r0, {r3, r8, r9, fp, ip, lr}
+ 8005ae8:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005aec:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005af0:	080032dc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005af4:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005af8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005afc:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
+ 8005b00:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005b04:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005b18 <DOVAR>:
- 8005b18:	f847 6d04 	str.w	r6, [r7, #-4]!
- 8005b1c:	4666      	mov	r6, ip
- 8005b1e:	f10c 0c04 	add.w	ip, ip, #4
- 8005b22:	f7fd bac7 	b.w	80030b4 <INEXT>
- 8005b26:	08005aec 	stmdaeq	r0, {r2, r3, r5, r6, r7, r9, fp, ip, lr}
+08005b08 <DOVAR>:
+ 8005b08:	f847 6d04 	str.w	r6, [r7, #-4]!
+ 8005b0c:	4666      	mov	r6, ip
+ 8005b0e:	f106 0608 	add.w	r6, r6, #8
+ 8005b12:	f7fd bacf 	b.w	80030b4 <INEXT>
+ 8005b16:	08005ac4 	stmdaeq	r0, {r2, r6, r7, r9, fp, ip, lr}
 
-08005b2a <_VARIA>:
- 8005b2a:	52415608 	subpl	r5, r1, #8, 12	; 0x800000
- 8005b2e:	4c424149 	stfmie	f4, [r2], {73}	; 0x49
- 8005b32:	 	ldrbmi	r0, [r0, -r5, asr #32]
+08005b1a <_VARIA>:
+ 8005b1a:	52415608 	subpl	r5, r1, #8, 12	; 0x800000
+ 8005b1e:	4c424149 	stfmie	f4, [r2], {73}	; 0x49
+ 8005b22:	 	ldrbmi	r0, [r0, -r5, asr #32]
 
-08005b34 <VARIA>:
- 8005b34:	4750      	bx	sl
- 8005b36:	bf00      	nop
- 8005b38:	08005af5 	stmdaeq	r0, {r0, r2, r4, r5, r6, r7, r9, fp, ip, lr}
- 8005b3c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005b40:	00000000 	andeq	r0, r0, r0
- 8005b44:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 8005b48:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005b4c:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
- 8005b50:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005b54:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005b24 <VARIA>:
+ 8005b24:	4750      	bx	sl
+ 8005b26:	bf00      	nop
+ 8005b28:	08005acd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r9, fp, ip, lr}
+ 8005b2c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005b30:	00000000 	andeq	r0, r0, r0
+ 8005b34:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 8005b38:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005b58 <DOCON>:
- 8005b58:	f847 6d04 	str.w	r6, [r7, #-4]!
- 8005b5c:	f85c 6b04 	ldr.w	r6, [ip], #4
- 8005b60:	f7fd baab 	b.w	80030ba <UNNEST>
- 8005b64:	08005b2a 	stmdaeq	r0, {r1, r3, r5, r8, r9, fp, ip, lr}
+08005b3c <DOCON>:
+ 8005b3c:	f847 6d04 	str.w	r6, [r7, #-4]!
+ 8005b40:	f85c 6b04 	ldr.w	r6, [ip], #4
+ 8005b44:	f7fd bab9 	b.w	80030ba <UNNEST>
+ 8005b48:	08005b1a 	stmdaeq	r0, {r1, r3, r4, r8, r9, fp, ip, lr}
 
-08005b68 <_CONST>:
- 8005b68:	4e4f4308 	cdpmi	3, 4, cr4, cr15, cr8, {0}
- 8005b6c:	4e415453 	mcrmi	4, 2, r5, cr1, cr3, {2}
- 8005b70:	bf000054 	svclt	0x00000054
+08005b4c <_CONST>:
+ 8005b4c:	4e4f4308 	cdpmi	3, 4, cr4, cr15, cr8, {0}
+ 8005b50:	4e415453 	mcrmi	4, 2, r5, cr1, cr3, {2}
+ 8005b54:	bf000054 	svclt	0x00000054
 
-08005b74 <CONST>:
- 8005b74:	4750      	bx	sl
- 8005b76:	bf00      	nop
- 8005b78:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
- 8005b7c:	080057bd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r7, r8, r9, sl, ip, lr}
- 8005b80:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 8005b84:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
- 8005b88:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005b8c:	08005b58 	stmdaeq	r0, {r3, r4, r6, r8, r9, fp, ip, lr}
- 8005b90:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005b94:	080052e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r9, ip, lr}
- 8005b98:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005b9c:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
- 8005ba0:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005ba4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005b58 <CONST>:
+ 8005b58:	4750      	bx	sl
+ 8005b5a:	bf00      	nop
+ 8005b5c:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
+ 8005b60:	080057a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, sl, ip, lr}
+ 8005b64:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 8005b68:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
+ 8005b6c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005b70:	08005b3c 	stmdaeq	r0, {r2, r3, r4, r5, r8, r9, fp, ip, lr}
+ 8005b74:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005b78:	080052c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, ip, lr}
+ 8005b7c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005b80:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
+ 8005b84:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005b88:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005ba8 <DMP>:
- 8005ba8:	4750      	bx	sl
- 8005baa:	bf00      	nop
- 8005bac:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
- 8005bb0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005bb4:	00000004 	andeq	r0, r0, r4
- 8005bb8:	08004735 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, sl, lr}
- 8005bbc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005bc0:	00000000 	andeq	r0, r0, r0
- 8005bc4:	08003a19 	stmdaeq	r0, {r0, r3, r4, r9, fp, ip, sp}
- 8005bc8:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005bcc:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005bd0:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005bd4:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005bd8:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
- 8005bdc:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005be0:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8005be4:	08005c00 	stmdaeq	r0, {sl, fp, ip, lr}
+08005b8c <DMP>:
+ 8005b8c:	4750      	bx	sl
+ 8005b8e:	bf00      	nop
+ 8005b90:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
+ 8005b94:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005b98:	00000004 	andeq	r0, r0, r4
+ 8005b9c:	08004735 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, sl, lr}
+ 8005ba0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005ba4:	00000000 	andeq	r0, r0, r0
+ 8005ba8:	08003a19 	stmdaeq	r0, {r0, r3, r4, r9, fp, ip, sp}
+ 8005bac:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005bb0:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005bb4:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005bb8:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005bbc:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
+ 8005bc0:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005bc4:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8005bc8:	08005be4 	stmdaeq	r0, {r2, r5, r6, r7, r8, r9, fp, ip, lr}
 
-08005be8 <PDUM1>:
- 8005be8:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005bec:	08003395 	stmdaeq	r0, {r0, r2, r4, r7, r8, r9, ip, sp}
- 8005bf0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005bf4:	00000003 	andeq	r0, r0, r3
- 8005bf8:	08004735 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, sl, lr}
- 8005bfc:	08003601 	stmdaeq	r0, {r0, r9, sl, ip, sp}
+08005bcc <PDUM1>:
+ 8005bcc:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005bd0:	08003395 	stmdaeq	r0, {r0, r2, r4, r7, r8, r9, ip, sp}
+ 8005bd4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005bd8:	00000003 	andeq	r0, r0, r3
+ 8005bdc:	08004735 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, sl, lr}
+ 8005be0:	08003601 	stmdaeq	r0, {r0, r9, sl, ip, sp}
 
-08005c00 <PDUM2>:
- 8005c00:	08003301 	stmdaeq	r0, {r0, r8, r9, ip, sp}
- 8005c04:	08005be8 	stmdaeq	r0, {r3, r5, r6, r7, r8, r9, fp, ip, lr}
- 8005c08:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005c0c:	08003a19 	stmdaeq	r0, {r0, r3, r4, r9, fp, ip, sp}
- 8005c10:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005c14:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005c18:	08005b68 	stmdaeq	r0, {r3, r5, r6, r8, r9, fp, ip, lr}
+08005be4 <PDUM2>:
+ 8005be4:	08003301 	stmdaeq	r0, {r0, r8, r9, ip, sp}
+ 8005be8:	08005bcc 	stmdaeq	r0, {r2, r3, r6, r7, r8, r9, fp, ip, lr}
+ 8005bec:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005bf0:	08003a19 	stmdaeq	r0, {r0, r3, r4, r9, fp, ip, sp}
+ 8005bf4:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005bf8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005bfc:	08005b4c 	stmdaeq	r0, {r2, r3, r6, r8, r9, fp, ip, lr}
 
-08005c1c <_DUMP>:
- 8005c1c:	4d554404 	cfldrdmi	mvd4, [r5, #-16]
- 8005c20:	bf000050 	svclt	0x00000050
+08005c00 <_DUMP>:
+ 8005c00:	4d554404 	cfldrdmi	mvd4, [r5, #-16]
+ 8005c04:	bf000050 	svclt	0x00000050
 
-08005c24 <DUMP>:
- 8005c24:	4750      	bx	sl
- 8005c26:	bf00      	nop
+08005c08 <DUMP>:
+ 8005c08:	4750      	bx	sl
+ 8005c0a:	bf00      	nop
+ 8005c0c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005c10:	0000000f 	andeq	r0, r0, pc
+ 8005c14:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
+ 8005c18:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005c1c:	fffffff0 			; <UNDEFINED> instruction: 0xfffffff0
+ 8005c20:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
+ 8005c24:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
  8005c28:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005c2c:	0000000f 	andeq	r0, r0, pc
- 8005c30:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
- 8005c34:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005c38:	fffffff0 			; <UNDEFINED> instruction: 0xfffffff0
- 8005c3c:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
- 8005c40:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 8005c44:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005c48:	fffffffc 			; <UNDEFINED> instruction: 0xfffffffc
- 8005c4c:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
- 8005c50:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
- 8005c54:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
- 8005c58:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005c5c:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005c60:	080042ed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, lr}
+ 8005c2c:	fffffffc 			; <UNDEFINED> instruction: 0xfffffffc
+ 8005c30:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
+ 8005c34:	08003479 	stmdaeq	r0, {r0, r3, r4, r5, r6, sl, ip, sp}
+ 8005c38:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
+ 8005c3c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005c40:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005c44:	080042ed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, lr}
+ 8005c48:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005c4c:	00000010 	andeq	r0, r0, r0, lsl r0
+ 8005c50:	08003e6d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, fp, ip, sp}
+ 8005c54:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005c58:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8005c5c:	08005c88 	stmdaeq	r0, {r3, r7, sl, fp, ip, lr}
+
+08005c60 <DUMP1>:
+ 8005c60:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
  8005c64:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
  8005c68:	00000010 	andeq	r0, r0, r0, lsl r0
- 8005c6c:	08003e6d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, fp, ip, sp}
- 8005c70:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005c74:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8005c78:	08005ca4 	stmdaeq	r0, {r2, r5, r7, sl, fp, ip, lr}
+ 8005c6c:	08003719 	stmdaeq	r0, {r0, r3, r4, r8, r9, sl, ip, sp}
+ 8005c70:	08005b8d 	stmdaeq	r0, {r0, r2, r3, r7, r8, r9, fp, ip, lr}
+ 8005c74:	080036c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, sl, ip, sp}
+ 8005c78:	080036c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, sl, ip, sp}
+ 8005c7c:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
+ 8005c80:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
+ 8005c84:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
 
-08005c7c <DUMP1>:
- 8005c7c:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8005c80:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005c84:	00000010 	andeq	r0, r0, r0, lsl r0
- 8005c88:	08003719 	stmdaeq	r0, {r0, r3, r4, r8, r9, sl, ip, sp}
- 8005c8c:	08005ba9 	stmdaeq	r0, {r0, r3, r5, r7, r8, r9, fp, ip, lr}
- 8005c90:	080036c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, sl, ip, sp}
- 8005c94:	080036c9 	stmdaeq	r0, {r0, r3, r6, r7, r9, sl, ip, sp}
- 8005c98:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
- 8005c9c:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
- 8005ca0:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
+08005c88 <DUMP4>:
+ 8005c88:	08003301 	stmdaeq	r0, {r0, r8, r9, ip, sp}
+ 8005c8c:	08005c60 	stmdaeq	r0, {r5, r6, sl, fp, ip, lr}
 
-08005ca4 <DUMP4>:
- 8005ca4:	08003301 	stmdaeq	r0, {r0, r8, r9, ip, sp}
- 8005ca8:	08005c7c 	stmdaeq	r0, {r2, r3, r4, r5, r6, sl, fp, ip, lr}
+08005c90 <DUMP3>:
+ 8005c90:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
+ 8005c94:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005c98:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
+ 8005c9c:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005ca0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005cac <DUMP3>:
- 8005cac:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
- 8005cb0:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005cb4:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
- 8005cb8:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005cbc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
-
-08005cc0 <TDOT>:
- 8005cc0:	4750      	bx	sl
- 8005cc2:	bf00      	nop
- 8005cc4:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
- 8005cc8:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005ccc:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005cd0:	080042ed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, lr}
- 8005cd4:	08003a95 	stmdaeq	r0, {r0, r2, r4, r7, r9, fp, ip, sp}
- 8005cd8:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005cdc:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005ce0:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+08005ca4 <TDOT>:
+ 8005ca4:	4750      	bx	sl
+ 8005ca6:	bf00      	nop
+ 8005ca8:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
+ 8005cac:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005cb0:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005cb4:	080042ed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, lr}
+ 8005cb8:	08003a95 	stmdaeq	r0, {r0, r2, r4, r7, r9, fp, ip, sp}
+ 8005cbc:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005cc0:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005cc4:	08003fcd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r8, r9, sl, fp, ip, sp}
+ 8005cc8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005ccc:	000000a0 	andeq	r0, r0, r0, lsr #1
+ 8005cd0:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
+ 8005cd4:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005cd8:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005cdc:	08003a95 	stmdaeq	r0, {r0, r2, r4, r7, r9, fp, ip, sp}
+ 8005ce0:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
  8005ce4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005ce8:	000000a0 	andeq	r0, r0, r0, lsr #1
- 8005cec:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
- 8005cf0:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005cf4:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005cf8:	08003a95 	stmdaeq	r0, {r0, r2, r4, r7, r9, fp, ip, sp}
- 8005cfc:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005d00:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005d04:	00000000 	andeq	r0, r0, r0
- 8005d08:	0800423d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r9, lr}
- 8005d0c:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
- 8005d10:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005d14:	00000024 	andeq	r0, r0, r4, lsr #32
- 8005d18:	080041f1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r8, lr}
- 8005d1c:	08003a95 	stmdaeq	r0, {r0, r2, r4, r7, r9, fp, ip, sp}
- 8005d20:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005d24:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005d28:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
- 8005d2c:	080035b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, sl, ip, sp}
- 8005d30:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
- 8005d34:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
- 8005d38:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005d3c:	08003a95 	stmdaeq	r0, {r0, r2, r4, r7, r9, fp, ip, sp}
- 8005d40:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005d44:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005d48:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
- 8005d4c:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005d50:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005d54:	08005c1c 	stmdaeq	r0, {r2, r3, r4, sl, fp, ip, lr}
+ 8005ce8:	00000000 	andeq	r0, r0, r0
+ 8005cec:	0800423d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r9, lr}
+ 8005cf0:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
+ 8005cf4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005cf8:	00000024 	andeq	r0, r0, r4, lsr #32
+ 8005cfc:	080041f1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r8, lr}
+ 8005d00:	08003a95 	stmdaeq	r0, {r0, r2, r4, r7, r9, fp, ip, sp}
+ 8005d04:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005d08:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005d0c:	080034a9 	stmdaeq	r0, {r0, r3, r5, r7, sl, ip, sp}
+ 8005d10:	080035b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, sl, ip, sp}
+ 8005d14:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
+ 8005d18:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
+ 8005d1c:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005d20:	08003a95 	stmdaeq	r0, {r0, r2, r4, r7, r9, fp, ip, sp}
+ 8005d24:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005d28:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005d2c:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
+ 8005d30:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005d34:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005d38:	08005c00 	stmdaeq	r0, {sl, fp, ip, lr}
 
-08005d58 <_DOTS>:
- 8005d58:	00532e02 	subseq	r2, r3, r2, lsl #28
+08005d3c <_DOTS>:
+ 8005d3c:	00532e02 	subseq	r2, r3, r2, lsl #28
 
-08005d5c <DOTS>:
- 8005d5c:	4750      	bx	sl
- 8005d5e:	bf00      	nop
- 8005d60:	08003f75 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, sl, fp, ip, sp}
- 8005d64:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005d68:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8005d6c:	08005d7c 	stmdaeq	r0, {r2, r3, r4, r5, r6, r8, sl, fp, ip, lr}
+08005d40 <DOTS>:
+ 8005d40:	4750      	bx	sl
+ 8005d42:	bf00      	nop
+ 8005d44:	08003f75 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, sl, fp, ip, sp}
+ 8005d48:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005d4c:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8005d50:	08005d60 	stmdaeq	r0, {r5, r6, r8, sl, fp, ip, lr}
 
-08005d70 <DOTS1>:
- 8005d70:	080033d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, r9, ip, sp}
- 8005d74:	08003f99 	stmdaeq	r0, {r0, r3, r4, r7, r8, r9, sl, fp, ip, sp}
- 8005d78:	08005cc1 	stmdaeq	r0, {r0, r6, r7, sl, fp, ip, lr}
+08005d54 <DOTS1>:
+ 8005d54:	080033d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, r9, ip, sp}
+ 8005d58:	08003f99 	stmdaeq	r0, {r0, r3, r4, r7, r8, r9, sl, fp, ip, sp}
+ 8005d5c:	08005ca5 	stmdaeq	r0, {r0, r2, r5, r7, sl, fp, ip, lr}
 
-08005d7c <DOTS2>:
- 8005d7c:	08003301 	stmdaeq	r0, {r0, r8, r9, ip, sp}
- 8005d80:	08005d70 	stmdaeq	r0, {r4, r5, r6, r8, sl, fp, ip, lr}
- 8005d84:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8005d88:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005d60 <DOTS2>:
+ 8005d60:	08003301 	stmdaeq	r0, {r0, r8, r9, ip, sp}
+ 8005d64:	08005d54 	stmdaeq	r0, {r2, r4, r6, r8, sl, fp, ip, lr}
+ 8005d68:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8005d6c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005d8c <RBASE>:
- 8005d8c:	f847 6d04 	str.w	r6, [r7, #-4]!
- 8005d90:	f64f 7680 	movw	r6, #65408	; 0xff80
- 8005d94:	f2c2 0601 	movt	r6, #8193	; 0x2001
- 8005d98:	f7fd b98c 	b.w	80030b4 <INEXT>
+08005d70 <RBASE>:
+ 8005d70:	f847 6d04 	str.w	r6, [r7, #-4]!
+ 8005d74:	f64f 7680 	movw	r6, #65408	; 0xff80
+ 8005d78:	f2c2 0601 	movt	r6, #8193	; 0x2001
+ 8005d7c:	f7fd b99a 	b.w	80030b4 <INEXT>
 
-08005d9c <RDOT>:
- 8005d9c:	4750      	bx	sl
- 8005d9e:	bf00      	nop
- 8005da0:	08005d8d 	stmdaeq	r0, {r0, r2, r3, r7, r8, sl, fp, ip, lr}
- 8005da4:	08003445 	stmdaeq	r0, {r0, r2, r6, sl, ip, sp}
- 8005da8:	080035b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, sl, ip, sp}
- 8005dac:	08003685 	stmdaeq	r0, {r0, r2, r7, r9, sl, ip, sp}
- 8005db0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005db4:	00000002 	andeq	r0, r0, r2
- 8005db8:	080035b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, sl, ip, sp}
- 8005dbc:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005dc0:	08005d8d 	stmdaeq	r0, {r0, r2, r3, r7, r8, sl, fp, ip, lr}
- 8005dc4:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
- 8005dc8:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005dcc:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005dd0:	08005cc1 	stmdaeq	r0, {r0, r6, r7, sl, fp, ip, lr}
+08005d80 <RDOT>:
+ 8005d80:	4750      	bx	sl
+ 8005d82:	bf00      	nop
+ 8005d84:	08005d71 	stmdaeq	r0, {r0, r4, r5, r6, r8, sl, fp, ip, lr}
+ 8005d88:	08003445 	stmdaeq	r0, {r0, r2, r6, sl, ip, sp}
+ 8005d8c:	080035b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, sl, ip, sp}
+ 8005d90:	08003685 	stmdaeq	r0, {r0, r2, r7, r9, sl, ip, sp}
+ 8005d94:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005d98:	00000002 	andeq	r0, r0, r2
+ 8005d9c:	080035b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, sl, ip, sp}
+ 8005da0:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005da4:	08005d71 	stmdaeq	r0, {r0, r4, r5, r6, r8, sl, fp, ip, lr}
+ 8005da8:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
+ 8005dac:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005db0:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005db4:	08005ca5 	stmdaeq	r0, {r0, r2, r5, r7, sl, fp, ip, lr}
+ 8005db8:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005dbc:	08003611 	stmdaeq	r0, {r0, r4, r9, sl, ip, sp}
+ 8005dc0:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005dc4:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005dc8:	0800381d 	stmdaeq	r0, {r0, r2, r3, r4, fp, ip, sp}
+ 8005dcc:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005dd0:	08005da8 	stmdaeq	r0, {r3, r5, r7, r8, sl, fp, ip, lr}
  8005dd4:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005dd8:	08003611 	stmdaeq	r0, {r0, r4, r9, sl, ip, sp}
- 8005ddc:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005de0:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005de4:	0800381d 	stmdaeq	r0, {r0, r2, r3, r4, fp, ip, sp}
- 8005de8:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005dec:	08005dc4 	stmdaeq	r0, {r2, r6, r7, r8, sl, fp, ip, lr}
- 8005df0:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005df4:	080036f1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r9, sl, ip, sp}
- 8005df8:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8005dfc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005e00:	08005d58 	stmdaeq	r0, {r3, r4, r6, r8, sl, fp, ip, lr}
+ 8005dd8:	080036f1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r9, sl, ip, sp}
+ 8005ddc:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8005de0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005de4:	08005d3c 	stmdaeq	r0, {r2, r3, r4, r5, r8, sl, fp, ip, lr}
 
-08005e04 <_TRACE>:
- 8005e04:	41525405 	cmpmi	r2, r5, lsl #8
- 8005e08:	bf004543 	svclt	0x00004543
+08005de8 <_TRACE>:
+ 8005de8:	41525405 	cmpmi	r2, r5, lsl #8
+ 8005dec:	bf004543 	svclt	0x00004543
 
-08005e0c <TRACE>:
- 8005e0c:	4750      	bx	sl
- 8005e0e:	bf00      	nop
- 8005e10:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+08005df0 <TRACE>:
+ 8005df0:	4750      	bx	sl
+ 8005df2:	bf00      	nop
+ 8005df4:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8005df8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005dfc:	0000003e 	andeq	r0, r0, lr, lsr r0
+ 8005e00:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005e04:	00000053 	andeq	r0, r0, r3, asr r0
+ 8005e08:	0800317d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, ip, sp}
+ 8005e0c:	0800317d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, ip, sp}
+ 8005e10:	08005d41 	stmdaeq	r0, {r0, r6, r8, sl, fp, ip, lr}
  8005e14:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
  8005e18:	0000003e 	andeq	r0, r0, lr, lsr r0
  8005e1c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005e20:	00000053 	andeq	r0, r0, r3, asr r0
+ 8005e20:	00000052 	andeq	r0, r0, r2, asr r0
  8005e24:	0800317d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, ip, sp}
  8005e28:	0800317d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, ip, sp}
- 8005e2c:	08005d5d 	stmdaeq	r0, {r0, r2, r3, r4, r6, r8, sl, fp, ip, lr}
- 8005e30:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005e34:	0000003e 	andeq	r0, r0, lr, lsr r0
- 8005e38:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005e3c:	00000052 	andeq	r0, r0, r2, asr r0
- 8005e40:	0800317d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, ip, sp}
- 8005e44:	0800317d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r6, r8, ip, sp}
- 8005e48:	08005d9d 	stmdaeq	r0, {r0, r2, r3, r4, r7, r8, sl, fp, ip, lr}
- 8005e4c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005e50:	08005e04 	stmdaeq	r0, {r2, r9, sl, fp, ip, lr}
+ 8005e2c:	08005d81 	stmdaeq	r0, {r0, r7, r8, sl, fp, ip, lr}
+ 8005e30:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005e34:	08005de8 	stmdaeq	r0, {r3, r5, r6, r7, r8, sl, fp, ip, lr}
 
-08005e54 <_TOBODY>:
- 8005e54:	4f423e05 	svcmi	0x00423e05
- 8005e58:	bf005944 	svclt	0x00005944
+08005e38 <_TOBODY>:
+ 8005e38:	4f423e05 	svcmi	0x00423e05
+ 8005e3c:	bf005944 	svclt	0x00005944
 
-08005e5c <TOBODY>:
- 8005e5c:	f106 0608 	add.w	r6, r6, #8
- 8005e60:	f7fd b928 	b.w	80030b4 <INEXT>
- 8005e64:	08005e54 	stmdaeq	r0, {r2, r4, r6, r9, sl, fp, ip, lr}
+08005e40 <TOBODY>:
+ 8005e40:	f106 0610 	add.w	r6, r6, #16
+ 8005e44:	f7fd b936 	b.w	80030b4 <INEXT>
 
-08005e68 <_TONFA>:
- 8005e68:	464e3e04 	strbmi	r3, [lr], -r4, lsl #28
- 8005e6c:	bf000041 	svclt	0x00000041
+08005e48 <TOVECTOR>:
+ 8005e48:	f106 0608 	add.w	r6, r6, #8
+ 8005e4c:	f7fd b932 	b.w	80030b4 <INEXT>
+ 8005e50:	08005e38 	stmdaeq	r0, {r3, r4, r5, r9, sl, fp, ip, lr}
 
-08005e70 <TONFA>:
- 8005e70:	4750      	bx	sl
- 8005e72:	bf00      	nop
- 8005e74:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
- 8005e78:	08003aad 	stmdaeq	r0, {r0, r2, r3, r5, r7, r9, fp, ip, sp}
- 8005e7c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+08005e54 <_TONFA>:
+ 8005e54:	464e3e04 	strbmi	r3, [lr], -r4, lsl #28
+ 8005e58:	bf000041 	svclt	0x00000041
 
-08005e80 <TNAM1>:
- 8005e80:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005e84:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005e88:	08005eb4 	stmdaeq	r0, {r2, r4, r5, r7, r9, sl, fp, ip, lr}
- 8005e8c:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005e90:	08004b35 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, fp, lr}
- 8005e94:	080033d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, r9, ip, sp}
- 8005e98:	0800354d 	stmdaeq	r0, {r0, r2, r3, r6, r8, sl, ip, sp}
- 8005e9c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005ea0:	08005eb4 	stmdaeq	r0, {r2, r4, r5, r7, r9, sl, fp, ip, lr}
- 8005ea4:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
- 8005ea8:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005eac:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8005eb0:	08005e80 	stmdaeq	r0, {r7, r9, sl, fp, ip, lr}
+08005e5c <TONFA>:
+ 8005e5c:	4750      	bx	sl
+ 8005e5e:	bf00      	nop
+ 8005e60:	080033e5 	stmdaeq	r0, {r0, r2, r5, r6, r7, r8, r9, ip, sp}
+ 8005e64:	08003aad 	stmdaeq	r0, {r0, r2, r3, r5, r7, r9, fp, ip, sp}
+ 8005e68:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
 
-08005eb4 <TNAM2>:
- 8005eb4:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005eb8:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
- 8005ebc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005ec0:	08005e68 	stmdaeq	r0, {r3, r5, r6, r9, sl, fp, ip, lr}
+08005e6c <TNAM1>:
+ 8005e6c:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005e70:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005e74:	08005ea0 	stmdaeq	r0, {r5, r7, r9, sl, fp, ip, lr}
+ 8005e78:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005e7c:	08004b35 	stmdaeq	r0, {r0, r2, r4, r5, r8, r9, fp, lr}
+ 8005e80:	080033d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, r9, ip, sp}
+ 8005e84:	0800354d 	stmdaeq	r0, {r0, r2, r3, r6, r8, sl, ip, sp}
+ 8005e88:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005e8c:	08005ea0 	stmdaeq	r0, {r5, r7, r9, sl, fp, ip, lr}
+ 8005e90:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
+ 8005e94:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005e98:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8005e9c:	08005e6c 	stmdaeq	r0, {r2, r3, r5, r6, r9, sl, fp, ip, lr}
 
-08005ec4 <_DOTID>:
- 8005ec4:	44492e03 	strbmi	r2, [r9], #-3587	; 0xfffff1fd
+08005ea0 <TNAM2>:
+ 8005ea0:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005ea4:	08003459 	stmdaeq	r0, {r0, r3, r4, r6, sl, ip, sp}
+ 8005ea8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005eac:	08005e54 	stmdaeq	r0, {r2, r4, r6, r9, sl, fp, ip, lr}
 
-08005ec8 <DOTID>:
- 8005ec8:	4750      	bx	sl
- 8005eca:	bf00      	nop
- 8005ecc:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
- 8005ed0:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005ed4:	08005ef0 	stmdaeq	r0, {r4, r5, r6, r7, r9, sl, fp, ip, lr}
- 8005ed8:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
- 8005edc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005ee0:	0000001f 	andeq	r0, r0, pc, lsl r0
- 8005ee4:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
- 8005ee8:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
+08005eb0 <_DOTID>:
+ 8005eb0:	44492e03 	strbmi	r2, [r9], #-3587	; 0xfffff1fd
+
+08005eb4 <DOTID>:
+ 8005eb4:	4750      	bx	sl
+ 8005eb6:	bf00      	nop
+ 8005eb8:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
+ 8005ebc:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005ec0:	08005edc 	stmdaeq	r0, {r2, r3, r4, r6, r7, r9, sl, fp, ip, lr}
+ 8005ec4:	08003951 	stmdaeq	r0, {r0, r4, r6, r8, fp, ip, sp}
+ 8005ec8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005ecc:	0000001f 	andeq	r0, r0, pc, lsl r0
+ 8005ed0:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
+ 8005ed4:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
+ 8005ed8:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+
+08005edc <DOTI1>:
+ 8005edc:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
+ 8005ee0:	6e7b2009 	cdpvs	0, 7, cr2, cr11, cr9, {0}
+ 8005ee4:	6d614e6f 	stclvs	14, cr4, [r1, #-444]!	; 0xfffffe44
+ 8005ee8:	bf007d65 	svclt	0x00007d65
  8005eec:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005ef0:	08005eb0 	stmdaeq	r0, {r4, r5, r7, r9, sl, fp, ip, lr}
 
-08005ef0 <DOTI1>:
- 8005ef0:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
- 8005ef4:	6e7b2009 	cdpvs	0, 7, cr2, cr11, cr9, {0}
- 8005ef8:	6d614e6f 	stclvs	14, cr4, [r1, #-444]!	; 0xfffffe44
- 8005efc:	bf007d65 	svclt	0x00007d65
- 8005f00:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005f04:	08005ec4 	stmdaeq	r0, {r2, r6, r7, r9, sl, fp, ip, lr}
+08005ef4 <_WORDS>:
+ 8005ef4:	524f5705 	subpl	r5, pc, #1310720	; 0x140000
+ 8005ef8:	bf005344 	svclt	0x00005344
 
-08005f08 <_WORDS>:
- 8005f08:	524f5705 	subpl	r5, pc, #1310720	; 0x140000
- 8005f0c:	bf005344 	svclt	0x00005344
+08005efc <WORDS>:
+ 8005efc:	4750      	bx	sl
+ 8005efe:	bf00      	nop
+ 8005f00:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8005f04:	08003aad 	stmdaeq	r0, {r0, r2, r3, r5, r7, r9, fp, ip, sp}
+ 8005f08:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
 
-08005f10 <WORDS>:
- 8005f10:	4750      	bx	sl
- 8005f12:	bf00      	nop
- 8005f14:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8005f18:	08003aad 	stmdaeq	r0, {r0, r2, r3, r5, r7, r9, fp, ip, sp}
- 8005f1c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+08005f0c <WORS1>:
+ 8005f0c:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
+ 8005f10:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8005f14:	08005f34 	stmdaeq	r0, {r2, r4, r5, r8, r9, sl, fp, ip, lr}
+ 8005f18:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
+ 8005f1c:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
+ 8005f20:	08005eb5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, fp, ip, lr}
+ 8005f24:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
+ 8005f28:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005f2c:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 8005f30:	08005f0c 	stmdaeq	r0, {r2, r3, r8, r9, sl, fp, ip, lr}
 
-08005f20 <WORS1>:
- 8005f20:	080036b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r9, sl, ip, sp}
- 8005f24:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8005f28:	08005f48 	stmdaeq	r0, {r3, r6, r8, r9, sl, fp, ip, lr}
- 8005f2c:	08003469 	stmdaeq	r0, {r0, r3, r5, r6, sl, ip, sp}
- 8005f30:	08004589 	stmdaeq	r0, {r0, r3, r7, r8, sl, lr}
- 8005f34:	08005ec9 	stmdaeq	r0, {r0, r3, r6, r7, r9, sl, fp, ip, lr}
- 8005f38:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
- 8005f3c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005f40:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 8005f44:	08005f20 	stmdaeq	r0, {r5, r8, r9, sl, fp, ip, lr}
+08005f34 <WORS2>:
+ 8005f34:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005f38:	08005ef4 	stmdaeq	r0, {r2, r4, r5, r6, r7, r9, sl, fp, ip, lr}
 
-08005f48 <WORS2>:
- 8005f48:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005f4c:	08005f08 	stmdaeq	r0, {r3, r8, r9, sl, fp, ip, lr}
+08005f3c <_MARK>:
+ 8005f3c:	52414d04 	subpl	r4, r1, #4, 26	; 0x100
+ 8005f40:	bf00004b 	svclt	0x0000004b
 
-08005f50 <_MARK>:
- 8005f50:	52414d04 	subpl	r4, r1, #4, 26	; 0x100
- 8005f54:	bf00004b 	svclt	0x0000004b
+08005f44 <MARK>:
+ 8005f44:	4750      	bx	sl
+ 8005f46:	bf00      	nop
+ 8005f48:	08005acd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r9, fp, ip, lr}
+ 8005f4c:	08005981 	stmdaeq	r0, {r0, r7, r8, fp, ip, lr}
+ 8005f50:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005f54:	4750      	bx	sl
+ 8005f56:	bf00      	nop
+ 8005f58:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
+ 8005f5c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005f60:	00000008 	andeq	r0, r0, r8
+ 8005f64:	080035b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, sl, ip, sp}
+ 8005f68:	08005e5d 	stmdaeq	r0, {r0, r2, r3, r4, r6, r9, sl, fp, ip, lr}
+ 8005f6c:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
+ 8005f70:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8005f74:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
+ 8005f78:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 8005f7c:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 8005f80:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8005f84:	08005f3c 	stmdaeq	r0, {r2, r3, r4, r5, r8, r9, sl, fp, ip, lr}
 
-08005f58 <MARK>:
- 8005f58:	4750      	bx	sl
- 8005f5a:	bf00      	nop
- 8005f5c:	08005af5 	stmdaeq	r0, {r0, r2, r4, r5, r6, r7, r9, fp, ip, lr}
- 8005f60:	0800599d 	stmdaeq	r0, {r0, r2, r3, r4, r7, r8, fp, ip, lr}
- 8005f64:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005f68:	4750      	bx	sl
- 8005f6a:	bf00      	nop
- 8005f6c:	080033a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, ip, sp}
- 8005f70:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005f74:	00000008 	andeq	r0, r0, r8
- 8005f78:	080035b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, r8, sl, ip, sp}
- 8005f7c:	08005e71 	stmdaeq	r0, {r0, r4, r5, r6, r9, sl, fp, ip, lr}
- 8005f80:	08003651 	stmdaeq	r0, {r0, r4, r6, r9, sl, ip, sp}
- 8005f84:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8005f88:	08003aed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, fp, ip, sp}
- 8005f8c:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8005f90:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 8005f94:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8005f98:	08005f50 	stmdaeq	r0, {r4, r6, r8, r9, sl, fp, ip, lr}
+08005f88 <_ARRAY>:
+ 8005f88:	52524105 	subspl	r4, r2, #1073741825	; 0x40000001
+ 8005f8c:	bf005941 	svclt	0x00005941
 
-08005f9c <_ARRAY>:
- 8005f9c:	52524105 	subspl	r4, r2, #1073741825	; 0x40000001
- 8005fa0:	bf005941 	svclt	0x00005941
+08005f90 <ARRAY>:
+ 8005f90:	4750      	bx	sl
+ 8005f92:	bf00      	nop
+ 8005f94:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
+ 8005f98:	080057a1 	stmdaeq	r0, {r0, r5, r7, r8, r9, sl, ip, lr}
+ 8005f9c:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 8005fa0:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
+ 8005fa4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005fa8:	08005fd0 	stmdaeq	r0, {r4, r6, r7, r8, r9, sl, fp, ip, lr}
+ 8005fac:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005fb0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005fb4:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
+ 8005fb8:	08005909 	stmdaeq	r0, {r0, r3, r8, fp, ip, lr}
+ 8005fbc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005fc0:	00000004 	andeq	r0, r0, r4
+ 8005fc4:	080035c5 	stmdaeq	r0, {r0, r2, r6, r7, r8, sl, ip, sp}
+ 8005fc8:	080052b1 	stmdaeq	r0, {r0, r4, r5, r7, r9, ip, lr}
+ 8005fcc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005fa4 <ARRAY>:
- 8005fa4:	4750      	bx	sl
- 8005fa6:	bf00      	nop
- 8005fa8:	08004b15 	stmdaeq	r0, {r0, r2, r4, r8, r9, fp, lr}
- 8005fac:	080057bd 	stmdaeq	r0, {r0, r2, r3, r4, r5, r7, r8, r9, sl, ip, lr}
- 8005fb0:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 8005fb4:	080030c5 	stmdaeq	r0, {r0, r2, r6, r7, ip, sp}
- 8005fb8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005fbc:	08005fe4 	stmdaeq	r0, {r2, r5, r6, r7, r8, r9, sl, fp, ip, lr}
- 8005fc0:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005fc4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005fc8:	080030ba 	stmdaeq	r0, {r1, r3, r4, r5, r7, ip, sp}
- 8005fcc:	08005925 	stmdaeq	r0, {r0, r2, r5, r8, fp, ip, lr}
- 8005fd0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005fd4:	00000004 	andeq	r0, r0, r4
- 8005fd8:	080035c5 	stmdaeq	r0, {r0, r2, r6, r7, r8, sl, ip, sp}
- 8005fdc:	080052cd 	stmdaeq	r0, {r0, r2, r3, r6, r7, r9, ip, lr}
- 8005fe0:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005fd0 <DO_ARRAY>:
+ 8005fd0:	4750      	bx	sl
+ 8005fd2:	bf00      	nop
+ 8005fd4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005fd8:	00000004 	andeq	r0, r0, r4
+ 8005fdc:	080035c5 	stmdaeq	r0, {r0, r2, r6, r7, r8, sl, ip, sp}
+ 8005fe0:	080033d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, r9, ip, sp}
+ 8005fe4:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
+ 8005fe8:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
+ 8005fec:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08005fe4 <DO_ARRAY>:
- 8005fe4:	4750      	bx	sl
- 8005fe6:	bf00      	nop
- 8005fe8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8005fec:	00000004 	andeq	r0, r0, r4
- 8005ff0:	080035c5 	stmdaeq	r0, {r0, r2, r6, r7, r8, sl, ip, sp}
- 8005ff4:	080033d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, r9, ip, sp}
- 8005ff8:	08003641 	stmdaeq	r0, {r0, r6, r9, sl, ip, sp}
- 8005ffc:	080035a5 	stmdaeq	r0, {r0, r2, r5, r7, r8, sl, ip, sp}
- 8006000:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08005ff0 <VERSN>:
+ 8005ff0:	4750      	bx	sl
+ 8005ff2:	bf00      	nop
+ 8005ff4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8005ff8:	00000100 	andeq	r0, r0, r0, lsl #2
+ 8005ffc:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8006000:	08005f88 	stmdaeq	r0, {r3, r7, r8, r9, sl, fp, ip, lr}
 
-08006004 <VERSN>:
- 8006004:	4750      	bx	sl
- 8006006:	bf00      	nop
- 8006008:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800600c:	00000100 	andeq	r0, r0, r0, lsl #2
- 8006010:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 8006014:	08005f9c 	stmdaeq	r0, {r2, r3, r4, r7, r8, r9, sl, fp, ip, lr}
+08006004 <_HI>:
+ 8006004:	00494802 	subeq	r4, r9, r2, lsl #16
 
-08006018 <_HI>:
- 8006018:	00494802 	subeq	r4, r9, r2, lsl #16
+08006008 <HI>:
+ 8006008:	4750      	bx	sl
+ 800600a:	bf00      	nop
+ 800600c:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8006010:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
+ 8006014:	79656211 	stmdbvc	r5!, {r0, r4, r9, sp, lr}^
+ 8006018:	20646e6f 	rsbcs	r6, r4, pc, ror #28
+ 800601c:	6970754a 	ldmdbvs	r0!, {r1, r3, r6, r8, sl, ip, sp, lr}^
+ 8006020:	2c726574 	cfldr64cs	mvdx6, [r2], #-464	; 0xfffffe30
+ 8006024:	bf007620 	svclt	0x00007620
+ 8006028:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
+ 800602c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8006030:	080042ed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, lr}
+ 8006034:	08005ff1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+ 8006038:	080041d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, lr}
+ 800603c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8006040:	00000000 	andeq	r0, r0, r0
+ 8006044:	0800421d 	stmdaeq	r0, {r0, r2, r3, r4, r9, lr}
+ 8006048:	0800421d 	stmdaeq	r0, {r0, r2, r3, r4, r9, lr}
+ 800604c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8006050:	0000002e 	andeq	r0, r0, lr, lsr #32
+ 8006054:	080041f1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r8, lr}
+ 8006058:	0800423d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r9, lr}
+ 800605c:	08004299 	stmdaeq	r0, {r0, r3, r4, r7, r9, lr}
+ 8006060:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
+ 8006064:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
+ 8006068:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
+ 800606c:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8006070:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-0800601c <HI>:
- 800601c:	4750      	bx	sl
- 800601e:	bf00      	nop
- 8006020:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8006024:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
- 8006028:	79656211 	stmdbvc	r5!, {r0, r4, r9, sp, lr}^
- 800602c:	20646e6f 	rsbcs	r6, r4, pc, ror #28
- 8006030:	6970754a 	ldmdbvs	r0!, {r1, r3, r6, r8, sl, ip, sp, lr}^
- 8006034:	2c726574 	cfldr64cs	mvdx6, [r2], #-464	; 0xfffffe30
- 8006038:	bf007620 	svclt	0x00007620
- 800603c:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
- 8006040:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8006044:	080042ed 	stmdaeq	r0, {r0, r2, r3, r5, r6, r7, r9, lr}
- 8006048:	08006005 	stmdaeq	r0, {r0, r2, sp, lr}
- 800604c:	080041d1 	stmdaeq	r0, {r0, r4, r6, r7, r8, lr}
- 8006050:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8006054:	00000000 	andeq	r0, r0, r0
- 8006058:	0800421d 	stmdaeq	r0, {r0, r2, r3, r4, r9, lr}
- 800605c:	0800421d 	stmdaeq	r0, {r0, r2, r3, r4, r9, lr}
- 8006060:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8006064:	0000002e 	andeq	r0, r0, lr, lsr #32
- 8006068:	080041f1 	stmdaeq	r0, {r0, r4, r5, r6, r7, r8, lr}
- 800606c:	0800423d 	stmdaeq	r0, {r0, r2, r3, r4, r5, r9, lr}
- 8006070:	08004299 	stmdaeq	r0, {r0, r3, r4, r7, r9, lr}
- 8006074:	080045dd 	stmdaeq	r0, {r0, r2, r3, r4, r6, r7, r8, sl, lr}
- 8006078:	08003a01 	stmdaeq	r0, {r0, r9, fp, ip, sp}
- 800607c:	08003361 	stmdaeq	r0, {r0, r5, r6, r8, r9, ip, sp}
- 8006080:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8006084:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+08006074 <HI_BOTH>:
+ 8006074:	4750      	bx	sl
+ 8006076:	bf00      	nop
+ 8006078:	08000e01 	stmdaeq	r0, {r0, r9, sl, fp}
+ 800607c:	08000e31 	stmdaeq	r0, {r0, r4, r5, r9, sl, fp}
+ 8006080:	08006009 	stmdaeq	r0, {r0, r3, sp, lr}
+ 8006084:	08000e19 	stmdaeq	r0, {r0, r3, r4, r9, sl, fp}
+ 8006088:	08000e31 	stmdaeq	r0, {r0, r4, r5, r9, sl, fp}
+ 800608c:	08006009 	stmdaeq	r0, {r0, r3, sp, lr}
+ 8006090:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08006088 <HI_BOTH>:
- 8006088:	4750      	bx	sl
- 800608a:	bf00      	nop
- 800608c:	08000e01 	stmdaeq	r0, {r0, r9, sl, fp}
- 8006090:	08000e31 	stmdaeq	r0, {r0, r4, r5, r9, sl, fp}
- 8006094:	0800601d 	stmdaeq	r0, {r0, r2, r3, r4, sp, lr}
- 8006098:	08000e19 	stmdaeq	r0, {r0, r3, r4, r9, sl, fp}
- 800609c:	08000e31 	stmdaeq	r0, {r0, r4, r5, r9, sl, fp}
- 80060a0:	0800601d 	stmdaeq	r0, {r0, r2, r3, r4, sp, lr}
- 80060a4:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
-
-080060a8 <PS2_QUERY>:
- 80060a8:	4750      	bx	sl
- 80060aa:	bf00      	nop
- 80060ac:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80060b0:	00000190 	muleq	r0, r0, r1
- 80060b4:	08003215 	stmdaeq	r0, {r0, r2, r4, r9, ip, sp}
- 80060b8:	08001c21 	stmdaeq	r0, {r0, r5, sl, fp, ip}
+08006094 <PS2_QUERY>:
+ 8006094:	4750      	bx	sl
+ 8006096:	bf00      	nop
+ 8006098:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 800609c:	00000190 	muleq	r0, r0, r1
+ 80060a0:	08003215 	stmdaeq	r0, {r0, r2, r4, r9, ip, sp}
+ 80060a4:	08001c21 	stmdaeq	r0, {r0, r5, sl, fp, ip}
+ 80060a8:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 80060ac:	080060c4 	stmdaeq	r0, {r2, r6, r7, sp, lr}
+ 80060b0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80060b4:	000000aa 	andeq	r0, r0, sl, lsr #1
+ 80060b8:	0800354d 	stmdaeq	r0, {r0, r2, r3, r6, r8, sl, ip, sp}
  80060bc:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 80060c0:	080060d8 	stmdaeq	r0, {r3, r4, r6, r7, sp, lr}
- 80060c4:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80060c8:	000000aa 	andeq	r0, r0, sl, lsr #1
- 80060cc:	0800354d 	stmdaeq	r0, {r0, r2, r3, r6, r8, sl, ip, sp}
- 80060d0:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 80060d4:	0800611c 	stmdaeq	r0, {r2, r3, r4, r8, sp, lr}
- 80060d8:	08001e09 	stmdaeq	r0, {r0, r3, r9, sl, fp, ip}
- 80060dc:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80060e0:	000000aa 	andeq	r0, r0, sl, lsr #1
- 80060e4:	0800354d 	stmdaeq	r0, {r0, r2, r3, r6, r8, sl, ip, sp}
- 80060e8:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 80060ec:	0800611c 	stmdaeq	r0, {r2, r3, r4, r8, sp, lr}
- 80060f0:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 80060f4:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
- 80060f8:	206f6e19 	rsbcs	r6, pc, r9, lsl lr	; <UNPREDICTABLE>
- 80060fc:	20325350 	eorscs	r5, r2, r0, asr r3
- 8006100:	6279656b 	rsbsvs	r6, r9, #448790528	; 0x1ac00000
- 8006104:	6472616f 	ldrbtvs	r6, [r2], #-367	; 0xfffffe91
- 8006108:	74656420 	strbtvc	r6, [r5], #-1056	; 0xfffffbe0
- 800610c:	65746365 	ldrbvs	r6, [r4, #-869]!	; 0xfffffc9b
- 8006110:	bf002e64 	svclt	0x00002e64
- 8006114:	08000e19 	stmdaeq	r0, {r0, r3, r4, r9, sl, fp}
- 8006118:	08000e31 	stmdaeq	r0, {r0, r4, r5, r9, sl, fp}
- 800611c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 80060c0:	08006108 	stmdaeq	r0, {r3, r8, sp, lr}
+ 80060c4:	08001e09 	stmdaeq	r0, {r0, r3, r9, sl, fp, ip}
+ 80060c8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 80060cc:	000000aa 	andeq	r0, r0, sl, lsr #1
+ 80060d0:	0800354d 	stmdaeq	r0, {r0, r2, r3, r6, r8, sl, ip, sp}
+ 80060d4:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 80060d8:	08006108 	stmdaeq	r0, {r3, r8, sp, lr}
+ 80060dc:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 80060e0:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
+ 80060e4:	206f6e19 	rsbcs	r6, pc, r9, lsl lr	; <UNPREDICTABLE>
+ 80060e8:	20325350 	eorscs	r5, r2, r0, asr r3
+ 80060ec:	6279656b 	rsbsvs	r6, r9, #448790528	; 0x1ac00000
+ 80060f0:	6472616f 	ldrbtvs	r6, [r2], #-367	; 0xfffffe91
+ 80060f4:	74656420 	strbtvc	r6, [r5], #-1056	; 0xfffffbe0
+ 80060f8:	65746365 	ldrbvs	r6, [r4, #-869]!	; 0xfffffc9b
+ 80060fc:	bf002e64 	svclt	0x00002e64
+ 8006100:	08000e19 	stmdaeq	r0, {r0, r3, r4, r9, sl, fp}
+ 8006104:	08000e31 	stmdaeq	r0, {r0, r4, r5, r9, sl, fp}
+ 8006108:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08006120 <IF_SENSE>:
- 8006120:	4750      	bx	sl
- 8006122:	bf00      	nop
- 8006124:	08000e01 	stmdaeq	r0, {r0, r9, sl, fp}
- 8006128:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800612c:	40020010 	andmi	r0, r2, r0, lsl r0
- 8006130:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
- 8006134:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8006138:	00000100 	andeq	r0, r0, r0, lsl #2
- 800613c:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
- 8006140:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
- 8006144:	0800614c 	stmdaeq	r0, {r2, r3, r6, r8, sp, lr}
- 8006148:	08003601 	stmdaeq	r0, {r0, r9, sl, ip, sp}
- 800614c:	08000e31 	stmdaeq	r0, {r0, r4, r5, r9, sl, fp}
- 8006150:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+0800610c <IF_SENSE>:
+ 800610c:	4750      	bx	sl
+ 800610e:	bf00      	nop
+ 8006110:	08000e01 	stmdaeq	r0, {r0, r9, sl, fp}
+ 8006114:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8006118:	40020010 	andmi	r0, r2, r0, lsl r0
+ 800611c:	08003375 	stmdaeq	r0, {r0, r2, r4, r5, r6, r8, r9, ip, sp}
+ 8006120:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8006124:	00000100 	andeq	r0, r0, r0, lsl #2
+ 8006128:	08003525 	stmdaeq	r0, {r0, r2, r5, r8, sl, ip, sp}
+ 800612c:	0800331f 	stmdaeq	r0, {r0, r1, r2, r3, r4, r8, r9, ip, sp}
+ 8006130:	08006138 	stmdaeq	r0, {r3, r4, r5, r8, sp, lr}
+ 8006134:	08003601 	stmdaeq	r0, {r0, r9, sl, ip, sp}
+ 8006138:	08000e31 	stmdaeq	r0, {r0, r4, r5, r9, sl, fp}
+ 800613c:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
 
-08006154 <READY>:
- 8006154:	4750      	bx	sl
- 8006156:	bf00      	nop
- 8006158:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
- 800615c:	41455205 	cmpmi	r5, r5, lsl #4
- 8006160:	bf005944 	svclt	0x00005944
- 8006164:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
- 8006168:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
- 800616c:	08006018 	stmdaeq	r0, {r3, r4, sp, lr}
+08006140 <READY>:
+ 8006140:	4750      	bx	sl
+ 8006142:	bf00      	nop
+ 8006144:	0800466d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r9, sl, lr}
+ 8006148:	41455205 	cmpmi	r5, r5, lsl #4
+ 800614c:	bf005944 	svclt	0x00005944
+ 8006150:	08004611 	stmdaeq	r0, {r0, r4, r9, sl, lr}
+ 8006154:	080030bb 	stmdaeq	r0, {r0, r1, r3, r4, r5, r7, ip, sp}
+ 8006158:	08006004 	stmdaeq	r0, {r2, sp, lr}
 
-08006170 <LINK>:
- 8006170:	4c4f4304 	mcrrmi	3, 0, r4, pc, cr4
- 8006174:	bf000044 	svclt	0x00000044
+0800615c <LINK>:
+ 800615c:	4c4f4304 	mcrrmi	3, 0, r4, pc, cr4
+ 8006160:	bf000044 	svclt	0x00000044
 
-08006178 <COLD>:
- 8006178:	b500      	push	{lr}
- 800617a:	f7fa fadd 	bl	8000738 <forth_init>
- 800617e:	f85d eb04 	ldr.w	lr, [sp], #4
- 8006182:	f8df c05c 	ldr.w	ip, [pc, #92]	; 80061e0 <COLD2+0x4>
- 8006186:	f7fc bf95 	b.w	80030b4 <INEXT>
- 800618a:	bf00      	nop
+08006164 <COLD>:
+ 8006164:	b500      	push	{lr}
+ 8006166:	f7fa fae7 	bl	8000738 <forth_init>
+ 800616a:	f85d eb04 	ldr.w	lr, [sp], #4
+ 800616e:	f8df c05c 	ldr.w	ip, [pc, #92]	; 80061cc <COLD2+0x4>
+ 8006172:	f7fc bf9f 	b.w	80030b4 <INEXT>
+ 8006176:	bf00      	nop
 
-0800618c <COLD1>:
+08006178 <COLD1>:
+ 8006178:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 800617c:	00000000 	andeq	r0, r0, r0
+ 8006180:	08003249 	stmdaeq	r0, {r0, r3, r6, r9, ip, sp}
+ 8006184:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8006188:	08000a64 	stmdaeq	r0, {r2, r5, r6, r9, fp}
  800618c:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 8006190:	00000000 	andeq	r0, r0, r0
- 8006194:	08003249 	stmdaeq	r0, {r0, r3, r6, r9, ip, sp}
- 8006198:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 800619c:	08000a64 	stmdaeq	r0, {r2, r5, r6, r9, fp}
- 80061a0:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80061a4:	20000000 	andcs	r0, r0, r0
- 80061a8:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
- 80061ac:	000000c0 	andeq	r0, r0, r0, asr #1
- 80061b0:	080040a9 	stmdaeq	r0, {r0, r3, r5, r7, lr}
- 80061b4:	08005189 	stmdaeq	r0, {r0, r3, r7, r8, ip, lr}
- 80061b8:	080020b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, sp}
- 80061bc:	080060a9 	stmdaeq	r0, {r0, r3, r5, r7, sp, lr}
- 80061c0:	080039e9 	stmdaeq	r0, {r0, r3, r5, r6, r7, r8, fp, ip, sp}
- 80061c4:	08004059 	stmdaeq	r0, {r0, r3, r4, r6, lr}
- 80061c8:	080058b9 	stmdaeq	r0, {r0, r3, r4, r5, r7, fp, ip, lr}
- 80061cc:	08006121 	stmdaeq	r0, {r0, r5, r8, sp, lr}
- 80061d0:	08006155 	stmdaeq	r0, {r0, r2, r4, r6, r8, sp, lr}
- 80061d4:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
- 80061d8:	080051a0 	stmdaeq	r0, {r5, r7, r8, ip, lr}
+ 8006190:	20000000 	andcs	r0, r0, r0
+ 8006194:	080032df 	stmdaeq	r0, {r0, r1, r2, r3, r4, r6, r7, r9, ip, sp}
+ 8006198:	000000c0 	andeq	r0, r0, r0, asr #1
+ 800619c:	080040a9 	stmdaeq	r0, {r0, r3, r5, r7, lr}
+ 80061a0:	0800516d 	stmdaeq	r0, {r0, r2, r3, r5, r6, r8, ip, lr}
+ 80061a4:	080020b5 	stmdaeq	r0, {r0, r2, r4, r5, r7, sp}
+ 80061a8:	08006095 	stmdaeq	r0, {r0, r2, r4, r7, sp, lr}
+ 80061ac:	080039e9 	stmdaeq	r0, {r0, r3, r5, r6, r7, r8, fp, ip, sp}
+ 80061b0:	08004059 	stmdaeq	r0, {r0, r3, r4, r6, lr}
+ 80061b4:	0800589d 	stmdaeq	r0, {r0, r2, r3, r4, r7, fp, ip, lr}
+ 80061b8:	0800610d 	stmdaeq	r0, {r0, r2, r3, r8, sp, lr}
+ 80061bc:	08006141 	stmdaeq	r0, {r0, r6, r8, sp, lr}
+ 80061c0:	08003347 	stmdaeq	r0, {r0, r1, r2, r6, r8, r9, ip, sp}
+ 80061c4:	08005184 	stmdaeq	r0, {r2, r7, r8, ip, lr}
 
-080061dc <COLD2>:
- 80061dc:	ffffffff 			; <UNDEFINED> instruction: 0xffffffff
- 80061e0:	0800618c 	stmdaeq	r0, {r2, r3, r7, r8, sp, lr}
+080061c8 <COLD2>:
+ 80061c8:	ffffffff 			; <UNDEFINED> instruction: 0xffffffff
+ 80061cc:	08006178 	stmdaeq	r0, {r3, r4, r5, r6, r8, sp, lr}
 
 Disassembly of section .rodata:
 
-080061e4 <__data_start>:
+080061d0 <__data_start>:
 	...
- 80061ec:	20202020 	eorcs	r2, r0, r0, lsr #32
- 80061f0:	00200020 	eoreq	r0, r0, r0, lsr #32
- 80061f4:	00505050 	subseq	r5, r0, r0, asr r0
- 80061f8:	00000000 	andeq	r0, r0, r0
- 80061fc:	50f85050 	rscspl	r5, r8, r0, asr r0
- 8006200:	005050f8 	ldrsheq	r5, [r0], #-8
- 8006204:	70a07820 	adcvc	r7, r0, r0, lsr #16
- 8006208:	0020f028 	eoreq	pc, r0, r8, lsr #32
- 800620c:	2010c8c0 	andscs	ip, r0, r0, asr #17
- 8006210:	00189840 	andseq	r9, r8, r0, asr #16
- 8006214:	40a09060 	adcmi	r9, r0, r0, rrx
- 8006218:	006890a8 	rsbeq	r9, r8, r8, lsr #1
- 800621c:	00402060 	subeq	r2, r0, r0, rrx
- 8006220:	00000000 	andeq	r0, r0, r0
- 8006224:	40402010 	submi	r2, r0, r0, lsl r0
- 8006228:	00102040 	andseq	r2, r0, r0, asr #32
- 800622c:	10102040 	andsne	r2, r0, r0, asr #32
- 8006230:	00402010 	subeq	r2, r0, r0, lsl r0
- 8006234:	70a82000 	adcvc	r2, r8, r0
- 8006238:	000020a8 	andeq	r2, r0, r8, lsr #1
- 800623c:	f8202000 			; <UNDEFINED> instruction: 0xf8202000
- 8006240:	00002020 	andeq	r2, r0, r0, lsr #32
- 8006244:	00000000 	andeq	r0, r0, r0
- 8006248:	00402060 	subeq	r2, r0, r0, rrx
- 800624c:	f0000000 			; <UNDEFINED> instruction: 0xf0000000
+ 80061d8:	20202020 	eorcs	r2, r0, r0, lsr #32
+ 80061dc:	00200020 	eoreq	r0, r0, r0, lsr #32
+ 80061e0:	00505050 	subseq	r5, r0, r0, asr r0
+ 80061e4:	00000000 	andeq	r0, r0, r0
+ 80061e8:	50f85050 	rscspl	r5, r8, r0, asr r0
+ 80061ec:	005050f8 	ldrsheq	r5, [r0], #-8
+ 80061f0:	70a07820 	adcvc	r7, r0, r0, lsr #16
+ 80061f4:	0020f028 	eoreq	pc, r0, r8, lsr #32
+ 80061f8:	2010c8c0 	andscs	ip, r0, r0, asr #17
+ 80061fc:	00189840 	andseq	r9, r8, r0, asr #16
+ 8006200:	40a09060 	adcmi	r9, r0, r0, rrx
+ 8006204:	006890a8 	rsbeq	r9, r8, r8, lsr #1
+ 8006208:	00402060 	subeq	r2, r0, r0, rrx
+ 800620c:	00000000 	andeq	r0, r0, r0
+ 8006210:	40402010 	submi	r2, r0, r0, lsl r0
+ 8006214:	00102040 	andseq	r2, r0, r0, asr #32
+ 8006218:	10102040 	andsne	r2, r0, r0, asr #32
+ 800621c:	00402010 	subeq	r2, r0, r0, lsl r0
+ 8006220:	70a82000 	adcvc	r2, r8, r0
+ 8006224:	000020a8 	andeq	r2, r0, r8, lsr #1
+ 8006228:	f8202000 			; <UNDEFINED> instruction: 0xf8202000
+ 800622c:	00002020 	andeq	r2, r0, r0, lsr #32
+ 8006230:	00000000 	andeq	r0, r0, r0
+ 8006234:	00402060 	subeq	r2, r0, r0, rrx
+ 8006238:	f0000000 			; <UNDEFINED> instruction: 0xf0000000
 	...
- 8006258:	00606000 	rsbeq	r6, r0, r0
- 800625c:	20100800 	andscs	r0, r0, r0, lsl #16
- 8006260:	00008040 	andeq	r8, r0, r0, asr #32
- 8006264:	a8988870 	ldmge	r8, {r4, r5, r6, fp, pc}
- 8006268:	007088c8 	rsbseq	r8, r0, r8, asr #17
- 800626c:	20206020 	eorcs	r6, r0, r0, lsr #32
- 8006270:	00f82020 	rscseq	r2, r8, r0, lsr #32
- 8006274:	20108870 	andscs	r8, r0, r0, ror r8
- 8006278:	00f88040 	rscseq	r8, r8, r0, asr #32
- 800627c:	f00808f0 			; <UNDEFINED> instruction: 0xf00808f0
- 8006280:	00f00808 	rscseq	r0, r0, r8, lsl #16
- 8006284:	90503010 	subsls	r3, r0, r0, lsl r0
- 8006288:	001010f8 	ldrsheq	r1, [r0], -r8
- 800628c:	f08080f8 			; <UNDEFINED> instruction: 0xf08080f8
- 8006290:	00f00808 	rscseq	r0, r0, r8, lsl #16
- 8006294:	f0804030 			; <UNDEFINED> instruction: 0xf0804030
- 8006298:	00708888 	rsbseq	r8, r0, r8, lsl #17
- 800629c:	201008f8 			; <UNDEFINED> instruction: 0x201008f8
- 80062a0:	00404040 	subeq	r4, r0, r0, asr #32
- 80062a4:	70888870 	addvc	r8, r8, r0, ror r8
- 80062a8:	00708888 	rsbseq	r8, r0, r8, lsl #17
- 80062ac:	70888870 	addvc	r8, r8, r0, ror r8
- 80062b0:	00700808 	rsbseq	r0, r0, r8, lsl #16
- 80062b4:	00606000 	rsbeq	r6, r0, r0
- 80062b8:	00006060 	andeq	r6, r0, r0, rrx
- 80062bc:	00606000 	rsbeq	r6, r0, r0
- 80062c0:	00402060 	subeq	r2, r0, r0, rrx
- 80062c4:	80402010 	subhi	r2, r0, r0, lsl r0
- 80062c8:	00102040 	andseq	r2, r0, r0, asr #32
- 80062cc:	00f80000 	rscseq	r0, r8, r0
- 80062d0:	000000f8 	strdeq	r0, [r0], -r8
- 80062d4:	08102040 	ldmdaeq	r0, {r6, sp}
- 80062d8:	00402010 	subeq	r2, r0, r0, lsl r0
- 80062dc:	10088870 	andne	r8, r8, r0, ror r8
- 80062e0:	00200020 	eoreq	r0, r0, r0, lsr #32
- 80062e4:	68088870 	stmdavs	r8, {r4, r5, r6, fp, pc}
- 80062e8:	0070a8a8 	rsbseq	sl, r0, r8, lsr #17
- 80062ec:	f8888870 			; <UNDEFINED> instruction: 0xf8888870
- 80062f0:	00888888 	addeq	r8, r8, r8, lsl #17
- 80062f4:	f08888f0 			; <UNDEFINED> instruction: 0xf08888f0
- 80062f8:	00f08888 	rscseq	r8, r0, r8, lsl #17
- 80062fc:	80808078 	addhi	r8, r0, r8, ror r0
- 8006300:	00788080 	rsbseq	r8, r8, r0, lsl #1
- 8006304:	888888f0 	stmhi	r8, {r4, r5, r6, r7, fp, pc}
- 8006308:	00f08888 	rscseq	r8, r0, r8, lsl #17
- 800630c:	f88080f8 			; <UNDEFINED> instruction: 0xf88080f8
- 8006310:	00f88080 	rscseq	r8, r8, r0, lsl #1
- 8006314:	f88080f8 			; <UNDEFINED> instruction: 0xf88080f8
- 8006318:	00808080 	addeq	r8, r0, r0, lsl #1
- 800631c:	b0808078 	addlt	r8, r0, r8, ror r0
- 8006320:	00708888 	rsbseq	r8, r0, r8, lsl #17
- 8006324:	f8888888 			; <UNDEFINED> instruction: 0xf8888888
- 8006328:	00888888 	addeq	r8, r8, r8, lsl #17
- 800632c:	20202070 	eorcs	r2, r0, r0, ror r0
- 8006330:	00702020 	rsbseq	r2, r0, r0, lsr #32
- 8006334:	08080878 	stmdaeq	r8, {r3, r4, r5, r6, fp}
- 8006338:	00609008 	rsbeq	r9, r0, r8
- 800633c:	c0a09088 	adcgt	r9, r0, r8, lsl #1
- 8006340:	008890a0 	addeq	r9, r8, r0, lsr #1
- 8006344:	80808080 	addhi	r8, r0, r0, lsl #1
- 8006348:	00f88080 	rscseq	r8, r8, r0, lsl #1
- 800634c:	88a8d888 	stmiahi	r8!, {r3, r7, fp, ip, lr, pc}
- 8006350:	00888888 	addeq	r8, r8, r8, lsl #17
- 8006354:	a8c88888 	stmiage	r8, {r3, r7, fp, pc}^
- 8006358:	00888898 	umulleq	r8, r8, r8, r8	; <UNPREDICTABLE>
- 800635c:	88888870 	stmhi	r8, {r4, r5, r6, fp, pc}
- 8006360:	00708888 	rsbseq	r8, r0, r8, lsl #17
- 8006364:	f08888f0 			; <UNDEFINED> instruction: 0xf08888f0
- 8006368:	00808080 	addeq	r8, r0, r0, lsl #1
- 800636c:	88888870 	stmhi	r8, {r4, r5, r6, fp, pc}
- 8006370:	007898a8 	rsbseq	r9, r8, r8, lsr #17
- 8006374:	f08888f0 			; <UNDEFINED> instruction: 0xf08888f0
- 8006378:	008890a0 	addeq	r9, r8, r0, lsr #1
- 800637c:	70808078 	addvc	r8, r0, r8, ror r0
- 8006380:	00f00808 	rscseq	r0, r0, r8, lsl #16
- 8006384:	202020f8 	strdcs	r2, [r0], -r8	; <UNPREDICTABLE>
- 8006388:	00202020 	eoreq	r2, r0, r0, lsr #32
- 800638c:	88888888 	stmhi	r8, {r3, r7, fp, pc}
- 8006390:	00708888 	rsbseq	r8, r0, r8, lsl #17
- 8006394:	88888888 	stmhi	r8, {r3, r7, fp, pc}
- 8006398:	00205088 	eoreq	r5, r0, r8, lsl #1
- 800639c:	a8888888 	stmge	r8, {r3, r7, fp, pc}
- 80063a0:	0088d8a8 	addeq	sp, r8, r8, lsr #17
- 80063a4:	20508888 	subscs	r8, r0, r8, lsl #17
- 80063a8:	00888850 	addeq	r8, r8, r0, asr r8
- 80063ac:	50888888 	addpl	r8, r8, r8, lsl #17
- 80063b0:	00202020 	eoreq	r2, r0, r0, lsr #32
- 80063b4:	402010f8 	strdmi	r1, [r0], -r8	; <UNPREDICTABLE>
- 80063b8:	00f88080 	rscseq	r8, r8, r0, lsl #1
- 80063bc:	40404060 	submi	r4, r0, r0, rrx
- 80063c0:	00604040 	rsbeq	r4, r0, r0, asr #32
- 80063c4:	20408000 	subcs	r8, r0, r0
- 80063c8:	00000810 	andeq	r0, r0, r0, lsl r8
- 80063cc:	08080818 	stmdaeq	r8, {r3, r4, fp}
- 80063d0:	00180808 	andseq	r0, r8, r8, lsl #16
- 80063d4:	00885020 	addeq	r5, r8, r0, lsr #32
+ 8006244:	00606000 	rsbeq	r6, r0, r0
+ 8006248:	20100800 	andscs	r0, r0, r0, lsl #16
+ 800624c:	00008040 	andeq	r8, r0, r0, asr #32
+ 8006250:	a8988870 	ldmge	r8, {r4, r5, r6, fp, pc}
+ 8006254:	007088c8 	rsbseq	r8, r0, r8, asr #17
+ 8006258:	20206020 	eorcs	r6, r0, r0, lsr #32
+ 800625c:	00f82020 	rscseq	r2, r8, r0, lsr #32
+ 8006260:	20108870 	andscs	r8, r0, r0, ror r8
+ 8006264:	00f88040 	rscseq	r8, r8, r0, asr #32
+ 8006268:	f00808f0 			; <UNDEFINED> instruction: 0xf00808f0
+ 800626c:	00f00808 	rscseq	r0, r0, r8, lsl #16
+ 8006270:	90503010 	subsls	r3, r0, r0, lsl r0
+ 8006274:	001010f8 	ldrsheq	r1, [r0], -r8
+ 8006278:	f08080f8 			; <UNDEFINED> instruction: 0xf08080f8
+ 800627c:	00f00808 	rscseq	r0, r0, r8, lsl #16
+ 8006280:	f0804030 			; <UNDEFINED> instruction: 0xf0804030
+ 8006284:	00708888 	rsbseq	r8, r0, r8, lsl #17
+ 8006288:	201008f8 			; <UNDEFINED> instruction: 0x201008f8
+ 800628c:	00404040 	subeq	r4, r0, r0, asr #32
+ 8006290:	70888870 	addvc	r8, r8, r0, ror r8
+ 8006294:	00708888 	rsbseq	r8, r0, r8, lsl #17
+ 8006298:	70888870 	addvc	r8, r8, r0, ror r8
+ 800629c:	00700808 	rsbseq	r0, r0, r8, lsl #16
+ 80062a0:	00606000 	rsbeq	r6, r0, r0
+ 80062a4:	00006060 	andeq	r6, r0, r0, rrx
+ 80062a8:	00606000 	rsbeq	r6, r0, r0
+ 80062ac:	00402060 	subeq	r2, r0, r0, rrx
+ 80062b0:	80402010 	subhi	r2, r0, r0, lsl r0
+ 80062b4:	00102040 	andseq	r2, r0, r0, asr #32
+ 80062b8:	00f80000 	rscseq	r0, r8, r0
+ 80062bc:	000000f8 	strdeq	r0, [r0], -r8
+ 80062c0:	08102040 	ldmdaeq	r0, {r6, sp}
+ 80062c4:	00402010 	subeq	r2, r0, r0, lsl r0
+ 80062c8:	10088870 	andne	r8, r8, r0, ror r8
+ 80062cc:	00200020 	eoreq	r0, r0, r0, lsr #32
+ 80062d0:	68088870 	stmdavs	r8, {r4, r5, r6, fp, pc}
+ 80062d4:	0070a8a8 	rsbseq	sl, r0, r8, lsr #17
+ 80062d8:	f8888870 			; <UNDEFINED> instruction: 0xf8888870
+ 80062dc:	00888888 	addeq	r8, r8, r8, lsl #17
+ 80062e0:	f08888f0 			; <UNDEFINED> instruction: 0xf08888f0
+ 80062e4:	00f08888 	rscseq	r8, r0, r8, lsl #17
+ 80062e8:	80808078 	addhi	r8, r0, r8, ror r0
+ 80062ec:	00788080 	rsbseq	r8, r8, r0, lsl #1
+ 80062f0:	888888f0 	stmhi	r8, {r4, r5, r6, r7, fp, pc}
+ 80062f4:	00f08888 	rscseq	r8, r0, r8, lsl #17
+ 80062f8:	f88080f8 			; <UNDEFINED> instruction: 0xf88080f8
+ 80062fc:	00f88080 	rscseq	r8, r8, r0, lsl #1
+ 8006300:	f88080f8 			; <UNDEFINED> instruction: 0xf88080f8
+ 8006304:	00808080 	addeq	r8, r0, r0, lsl #1
+ 8006308:	b0808078 	addlt	r8, r0, r8, ror r0
+ 800630c:	00708888 	rsbseq	r8, r0, r8, lsl #17
+ 8006310:	f8888888 			; <UNDEFINED> instruction: 0xf8888888
+ 8006314:	00888888 	addeq	r8, r8, r8, lsl #17
+ 8006318:	20202070 	eorcs	r2, r0, r0, ror r0
+ 800631c:	00702020 	rsbseq	r2, r0, r0, lsr #32
+ 8006320:	08080878 	stmdaeq	r8, {r3, r4, r5, r6, fp}
+ 8006324:	00609008 	rsbeq	r9, r0, r8
+ 8006328:	c0a09088 	adcgt	r9, r0, r8, lsl #1
+ 800632c:	008890a0 	addeq	r9, r8, r0, lsr #1
+ 8006330:	80808080 	addhi	r8, r0, r0, lsl #1
+ 8006334:	00f88080 	rscseq	r8, r8, r0, lsl #1
+ 8006338:	88a8d888 	stmiahi	r8!, {r3, r7, fp, ip, lr, pc}
+ 800633c:	00888888 	addeq	r8, r8, r8, lsl #17
+ 8006340:	a8c88888 	stmiage	r8, {r3, r7, fp, pc}^
+ 8006344:	00888898 	umulleq	r8, r8, r8, r8	; <UNPREDICTABLE>
+ 8006348:	88888870 	stmhi	r8, {r4, r5, r6, fp, pc}
+ 800634c:	00708888 	rsbseq	r8, r0, r8, lsl #17
+ 8006350:	f08888f0 			; <UNDEFINED> instruction: 0xf08888f0
+ 8006354:	00808080 	addeq	r8, r0, r0, lsl #1
+ 8006358:	88888870 	stmhi	r8, {r4, r5, r6, fp, pc}
+ 800635c:	007898a8 	rsbseq	r9, r8, r8, lsr #17
+ 8006360:	f08888f0 			; <UNDEFINED> instruction: 0xf08888f0
+ 8006364:	008890a0 	addeq	r9, r8, r0, lsr #1
+ 8006368:	70808078 	addvc	r8, r0, r8, ror r0
+ 800636c:	00f00808 	rscseq	r0, r0, r8, lsl #16
+ 8006370:	202020f8 	strdcs	r2, [r0], -r8	; <UNPREDICTABLE>
+ 8006374:	00202020 	eoreq	r2, r0, r0, lsr #32
+ 8006378:	88888888 	stmhi	r8, {r3, r7, fp, pc}
+ 800637c:	00708888 	rsbseq	r8, r0, r8, lsl #17
+ 8006380:	88888888 	stmhi	r8, {r3, r7, fp, pc}
+ 8006384:	00205088 	eoreq	r5, r0, r8, lsl #1
+ 8006388:	a8888888 	stmge	r8, {r3, r7, fp, pc}
+ 800638c:	0088d8a8 	addeq	sp, r8, r8, lsr #17
+ 8006390:	20508888 	subscs	r8, r0, r8, lsl #17
+ 8006394:	00888850 	addeq	r8, r8, r0, asr r8
+ 8006398:	50888888 	addpl	r8, r8, r8, lsl #17
+ 800639c:	00202020 	eoreq	r2, r0, r0, lsr #32
+ 80063a0:	402010f8 	strdmi	r1, [r0], -r8	; <UNPREDICTABLE>
+ 80063a4:	00f88080 	rscseq	r8, r8, r0, lsl #1
+ 80063a8:	40404060 	submi	r4, r0, r0, rrx
+ 80063ac:	00604040 	rsbeq	r4, r0, r0, asr #32
+ 80063b0:	20408000 	subcs	r8, r0, r0
+ 80063b4:	00000810 	andeq	r0, r0, r0, lsl r8
+ 80063b8:	08080818 	stmdaeq	r8, {r3, r4, fp}
+ 80063bc:	00180808 	andseq	r0, r8, r8, lsl #16
+ 80063c0:	00885020 	addeq	r5, r8, r0, lsr #32
 	...
- 80063e0:	00f80000 	rscseq	r0, r8, r0
- 80063e4:	00102040 	andseq	r2, r0, r0, asr #32
- 80063e8:	00000000 	andeq	r0, r0, r0
- 80063ec:	08700000 	ldmdaeq	r0!, {}^	; <UNPREDICTABLE>
- 80063f0:	00788878 	rsbseq	r8, r8, r8, ror r8
- 80063f4:	b0808080 	addlt	r8, r0, r0, lsl #1
- 80063f8:	00f088c8 	rscseq	r8, r0, r8, asr #17
- 80063fc:	80700000 	rsbshi	r0, r0, r0
- 8006400:	00708880 	rsbseq	r8, r0, r0, lsl #17
- 8006404:	68080808 	stmdavs	r8, {r3, fp}
- 8006408:	00788898 			; <UNDEFINED> instruction: 0x00788898
- 800640c:	88700000 	ldmdahi	r0!, {}^	; <UNPREDICTABLE>
- 8006410:	007080f8 	ldrshteq	r8, [r0], #-8
- 8006414:	e0404830 	sub	r4, r0, r0, lsr r8
- 8006418:	00404040 	subeq	r4, r0, r0, asr #32
- 800641c:	88780000 	ldmdahi	r8!, {}^	; <UNPREDICTABLE>
- 8006420:	70087888 	andvc	r7, r8, r8, lsl #17
- 8006424:	c8b08080 	ldmgt	r0!, {r7, pc}
- 8006428:	00888888 	addeq	r8, r8, r8, lsl #17
- 800642c:	20002000 	andcs	r2, r0, r0
- 8006430:	00202020 	eoreq	r2, r0, r0, lsr #32
- 8006434:	10300010 	eorsne	r0, r0, r0, lsl r0
- 8006438:	00609010 	rsbeq	r9, r0, r0, lsl r0
- 800643c:	a0908080 	addsge	r8, r0, r0, lsl #1
- 8006440:	0090a0c0 	addseq	sl, r0, r0, asr #1
- 8006444:	20202060 	eorcs	r2, r0, r0, rrx
- 8006448:	00702020 	rsbseq	r2, r0, r0, lsr #32
- 800644c:	a8d00000 	ldmge	r0, {}^	; <UNPREDICTABLE>
- 8006450:	008888a8 	addeq	r8, r8, r8, lsr #17
- 8006454:	c8b00000 	ldmgt	r0!, {}	; <UNPREDICTABLE>
- 8006458:	00888888 	addeq	r8, r8, r8, lsl #17
- 800645c:	88700000 	ldmdahi	r0!, {}^	; <UNPREDICTABLE>
- 8006460:	00708888 	rsbseq	r8, r0, r8, lsl #17
- 8006464:	88f00000 	ldmhi	r0!, {}^	; <UNPREDICTABLE>
- 8006468:	8080f088 	addhi	pc, r0, r8, lsl #1
- 800646c:	90680000 	rsbls	r0, r8, r0
- 8006470:	1850b090 	ldmdane	r0, {r4, r7, ip, sp, pc}^
- 8006474:	c8b00000 	ldmgt	r0!, {}	; <UNPREDICTABLE>
- 8006478:	00808080 	addeq	r8, r0, r0, lsl #1
- 800647c:	80700000 	rsbshi	r0, r0, r0
- 8006480:	00f00870 	rscseq	r0, r0, r0, ror r8
- 8006484:	40e04040 	rscmi	r4, r0, r0, asr #32
- 8006488:	00304840 	eorseq	r4, r0, r0, asr #16
- 800648c:	88880000 	stmhi	r8, {}	; <UNPREDICTABLE>
- 8006490:	00689888 	rsbeq	r9, r8, r8, lsl #17
- 8006494:	88880000 	stmhi	r8, {}	; <UNPREDICTABLE>
- 8006498:	00205088 	eoreq	r5, r0, r8, lsl #1
- 800649c:	88880000 	stmhi	r8, {}	; <UNPREDICTABLE>
- 80064a0:	0050a8a8 	subseq	sl, r0, r8, lsr #17
- 80064a4:	50880000 	addpl	r0, r8, r0
- 80064a8:	00885020 	addeq	r5, r8, r0, lsr #32
- 80064ac:	88880000 	stmhi	r8, {}	; <UNPREDICTABLE>
- 80064b0:	70087888 	andvc	r7, r8, r8, lsl #17
- 80064b4:	10f80000 	rscsne	r0, r8, r0
- 80064b8:	00f84020 	rscseq	r4, r8, r0, lsr #32
- 80064bc:	80404020 	subhi	r4, r0, r0, lsr #32
- 80064c0:	00204040 	eoreq	r4, r0, r0, asr #32
- 80064c4:	20202020 	eorcs	r2, r0, r0, lsr #32
- 80064c8:	00202020 	eoreq	r2, r0, r0, lsr #32
- 80064cc:	10202040 	eorne	r2, r0, r0, asr #32
- 80064d0:	00402020 	subeq	r2, r0, r0, lsr #32
- 80064d4:	a8400000 	stmdage	r0, {}^	; <UNPREDICTABLE>
- 80064d8:	00000010 	andeq	r0, r0, r0, lsl r0
- 80064dc:	fcfcfcfc 	ldc2l	12, cr15, [ip], #1008	; 0x3f0
- 80064e0:	fcfcfcfc 	ldc2l	12, cr15, [ip], #1008	; 0x3f0
- 80064e4:	f8102040 			; <UNDEFINED> instruction: 0xf8102040
- 80064e8:	00402010 	subeq	r2, r0, r0, lsl r0
- 80064ec:	f8402010 			; <UNDEFINED> instruction: 0xf8402010
- 80064f0:	00102040 	andseq	r2, r0, r0, asr #32
- 80064f4:	20a87020 	adccs	r7, r8, r0, lsr #32
- 80064f8:	00002020 	andeq	r2, r0, r0, lsr #32
- 80064fc:	20202000 	eorcs	r2, r0, r0
- 8006500:	002070a8 	eoreq	r7, r0, r8, lsr #1
- 8006504:	f8f87000 			; <UNDEFINED> instruction: 0xf8f87000
- 8006508:	000070f8 	strdeq	r7, [r0], -r8
+ 80063cc:	00f80000 	rscseq	r0, r8, r0
+ 80063d0:	00102040 	andseq	r2, r0, r0, asr #32
+ 80063d4:	00000000 	andeq	r0, r0, r0
+ 80063d8:	08700000 	ldmdaeq	r0!, {}^	; <UNPREDICTABLE>
+ 80063dc:	00788878 	rsbseq	r8, r8, r8, ror r8
+ 80063e0:	b0808080 	addlt	r8, r0, r0, lsl #1
+ 80063e4:	00f088c8 	rscseq	r8, r0, r8, asr #17
+ 80063e8:	80700000 	rsbshi	r0, r0, r0
+ 80063ec:	00708880 	rsbseq	r8, r0, r0, lsl #17
+ 80063f0:	68080808 	stmdavs	r8, {r3, fp}
+ 80063f4:	00788898 			; <UNDEFINED> instruction: 0x00788898
+ 80063f8:	88700000 	ldmdahi	r0!, {}^	; <UNPREDICTABLE>
+ 80063fc:	007080f8 	ldrshteq	r8, [r0], #-8
+ 8006400:	e0404830 	sub	r4, r0, r0, lsr r8
+ 8006404:	00404040 	subeq	r4, r0, r0, asr #32
+ 8006408:	88780000 	ldmdahi	r8!, {}^	; <UNPREDICTABLE>
+ 800640c:	70087888 	andvc	r7, r8, r8, lsl #17
+ 8006410:	c8b08080 	ldmgt	r0!, {r7, pc}
+ 8006414:	00888888 	addeq	r8, r8, r8, lsl #17
+ 8006418:	20002000 	andcs	r2, r0, r0
+ 800641c:	00202020 	eoreq	r2, r0, r0, lsr #32
+ 8006420:	10300010 	eorsne	r0, r0, r0, lsl r0
+ 8006424:	00609010 	rsbeq	r9, r0, r0, lsl r0
+ 8006428:	a0908080 	addsge	r8, r0, r0, lsl #1
+ 800642c:	0090a0c0 	addseq	sl, r0, r0, asr #1
+ 8006430:	20202060 	eorcs	r2, r0, r0, rrx
+ 8006434:	00702020 	rsbseq	r2, r0, r0, lsr #32
+ 8006438:	a8d00000 	ldmge	r0, {}^	; <UNPREDICTABLE>
+ 800643c:	008888a8 	addeq	r8, r8, r8, lsr #17
+ 8006440:	c8b00000 	ldmgt	r0!, {}	; <UNPREDICTABLE>
+ 8006444:	00888888 	addeq	r8, r8, r8, lsl #17
+ 8006448:	88700000 	ldmdahi	r0!, {}^	; <UNPREDICTABLE>
+ 800644c:	00708888 	rsbseq	r8, r0, r8, lsl #17
+ 8006450:	88f00000 	ldmhi	r0!, {}^	; <UNPREDICTABLE>
+ 8006454:	8080f088 	addhi	pc, r0, r8, lsl #1
+ 8006458:	90680000 	rsbls	r0, r8, r0
+ 800645c:	1850b090 	ldmdane	r0, {r4, r7, ip, sp, pc}^
+ 8006460:	c8b00000 	ldmgt	r0!, {}	; <UNPREDICTABLE>
+ 8006464:	00808080 	addeq	r8, r0, r0, lsl #1
+ 8006468:	80700000 	rsbshi	r0, r0, r0
+ 800646c:	00f00870 	rscseq	r0, r0, r0, ror r8
+ 8006470:	40e04040 	rscmi	r4, r0, r0, asr #32
+ 8006474:	00304840 	eorseq	r4, r0, r0, asr #16
+ 8006478:	88880000 	stmhi	r8, {}	; <UNPREDICTABLE>
+ 800647c:	00689888 	rsbeq	r9, r8, r8, lsl #17
+ 8006480:	88880000 	stmhi	r8, {}	; <UNPREDICTABLE>
+ 8006484:	00205088 	eoreq	r5, r0, r8, lsl #1
+ 8006488:	88880000 	stmhi	r8, {}	; <UNPREDICTABLE>
+ 800648c:	0050a8a8 	subseq	sl, r0, r8, lsr #17
+ 8006490:	50880000 	addpl	r0, r8, r0
+ 8006494:	00885020 	addeq	r5, r8, r0, lsr #32
+ 8006498:	88880000 	stmhi	r8, {}	; <UNPREDICTABLE>
+ 800649c:	70087888 	andvc	r7, r8, r8, lsl #17
+ 80064a0:	10f80000 	rscsne	r0, r8, r0
+ 80064a4:	00f84020 	rscseq	r4, r8, r0, lsr #32
+ 80064a8:	80404020 	subhi	r4, r0, r0, lsr #32
+ 80064ac:	00204040 	eoreq	r4, r0, r0, asr #32
+ 80064b0:	20202020 	eorcs	r2, r0, r0, lsr #32
+ 80064b4:	00202020 	eoreq	r2, r0, r0, lsr #32
+ 80064b8:	10202040 	eorne	r2, r0, r0, asr #32
+ 80064bc:	00402020 	subeq	r2, r0, r0, lsr #32
+ 80064c0:	a8400000 	stmdage	r0, {}^	; <UNPREDICTABLE>
+ 80064c4:	00000010 	andeq	r0, r0, r0, lsl r0
+ 80064c8:	fcfcfcfc 	ldc2l	12, cr15, [ip], #1008	; 0x3f0
+ 80064cc:	fcfcfcfc 	ldc2l	12, cr15, [ip], #1008	; 0x3f0
+ 80064d0:	f8102040 			; <UNDEFINED> instruction: 0xf8102040
+ 80064d4:	00402010 	subeq	r2, r0, r0, lsl r0
+ 80064d8:	f8402010 			; <UNDEFINED> instruction: 0xf8402010
+ 80064dc:	00102040 	andseq	r2, r0, r0, asr #32
+ 80064e0:	20a87020 	adccs	r7, r8, r0, lsr #32
+ 80064e4:	00002020 	andeq	r2, r0, r0, lsr #32
+ 80064e8:	20202000 	eorcs	r2, r0, r0
+ 80064ec:	002070a8 	eoreq	r7, r0, r8, lsr #1
+ 80064f0:	f8f87000 			; <UNDEFINED> instruction: 0xf8f87000
+ 80064f4:	000070f8 	strdeq	r7, [r0], -r8
 
 Disassembly of section .ARM.attributes:
 
@@ -9095,7 +9092,7 @@ Disassembly of section .ARM.attributes:
 Disassembly of section .debug_line:
 
 00000000 <.debug_line>:
-   0:	00000cbd 			; <UNDEFINED> instruction: 0x00000cbd
+   0:	00000cbf 			; <UNDEFINED> instruction: 0x00000cbf
    4:	008d0003 	addeq	r0, sp, r3
    8:	01020000 	mrseq	r0, (UNDEF: 2)
    c:	000d0efb 	strdeq	r0, [sp], -fp
@@ -9817,100 +9814,100 @@ Disassembly of section .debug_line:
  b3c:	03013202 	movweq	r3, #4610	; 0x1202
  b40:	013a0220 	teqeq	sl, r0, lsr #4
  b44:	e4081603 	str	r1, [r8], #-1539	; 0xfffff9fd
- b48:	74081403 	strvc	r1, [r8], #-1027	; 0xfffffbfd
- b4c:	58081403 	stmdapl	r8, {r0, r1, sl, ip}
- b50:	e4081803 	str	r1, [r8], #-2051	; 0xfffff7fd
- b54:	2e021603 	cfmadd32cs	mvax0, mvfx1, mvfx2, mvfx3
- b58:	080f0301 	stmdaeq	pc, {r0, r8, r9}	; <UNPREDICTABLE>
- b5c:	08110374 	ldmdaeq	r1, {r2, r4, r5, r6, r8, r9}
- b60:	080c03c8 	stmdaeq	ip, {r3, r6, r7, r8, r9}
- b64:	021b0358 	andseq	r0, fp, #88, 6	; 0x60000001
- b68:	25030124 	strcs	r0, [r3, #-292]	; 0xfffffedc
- b6c:	4b015002 	blmi	54b7c <RAM_SIZE+0x34b7c>
- b70:	c8081903 	stmdagt	r8, {r0, r1, r8, fp, ip}
- b74:	2e021d03 	cdpcs	13, 0, cr1, cr2, cr3, {0}
- b78:	ba0c0301 	blt	301784 <FLASH_SIZE+0x281784>
- b7c:	20080d03 	andcs	r0, r8, r3, lsl #26
- b80:	03ba1103 			; <UNDEFINED> instruction: 0x03ba1103
- b84:	01280216 			; <UNDEFINED> instruction: 0x01280216
- b88:	03ba0b03 			; <UNDEFINED> instruction: 0x03ba0b03
- b8c:	03740810 	cmneq	r4, #16, 16	; 0x100000
- b90:	1203d60c 	andne	sp, r3, #12, 12	; 0xc00000
- b94:	0c03ac08 	stceq	12, cr10, [r3], {8}
- b98:	081803ba 	ldmdaeq	r8, {r1, r3, r4, r5, r7, r8, r9}
- b9c:	f20b03e4 	vcgt.s8	q0, <illegal reg q13.5>, q10
- ba0:	ac080903 			; <UNDEFINED> instruction: 0xac080903
- ba4:	212f2f21 			; <UNDEFINED> instruction: 0x212f2f21
- ba8:	2f21212f 	svccs	0x0021212f
- bac:	8a2f2f2f 	bhi	bcc870 <FLASH_SIZE+0xb4c870>
- bb0:	2f2f2fdd 	svccs	0x002f2fdd
- bb4:	2f21212f 	svccs	0x0021212f
- bb8:	322f2f2f 	eorcc	r2, pc, #47, 30	; 0xbc
- bbc:	ac081103 	stfges	f1, [r8], {3}
- bc0:	3c080b03 			; <UNDEFINED> instruction: 0x3c080b03
- bc4:	0d038a2f 	vstreq	s16, [r3, #-188]	; 0xffffff44
- bc8:	2f2f9008 	svccs	0x002f9008
- bcc:	03820a03 	orreq	r0, r2, #12288	; 0x3000
- bd0:	0a03ba0b 	beq	ef404 <FLASH_SIZE+0x6f404>
- bd4:	6d2f2ff2 	stcvs	15, cr2, [pc, #-968]!	; 814 <SCB_VECTKEY+0x21a>
- bd8:	038a2f2f 	orreq	r2, sl, #47, 30	; 0xbc
- bdc:	0320080b 			; <UNDEFINED> instruction: 0x0320080b
- be0:	0e03f20b 	cdpeq	2, 0, cr15, cr3, cr11, {0}
- be4:	0e039008 	cdpeq	0, 0, cr9, cr3, cr8, {0}
- be8:	0d039008 	stceq	0, cr9, [r3, #-32]	; 0xffffffe0
- bec:	0d032008 	stceq	0, cr2, [r3, #-32]	; 0xffffffe0
- bf0:	080e03d6 	stmdaeq	lr, {r1, r2, r4, r6, r7, r8, r9}
- bf4:	f20c0320 	vcgt.s8	d0, d12, d16
- bf8:	03d60b03 	bicseq	r0, r6, #3072	; 0xc00
- bfc:	0320080e 			; <UNDEFINED> instruction: 0x0320080e
- c00:	0c03f20b 	sfmeq	f7, 1, [r3], {11}
- c04:	081003f2 	ldmdaeq	r0, {r1, r4, r5, r6, r7, r8, r9}
- c08:	08130320 	ldmdaeq	r3, {r5, r8, r9}
- c0c:	021e0390 	andseq	r0, lr, #144, 6	; 0x40000002
- c10:	1c030134 	stfnes	f0, [r3], {52}	; 0x34
- c14:	03012c02 	movweq	r2, #7170	; 0x1c02
- c18:	03c80814 	biceq	r0, r8, #20, 16	; 0x140000
- c1c:	0e03f20d 	cdpeq	2, 0, cr15, cr3, cr13, {0}
- c20:	0f032008 	svceq	0x00032008
- c24:	0e033c08 	cdpeq	12, 0, cr3, cr3, cr8, {0}
- c28:	080e03f2 	stmdaeq	lr, {r1, r4, r5, r6, r7, r8, r9}
- c2c:	08170358 	ldmdaeq	r7, {r3, r4, r6, r8, r9}
- c30:	08110358 	ldmdaeq	r1, {r3, r4, r6, r8, r9}
- c34:	08100390 	ldmdaeq	r0, {r4, r7, r8, r9}
- c38:	d60b03c8 	strle	r0, [fp], -r8, asr #7
- c3c:	03d60a03 	bicseq	r0, r6, #12288	; 0x3000
- c40:	01240217 			; <UNDEFINED> instruction: 0x01240217
- c44:	03d60f03 	bicseq	r0, r6, #3, 30
- c48:	01260214 			; <UNDEFINED> instruction: 0x01260214
- c4c:	20080f03 	andcs	r0, r8, r3, lsl #30
- c50:	032f212f 			; <UNDEFINED> instruction: 0x032f212f
- c54:	0e039009 	cdpeq	0, 0, cr9, cr3, cr9, {0}
- c58:	2f2f2008 	svccs	0x002f2008
- c5c:	081803a6 	ldmdaeq	r8, {r1, r2, r5, r7, r8, r9}
- c60:	02230390 	eoreq	r0, r3, #144, 6	; 0x40000002
- c64:	2b03013e 	blcs	c1164 <FLASH_SIZE+0x41164>
- c68:	03014e02 	movweq	r4, #7682	; 0x1e02
- c6c:	014e0229 	cmpeq	lr, r9, lsr #4
- c70:	74080e03 	strvc	r0, [r8], #-3587	; 0xfffff1fd
- c74:	03354b2f 	teqeq	r5, #48128	; 0xbc00
- c78:	0138021d 	teqeq	r8, sp, lsl r2
- c7c:	28021503 	stmdacs	r2, {r0, r1, r8, sl, ip}
- c80:	038a2f01 	orreq	r2, sl, #1, 30
- c84:	012c0219 			; <UNDEFINED> instruction: 0x012c0219
- c88:	0200d703 	andeq	sp, r0, #786432	; 0xc0000
- c8c:	17030124 	strne	r0, [r3, -r4, lsr #2]
- c90:	86012402 	strhi	r2, [r1], -r2, lsl #8
- c94:	c8081103 	stmdagt	r8, {r0, r1, r8, ip}
- c98:	e4081003 	str	r1, [r8], #-3
- c9c:	03f21403 	mvnseq	r1, #50331648	; 0x3000000
- ca0:	1b03ba0a 	blne	ef4d0 <FLASH_SIZE+0x6f4d0>
- ca4:	03013602 	movweq	r3, #5634	; 0x1602
- ca8:	1b03f20e 	blne	fd4e8 <FLASH_SIZE+0x7d4e8>
- cac:	03013c02 	movweq	r3, #7170	; 0x1c02
- cb0:	03900810 	orrseq	r0, r0, #16, 16	; 0x100000
- cb4:	59200810 	stmdbpl	r0!, {r4, fp}
- cb8:	112d022f 			; <UNDEFINED> instruction: 0x112d022f
- cbc:	01000202 	tsteq	r0, r2, lsl #4
+ b48:	039e1603 	orrseq	r1, lr, #3145728	; 0x300000
+ b4c:	03580814 	cmpeq	r8, #20, 16	; 0x140000
+ b50:	03e40818 	mvneq	r0, #24, 16	; 0x180000
+ b54:	012e0216 			; <UNDEFINED> instruction: 0x012e0216
+ b58:	74080f03 	strvc	r0, [r8], #-3843	; 0xfffff0fd
+ b5c:	c8081103 	stmdagt	r8, {r0, r1, r8, ip}
+ b60:	58080c03 	stmdapl	r8, {r0, r1, sl, fp}
+ b64:	24021b03 	strcs	r1, [r2], #-2819	; 0xfffff4fd
+ b68:	02250301 	eoreq	r0, r5, #67108864	; 0x4000000
+ b6c:	034b0150 	movteq	r0, #45392	; 0xb150
+ b70:	03c80819 	biceq	r0, r8, #1638400	; 0x190000
+ b74:	012e021d 			; <UNDEFINED> instruction: 0x012e021d
+ b78:	03ba0c03 			; <UNDEFINED> instruction: 0x03ba0c03
+ b7c:	0320080d 			; <UNDEFINED> instruction: 0x0320080d
+ b80:	1603ba11 			; <UNDEFINED> instruction: 0x1603ba11
+ b84:	03012802 	movweq	r2, #6146	; 0x1802
+ b88:	1003ba0b 	andne	fp, r3, fp, lsl #20
+ b8c:	0c037408 	cfstrseq	mvf7, [r3], {8}
+ b90:	081203d6 	ldmdaeq	r2, {r1, r2, r4, r6, r7, r8, r9}
+ b94:	ba0c03ac 	blt	301a4c <FLASH_SIZE+0x281a4c>
+ b98:	e4081803 	str	r1, [r8], #-2051	; 0xfffff7fd
+ b9c:	03f20b03 	mvnseq	r0, #3072	; 0xc00
+ ba0:	21ac0809 			; <UNDEFINED> instruction: 0x21ac0809
+ ba4:	2f212f2f 	svccs	0x00212f2f
+ ba8:	2f2f2121 	svccs	0x002f2121
+ bac:	dd8a2f2f 	stcle	15, cr2, [sl, #188]	; 0xbc
+ bb0:	2f2f2f2f 	svccs	0x002f2f2f
+ bb4:	2f2f2121 	svccs	0x002f2121
+ bb8:	03322f2f 	teqeq	r2, #47, 30	; 0xbc
+ bbc:	03ac0811 			; <UNDEFINED> instruction: 0x03ac0811
+ bc0:	2f3c080b 	svccs	0x003c080b
+ bc4:	080d038a 	stmdaeq	sp, {r1, r3, r7, r8, r9}
+ bc8:	032f2f90 			; <UNDEFINED> instruction: 0x032f2f90
+ bcc:	0b03820a 	bleq	e13fc <FLASH_SIZE+0x613fc>
+ bd0:	f20a03ba 	vcge.s8	d0, d26, d26
+ bd4:	2f6d2f2f 	svccs	0x006d2f2f
+ bd8:	0b038a2f 	bleq	e349c <FLASH_SIZE+0x6349c>
+ bdc:	0b032008 	bleq	c8c04 <FLASH_SIZE+0x48c04>
+ be0:	080e03f2 	stmdaeq	lr, {r1, r4, r5, r6, r7, r8, r9}
+ be4:	080e0390 	stmdaeq	lr, {r4, r7, r8, r9}
+ be8:	080d0390 	stmdaeq	sp, {r4, r7, r8, r9}
+ bec:	d60d0320 	strle	r0, [sp], -r0, lsr #6
+ bf0:	20080e03 	andcs	r0, r8, r3, lsl #28
+ bf4:	03f20c03 	mvnseq	r0, #768	; 0x300
+ bf8:	0e03d60b 	cfmadd32eq	mvax0, mvfx13, mvfx3, mvfx11
+ bfc:	0b032008 	bleq	c8c24 <FLASH_SIZE+0x48c24>
+ c00:	f20c03f2 	vcge.s8	q0, q14, q9
+ c04:	20081003 	andcs	r1, r8, r3
+ c08:	90081303 	andls	r1, r8, r3, lsl #6
+ c0c:	34021e03 	strcc	r1, [r2], #-3587	; 0xfffff1fd
+ c10:	021c0301 	andseq	r0, ip, #67108864	; 0x4000000
+ c14:	1403012c 	strne	r0, [r3], #-300	; 0xfffffed4
+ c18:	0d03c808 	stceq	8, cr12, [r3, #-32]	; 0xffffffe0
+ c1c:	080e03f2 	stmdaeq	lr, {r1, r4, r5, r6, r7, r8, r9}
+ c20:	080f0320 	stmdaeq	pc, {r5, r8, r9}	; <UNPREDICTABLE>
+ c24:	f20e033c 	vcge.s8	d0, d14, d28
+ c28:	58080e03 	stmdapl	r8, {r0, r1, r9, sl, fp}
+ c2c:	58081703 	stmdapl	r8, {r0, r1, r8, r9, sl, ip}
+ c30:	90081103 	andls	r1, r8, r3, lsl #2
+ c34:	74081003 	strvc	r1, [r8], #-3
+ c38:	03d60b03 	bicseq	r0, r6, #3072	; 0xc00
+ c3c:	1703d60a 	strne	sp, [r3, -sl, lsl #12]
+ c40:	03012402 	movweq	r2, #5122	; 0x1402
+ c44:	1403d60f 	strne	sp, [r3], #-1551	; 0xfffff9f1
+ c48:	03012602 	movweq	r2, #5634	; 0x1602
+ c4c:	2fc80813 	svccs	0x00c80813
+ c50:	09032f21 	stmdbeq	r3, {r0, r5, r8, r9, sl, fp, sp}
+ c54:	ba0c0390 	blt	301a9c <FLASH_SIZE+0x281a9c>
+ c58:	03a62f2f 			; <UNDEFINED> instruction: 0x03a62f2f
+ c5c:	03900818 	orrseq	r0, r0, #24, 16	; 0x180000
+ c60:	013e0223 	teqeq	lr, r3, lsr #4
+ c64:	4e022b03 	vmlami.f64	d2, d2, d3
+ c68:	02290301 	eoreq	r0, r9, #67108864	; 0x4000000
+ c6c:	0e03014e 	adfeqsm	f0, f3, #0.5
+ c70:	4b2f7408 	blmi	bddc98 <FLASH_SIZE+0xb5dc98>
+ c74:	021d0335 	andseq	r0, sp, #-738197504	; 0xd4000000
+ c78:	15030138 	strne	r0, [r3, #-312]	; 0xfffffec8
+ c7c:	2f012802 	svccs	0x00012802
+ c80:	2f2e0b03 	svccs	0x002e0b03
+ c84:	0219038a 	andseq	r0, r9, #671088642	; 0x28000002
+ c88:	d703012c 	strle	r0, [r3, -ip, lsr #2]
+ c8c:	01240200 			; <UNDEFINED> instruction: 0x01240200
+ c90:	24021703 	strcs	r1, [r2], #-1795	; 0xfffff8fd
+ c94:	11038601 	tstne	r3, r1, lsl #12
+ c98:	1003c808 	andne	ip, r3, r8, lsl #16
+ c9c:	1403e408 	strne	lr, [r3], #-1032	; 0xfffffbf8
+ ca0:	ba0a03f2 	blt	281c70 <FLASH_SIZE+0x201c70>
+ ca4:	36021b03 	strcc	r1, [r2], -r3, lsl #22
+ ca8:	f20e0301 	vcgt.s8	d0, d14, d1
+ cac:	3c021b03 			; <UNDEFINED> instruction: 0x3c021b03
+ cb0:	08100301 	ldmdaeq	r0, {r0, r8, r9}
+ cb4:	08100390 	ldmdaeq	r0, {r4, r7, r8, r9}
+ cb8:	022f5920 	eoreq	r5, pc, #32, 18	; 0x80000
+ cbc:	0202112d 	andeq	r1, r2, #1073741835	; 0x4000000b
  cc0:	Address 0x0000000000000cc0 is out of bounds.
 
 
@@ -9922,7 +9919,7 @@ Disassembly of section .debug_info:
    8:	01040000 	mrseq	r0, (UNDEF: 4)
    c:	00000000 	andeq	r0, r0, r0
   10:	08000200 	stmdaeq	r0, {r9}
-  14:	080061e4 	stmdaeq	r0, {r2, r5, r6, r7, r8, sp, lr}
+  14:	080061d0 	stmdaeq	r0, {r4, r6, r7, r8, sp, lr}
   18:	00000000 	andeq	r0, r0, r0
   1c:	00000007 	andeq	r0, r0, r7
   20:	0000002b 	andeq	r0, r0, fp, lsr #32
@@ -9946,7 +9943,7 @@ Disassembly of section .debug_aranges:
    8:	00040000 	andeq	r0, r4, r0
    c:	00000000 	andeq	r0, r0, r0
   10:	08000200 	stmdaeq	r0, {r9}
-  14:	00005fe4 	andeq	r5, r0, r4, ror #31
+  14:	00005fd0 	ldrdeq	r5, [r0], -r0
 	...
 
 Disassembly of section .debug_str:

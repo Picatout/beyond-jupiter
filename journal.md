@@ -1,5 +1,9 @@
 2022-02-17 
 
+*  Débogué **DOES>** commit 11:41
+
+* Modifié **CREATE** et **VARIABLE** 
+
 * bogue dans ABORT et DOES>. 22:23 commit.
 
 * 22:21 **DEFER**, **DEFER!**, **DEFER!**, **:NONAME** et **IS** testés.  

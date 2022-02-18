@@ -3199,10 +3199,12 @@ ACCP4:
 ABORT1: 
 	_ADR    LBRAC  
 	_ADR	PRESE
+/*
 	_DOLIT  0 
 	_DOLIT  TIBB 
 	_DOLIT UPP+SRC 
 	_ADR   DSTOR 
+*/
 	_BRAN	QUIT
 
 
@@ -4126,7 +4128,7 @@ DODOES:
 	_ADR LAST 
 	_ADR AT
 	_ADR TOCFA 
-	_ADR TOBODY  
+	_ADR TOVECTOR  
 	_ADR STORE  
 	_UNNEST 
 
@@ -4142,9 +4144,9 @@ DODOES:
 	_DOLIT	UNNEST
 	_ADR	CALLC 
 	_ADR COMPI_NEST
-	_DOLIT RFROM 
-	_ADR	CALLC
-	_UNNEST 
+//	_DOLIT RFROM 
+//	_ADR   CALLC
+ 	_UNNEST 
 
 
 /****************************
@@ -4238,6 +4240,10 @@ input:
 	_ADR	COMPI_NEST 
 	_DOLIT	DOVAR
 	_ADR	CALLC
+	_DOLIT  NOP     // reserved slot    
+	_ADR    CALLC   // for DOES> vector 
+	_DOLIT  UNNEST 
+	_ADR    CALLC 
 	_UNNEST
 
 /*******************************
@@ -4248,7 +4254,7 @@ hidden word used by compiler
 DOVAR:
 	_PUSH
 	MOV TOS,IP
-	ADD IP,IP,#CELLL  
+	ADD TOS,#2*CELLL // >BODY 
 	_NEXT  
 
 
@@ -4262,8 +4268,6 @@ DOVAR:
 	_ADR	CREAT
 	_DOLIT	0
 	_ADR	COMMA
-	_DOLIT  UNNEST 
-	_ADR    CALLC 
 	_UNNEST
 
 /**********************************
@@ -4498,8 +4502,20 @@ RDOT:
   from code field address 
 ****************************/
 	_HEADER TOBODY,5,">BODY"
-	add TOS,#8  
+	add TOS,#4*CELLL   
 	_NEXT 		
+
+/*****************************
+	>VECTOR ( xt -- adr )
+	for words defined by 
+	CREATE  return 
+	address vector slot 
+	for DOES> 
+hidden word.	
+*****************************/
+TOVECTOR:
+	add TOS,#2*CELLL
+	_NEXT 
 
 /*****************************
     >NFA	( cfa -- nfa | F )
