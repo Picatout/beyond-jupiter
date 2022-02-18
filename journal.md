@@ -1,5 +1,9 @@
 2022-02-17 
 
+* bogue dans ABORT et DOES>. 22:23 commit.
+
+* 22:21 **DEFER**, **DEFER!**, **DEFER!**, **:NONAME** et **IS** testés.  
+
 * 20:34 commit.
 
 * Modification à **CREATE** pour que le data field soit après la définition du mot mais non alloué. 
