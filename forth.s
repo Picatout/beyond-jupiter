@@ -1162,27 +1162,6 @@ BRAN:
   System and user variables
 ******************************/
 
-/*******************************
-  doVAR	( -- a )
-  Run time routine for VARIABLE and CREATE.
-hidden word used by compiler
-********************************/
-DOVAR:
-	_PUSH
-	MOV TOS,IP
-	ADD IP,IP,#4 
-	B UNNEST 
-
-/**********************************
-    doCON	( -- a ) 
- 	Run time routine for CONSTANT.
-hidden word used by compiler 
-***********************************/
-DOCON:
-	_PUSH
-	LDR.W TOS,[IP],#4 
-	B UNNEST 
-
 /***********************
   system variables 
 ***********************/
@@ -2904,11 +2883,11 @@ PARS8:
 ***********************/
 
 /*************************
-    NAME>	( na -- ca )
- 	Return a code address
-	given a name address.
+    >CFA	( nfa -- cfa )
+ 	Return a code field address
+	given a name field address.
 **************************/
-	_HEADER NAMET,5,"NAME>"
+	_HEADER TOCFA,4,">CFA"
 	_NEST
 	_ADR	COUNT
 	_DOLIT	0x1F
@@ -3012,7 +2991,7 @@ SEARCH5:
 	_ADR	DROP			// na+1
 	_ADR	ONEM			// na
 	_ADR	DUPP			// na na
-	_ADR	NAMET			// na ca
+	_ADR	TOCFA			// na ca
 	_ADR	SWAP			// ca na
 	_UNNEST			//  return with a match
 
@@ -3220,6 +3199,10 @@ ACCP4:
 ABORT1: 
 	_ADR    LBRAC  
 	_ADR	PRESE
+	_DOLIT  0 
+	_DOLIT  TIBB 
+	_DOLIT UPP+SRC 
+	_ADR   DSTOR 
 	_BRAN	QUIT
 
 
@@ -3406,14 +3389,9 @@ output:
 	and the terminal input buffer.
 **********************************/
 	_HEADER PRESE,6,"PRESET"
-	_NEST 
-	_DOLIT SPP 
-	_ADR SPSTOR
-	_DOLIT TIBB        
-	_DOLIT 0   
-	_DOLIT UPP+SRC  
-	_ADR   DSTOR    
-	_UNNEST 
+	_MOV32 DSP,SPP 
+	_NEXT 
+
 
 /*********************
     QUIT	( -- )
@@ -3901,7 +3879,7 @@ DOLEAVE:
 	_NEST 
 	_ADR LAST
 	_ADR AT  
-	_ADR NAMET 
+	_ADR TOCFA 
 	_ADR CALLC  
 	_UNNEST 
 
@@ -4133,23 +4111,6 @@ CALLC:
   Defining words
 ******************/
 
-/***********************************
-    CONSTANT	( u -- //  string> )
- 	Compile a new constant.
-************************************/
-	_HEADER CONST,8,"CONSTANT"
-	_NEST 
-	_ADR	TOKEN
-	_ADR	SNAME
-	_ADR	OVERT
-	_ADR	COMPI_NEST
-	_DOLIT	DOCON
-	_ADR	CALLC
-	_ADR	COMMA
-	_DOLIT	UNNEST 
-	_ADR	CALLC  
-	_UNNEST
-
 	.p2align 2 
 /****************************************
  doDOES> ( -- a )
@@ -4164,7 +4125,7 @@ DODOES:
 	_ADR	ONEP  
 	_ADR LAST 
 	_ADR AT
-	_ADR NAMET 
+	_ADR TOCFA 
 	_ADR CELLP 
 	_ADR STORE  
 	_UNNEST 
@@ -4225,7 +4186,7 @@ DODOES:
 	_ADR ONEP 
 	_ADR LAST 
 	_ADR AT 
-	_ADR NAMET 
+	_ADR TOCFA 
 	_ADR CELLP 
 	_ADR STORE 
 	_UNNEST 
@@ -4285,7 +4246,21 @@ input:
 	_ADR	COMPI_NEST 
 	_DOLIT	DOVAR
 	_ADR	CALLC
+	_DOLIT UNNEST
+	_ADR	CALLC  
 	_UNNEST
+
+/*******************************
+  doVAR	( -- a )
+  Run time routine for VARIABLE and CREATE.
+hidden word used by compiler
+********************************/
+DOVAR:
+	_PUSH
+	MOV TOS,IP
+	ADD TOS,#CELLL 
+	ADD IP,IP,#2*CELLL  
+	B UNNEST 
 
 /*******************************
     VARIABLE	( -- //  string> )
@@ -4297,7 +4272,33 @@ input:
 	_ADR	CREAT
 	_DOLIT	0
 	_ADR	COMMA
-	_DOLIT UNNEST
+	_UNNEST
+
+/**********************************
+    doCON	( -- a ) 
+ 	Run time routine for CONSTANT.
+hidden word used by compiler 
+***********************************/
+DOCON:
+	_PUSH
+	LDR.W TOS,[IP],#4 
+	B UNNEST 
+
+
+/***********************************
+    CONSTANT	( u -- //  string> )
+ 	Compile a new constant.
+************************************/
+	_HEADER CONST,8,"CONSTANT"
+	_NEST 
+	_ADR	TOKEN
+	_ADR	SNAME
+	_ADR	OVERT
+	_ADR	COMPI_NEST
+	_DOLIT	DOCON
+	_ADR	CALLC
+	_ADR	COMMA
+	_DOLIT	UNNEST 
 	_ADR	CALLC  
 	_UNNEST
 
@@ -4505,33 +4506,33 @@ RDOT:
   from code field address 
 ****************************/
 	_HEADER TOBODY,5,">BODY"
-	add TOS,#8 
+	add TOS,#12 
 	_NEXT 		
 
 /*****************************
-    >NAME	( ca -- na | F )
+    >NFA	( cfa -- nfa | F )
  	Convert code address 
 	to a name address.
 *****************************/
-	_HEADER TNAME,5,">NAME"
+	_HEADER TONFA,4,">NFA"
 	_NEST
 	_ADR	TOR			//  
 	_ADR	CNTXT			//  va
-	_ADR	AT			//  na
+	_ADR	AT			//  nfa
 TNAM1:
-	_ADR	DUPP			//  na na
+	_ADR	DUPP			//  nfa nfa
 	_QBRAN	TNAM2	//  vocabulary end, no match
-	_ADR	DUPP			//  na na
-	_ADR	NAMET			//  na ca
-	_ADR	RAT			//  na ca code
-	_ADR	XORR			//  na f --
+	_ADR	DUPP			//  nfa nfa
+	_ADR	TOCFA			//  nfa ca
+	_ADR	RAT			//  nfa cfa code
+	_ADR	XORR			//  nfa f --
 	_QBRAN	TNAM2
 	_ADR	CELLM			//  la 
-	_ADR	AT			//  next_na
+	_ADR	AT			//  next_nfa
 	_BRAN	TNAM1
 TNAM2:	
 	_ADR	RFROM
-	_ADR	DROP			//  0|na --
+	_ADR	DROP			//  0|nfa --
 	_UNNEST			// 0
 
 /********************************
@@ -4600,7 +4601,7 @@ SEE1:
 	_ADR	OVER			//  a offset a
 	_ADR	PLUS			//  a target-4
 	_ADR	CELLP			//  a target
-	_ADR	TNAME			//  a na/0 --, is it a name?
+	_ADR	TONFA			//  a na/0 --, is it a name?
 	_ADR	QDUP			//  name address or zero
 	_QBRAN	DECOM1
 	_ADR	SPACE			//  a na
@@ -4657,7 +4658,7 @@ WORS2:
 	_ADR RFROM 
 	_DOLIT 8
 	_ADR SUBB
-	_ADR TNAME
+	_ADR TONFA
 	_ADR CELLM
 	_ADR AT  
 	_ADR LAST 

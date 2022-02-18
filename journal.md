@@ -1,9 +1,21 @@
 2022-02-17 
 
+* 20:34 commit.
+
+* Modification à **CREATE** pour que le data field soit après la définition du mot mais non alloué. 
+
+* Modifié **&gt;BODY** pour tenir compte de la modification de **CREATE**. 
+
+* Renommé  **&gt;NAME** en **&gt;NFA** et renommé **NAME&gt;** en **&gt;CFA**.
+
+* Corrigé bogue dans **PRESET**. Ce mot est maintenant codé en assembleur.
+
+----
+
 * Ajout des mots __0&gt;__, __0&tl;&gt;__ et __&lt;&gt;__. 
 
 * Ajout des mots  __:NONAME__ et __IS__. 
- 
+
 2022-02-16
 
 * Ajouté et testé le mot **RECURSE**. Ceci complète le vocabulaire CORE du standard forth 2012.
