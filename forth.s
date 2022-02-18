@@ -4126,7 +4126,7 @@ DODOES:
 	_ADR LAST 
 	_ADR AT
 	_ADR TOCFA 
-	_ADR CELLP 
+	_ADR TOBODY  
 	_ADR STORE  
 	_UNNEST 
 
@@ -4148,28 +4148,23 @@ DODOES:
 
 
 /****************************
-  DEFER@ ( "name" -- a )
-  return value of code field 
-  of defered function. 
+  DEFER@ ( cfa1 -- cfa2 )
+
 ******************************/
 	_HEADER DEFERAT,6,"DEFER@"
 	_NEST 
-	_ADR TICK
-	_ADR CELLP 
+	_ADR TOBODY
 	_ADR AT 
-	_ADR ONEM 
 	_UNNEST 
 
+
 /*********************************
- DEFER! ( "name1" "name2" -- )
+ DEFER! ( cfa1 cfa2 -- )
  assign an action to a defered word 
 ************************************/
 	_HEADER DEFERSTO,6,"DEFER!"
 	_NEST 
-	_ADR TICK 
-	_ADR ONEP 
-	_ADR TICK 
-	_ADR CELLP 
+	_ADR TOBODY 
 	_ADR STORE 
 	_UNNEST
 
@@ -4179,21 +4174,18 @@ DODOES:
 *****************************/
 	_HEADER DEFER,5,"DEFER"
 	_NEST 
-	_ADR CREAT 
+	_ADR CREAT
+	_DOLIT NOP  
+	_ADR  CALLC 
+	_DOLIT  AT 
+	_ADR   CALLC 
+	_DOLIT  EXECU
+	_ADR   CALLC   
 	_DOLIT UNNEST 
-	_ADR CALLC 
-	_DOLIT DEFER_NOP
-	_ADR ONEP 
-	_ADR LAST 
-	_ADR AT 
-	_ADR TOCFA 
-	_ADR CELLP 
-	_ADR STORE 
+	_ADR  CALLC 
 	_UNNEST 
-DEFER_NOP:
-	_NEST  
-	_ADR NOP 
-	_UNNEST 
+
+
 
 /*********************************
 	:NONAME  ( -- xt )
@@ -4246,8 +4238,6 @@ input:
 	_ADR	COMPI_NEST 
 	_DOLIT	DOVAR
 	_ADR	CALLC
-	_DOLIT UNNEST
-	_ADR	CALLC  
 	_UNNEST
 
 /*******************************
@@ -4258,9 +4248,9 @@ hidden word used by compiler
 DOVAR:
 	_PUSH
 	MOV TOS,IP
-	ADD TOS,#CELLL 
-	ADD IP,IP,#2*CELLL  
-	B UNNEST 
+	ADD IP,IP,#CELLL  
+	_NEXT  
+
 
 /*******************************
     VARIABLE	( -- //  string> )
@@ -4272,6 +4262,8 @@ DOVAR:
 	_ADR	CREAT
 	_DOLIT	0
 	_ADR	COMMA
+	_DOLIT  UNNEST 
+	_ADR    CALLC 
 	_UNNEST
 
 /**********************************
@@ -4506,7 +4498,7 @@ RDOT:
   from code field address 
 ****************************/
 	_HEADER TOBODY,5,">BODY"
-	add TOS,#12 
+	add TOS,#8  
 	_NEXT 		
 
 /*****************************
