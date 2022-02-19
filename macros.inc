@@ -190,6 +190,7 @@
 	.p2align 2 
 	.endm
 
+	// POSTPONE COMPILE 
 	.macro _COMPI name 
 	_DOLIT \name 
 	_ADR CALLC 

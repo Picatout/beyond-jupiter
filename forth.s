@@ -3665,17 +3665,38 @@ STRCQ:
 	_UNNEST
 
 /********************************
-	DO ( limit start -- a )
+	DO ( limit start -- a 0 )
 	initialise a DO...LOOP 
 	or DO...+LOOP 
 ********************************/
 	_HEADER DO,COMPO+IMEDD+2,"DO"
 	_NEST
-	_COMPI SWAP
-	_COMPI TOR 
-	_COMPI TOR 
+	_COMPI DTOR 
 	_ADR HERE 
 	_DOLIT 0  // end marker used by resolve_leave 
+	_UNNEST 
+	
+/******************************
+	?DO ( limit start -- a )	
+    initialise conditional 
+	?DO ... LOOP 	
+	at run time abort loop 
+	if limit = start 
+******************************/
+	_HEADER QDO,COMPO+IMEDD+3,"?DO"
+	_NEST 
+	_COMPI  DDUP
+	_COMPI  EQUAL 
+	_COMPI  QBRAN
+	_ADR    HERE 
+	_DOLIT  0 
+	_ADR    COMMA 
+	_COMPI  DDROP  
+	_COMPI  EXIT 
+	_ADR    HERE 
+	_ADR    SWAP 
+	_ADR    STORE  
+	_ADR    DO 
 	_UNNEST 
 
 DOPLOOP: // ( n -- R: limit counter )
@@ -3691,23 +3712,7 @@ DOPLOOP: // ( n -- R: limit counter )
 	_NEXT 
 9:  ldr IP,[IP]
 	_NEXT 
-	
-/******************************
-	?DO ( limit start -- a )	
-    initialise conditional 
-	?DO ... LOOP 	
-	at run time abort loop 
-	if limit = start 
-******************************/
-	_HEADER QDO,COMPO+IMEDD+3,"?DO"
-	_NEST 
-	_COMPI  DDUP
-	_ADR    DO 
-	_COMPI  EQUAL  
-	_COMPI	IFF
-	_COMPI  LEAVE  
-	_COMPI  THENN     
-	_UNNEST 
+
 
 /***************************
 	+LOOP ( a -- )
