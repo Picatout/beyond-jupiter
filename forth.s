@@ -170,6 +170,19 @@ KEY1:
 	_ADR CAPS_LED 
 	_ADR	QKEY 
 	_QBRAN	KEY1
+/*  add this code to filter out control characters 	
+	_ADR    DUPP 
+	_DOLIT  13 
+	_ADR    EQUAL 
+	_TBRAN  KEY2 
+	_ADR    DUPP
+	_DOLIT  32 
+	_ADR    LESS 
+	_QBRAN  KEY2 
+	_ADR    DROP 
+	_BRAN   KEY1 
+*/ 
+KEY2: 	
 	_UNNEST
 
 /**********************************************
@@ -1905,6 +1918,8 @@ output:
  	Copy u bytes from b1 to b2.
 ********************************/
 	_HEADER CMOVE,5,"CMOVE"
+	CMP TOS,#1 
+	BMI CMOV3 
 	LDR	T2,[DSP],#4
 	LDR	T3,[DSP],#4
 	B CMOV1
@@ -1916,16 +1931,27 @@ CMOV1:
 	BEQ	CMOV2
 	SUB	TOS,TOS,#1
 	B CMOV0
+CMOV3: 
+	ADD  DSP,#2*CELLL  
 CMOV2:
 	_POP
 	_NEXT
 
-/***************************
-    MOVE	( a1 a2 u -- )
- 	Copy u words from a1 to a2.
-*******************************/
+/*********************************
+	MOVE ( a1 a2 u -- )
+	alias for CMOVE 
+*********************************/
 	_HEADER MOVE,4,"MOVE"
-	MOV T0,#4 
+	B CMOVE 
+
+
+/***************************
+    WMOVE	( a1 a2 u -- )
+ 	Copy u byte from a1 to a2
+	round u to upper modulo 4 
+*******************************/
+	_HEADER WMOVE,4,"WMOVE"
+	MOV T0,#4
 	ADD TOS,#3 
 	BIC TOS,#3
 	LDR	T1,[DSP],#4 // dest
@@ -3024,7 +3050,7 @@ SEARCH5:
 	_ADR TOR 
 	_ADR PAD 
 	_ADR SWAP
-	_ADR MOVE  
+	_ADR WMOVE  
 	_ADR PAD 
 	_ADR RFROM
 	_ADR PLUS 
@@ -3199,12 +3225,14 @@ ACCP4:
 ABORT1: 
 	_ADR    LBRAC  
 	_ADR	PRESE
-/*
 	_DOLIT  0 
+	_ADR    DUPP 
+	_DOLIT  UPP+TOIN 
+	_ADR    DSTOR 
 	_DOLIT  TIBB 
-	_DOLIT UPP+SRC 
-	_ADR   DSTOR 
-*/
+	_DOLIT  UPP+TIBUF  
+	_ADR    STORE 
+	_ADR    CR 
 	_BRAN	QUIT
 
 
@@ -3518,7 +3546,7 @@ output:
 /******************************
     ,	   ( w -- )
  	Compile an integer 
-	into the code dictionary.
+	into dataspace.
 ******************************/
 	_HEADER COMMA,1,","
 	_NEST
@@ -3530,6 +3558,21 @@ output:
 	_ADR	STORE
 	_UNNEST	// adjust code pointer, compile
 	.p2align 2 
+
+/***********************************
+	C, ( c -- )
+	compile 1 character into 
+	dataspace 
+************************************/
+	_HEADER CCOMMA,2,"C,"
+	_NEST 
+	_ADR 	HERE 
+	_ADR	DUPP 
+	_ADR    ONEP 
+	_ADR    CPP 
+	_ADR    STORE 
+	_ADR    CSTOR 
+	_UNNEST 
 
 /************************************
     [COMPILE]   ( -- //  string> )
@@ -4044,6 +4087,7 @@ COLON_ABORT:
 	_NEST
 	_DOLIT	UNNEST
 	_ADR	CALLC
+	_ADR    ALIGN 
 	_ADR	LBRAC
 	_ADR	OVERT
 	_UNNEST
@@ -4085,9 +4129,9 @@ CALLC:
 **************************/
 	_HEADER COLON,1,":"
 	_NEST
+	_ADR    ALIGN 
 	_ADR	TOKEN
 	_ADR	SNAME
-	_ADR    OVERT 
 	_ADR	COMPI_NEST 
 	_ADR	RBRAC
 	_UNNEST
@@ -4234,6 +4278,7 @@ input:
 ***********************************/
 	_HEADER CREAT,6,"CREATE"
 	_NEST 
+	_ADR	ALIGN 
 	_ADR	TOKEN
 	_ADR	SNAME
 	_ADR	OVERT
@@ -4835,7 +4880,7 @@ COLD1:
 	_DOLIT	UZERO
 	_DOLIT	UPP
 	_DOLIT	ULAST-UZERO
-	_ADR	MOVE 			// initialize user area
+	_ADR	WMOVE 			// initialize user area
 	_ADR	PRESE			// initialize stack and TIB
 	_ADR	WR_DIS          // disable WEL bit in U3 spi flash  
 	_ADR 	PS2_QUERY  

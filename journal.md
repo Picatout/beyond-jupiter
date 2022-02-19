@@ -1,5 +1,23 @@
 2022-02-17 
 
+*  La liste complète des mots du CORE forth 2012 standard est maintenant implémentée. commit 20:23
+
+*  Move ne correspondait pas au standard forth 2012. Il devait transféré un nombre extact d'octets. Je l'ai renommé **WMOVE** car il transfert 
+   un nombre entier de mots de 32 bits.  **MOVE** est maintenant un alias pour **CMOVE** puisque sur ce système il font la même chose.
+
+*  Modifié  **:** et **CREATE** pour que l'entête de dictionnaire soit alignée. Au cas ou HERE ne serait pas aligné au moment de la création 
+d'un nouveau mot. Cette possibilité existe si **ALLOT** est utilisé avec un argument qui n'est pas modulo 4 . Par exemple lorsque **C,** est utilisé.
+
+*  Ajout de **C,**. 
+
+*  Corrigé  bogue dans **ABORT**. 
+
+*  Modifié  **;** pour que le pointeur HERE soit alignée après la définition.
+
+*  Supprimé le **OVERT** dans la définition de **:**. Le mot de doit-être visible dans FIND seulement après que la définition soit complétée.
+
+----------------
+
 *  Débogué **DOES>** commit 11:41
 
 * Modifié **CREATE** et **VARIABLE** 

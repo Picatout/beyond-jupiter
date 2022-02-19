@@ -436,7 +436,7 @@ plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
     _DOLIT VIDEO_BUFFER_SIZE 
     _ADR RFROM  
     _ADR SUBB 
-    _ADR MOVE
+    _ADR WMOVE
     _DOLIT 24 
     _ADR CLRLINE 
     _UNNEST 
@@ -454,7 +454,7 @@ plot_op: .byte 0, (op_pen-op_back)/2,(op_invert-op_back)/2,(op_xor-op_back)/2
     _DOLIT VIDEO_BUFFER_SIZE 
     _DOLIT BPR*CHAR_HEIGHT 
     _ADR SUBB  
-    _ADR MOVE
+    _ADR WMOVE
     _DOLIT 0 
     _ADR CLRLINE
     _UNNEST 
