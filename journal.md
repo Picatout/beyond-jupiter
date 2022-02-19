@@ -1,5 +1,14 @@
 2022-02-17 
 
+* 23:07 commit 
+
+* Travail sur **?DO** .
+
+* Modifié >NFA pour mettre le bit thumb du cfa à zéro. 
+
+* Corrigé  **2R&gt;**, **2&gt;R** et ajouté **2R@**. 
+---
+
 *  La liste complète des mots du CORE forth 2012 standard est maintenant implémentée. commit 20:23
 
 *  Move ne correspondait pas au standard forth 2012. Il devait transféré un nombre extact d'octets. Je l'ai renommé **WMOVE** car il transfert 

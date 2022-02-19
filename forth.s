@@ -465,14 +465,15 @@ BRAN:
 	_NEXT 
 
 /***********************************************
-	2R> (  -- D ) R: D --  
+	2R> (  -- x1 x2 ) R: x1 x2 --  
     push a double from rstack 
 ***********************************************/
 	_HEADER DRFROM,3,"2R>"
 	_PUSH 
-	LDR TOS,[RSP],#4 
+	LDR TOS,[RSP,#CELLL] 
 	_PUSH 
-	LDR TOS,[RSP],#4
+	LDR TOS,[RSP]
+	ADD RSP,#2*CELLL 
 	_NEXT 
 
 /************************************************
@@ -485,22 +486,34 @@ BRAN:
 	_NEXT 
 
 /***********************************************
+	2R@ ( -- x2 x1 ) ( R: x1 x2 -- ) 
+	Copy 2 element of return stack to data stack
+***********************************************/
+	_HEADER DRAT,3,"2R@"
+	_PUSH 
+	LDR TOS,[RSP,#CELLL] 
+	_PUSH 
+	LDR TOS,[RSP] 
+	_NEXT 
+
+
+/***********************************************
     >R	  ( w -- ) R: -- w 
  	pop to rstack.
 ************************************************/
 	_HEADER TOR,2,">R"
-	STR	TOS,[RSP,#-4]!
+	STR	TOS,[RSP,#-CELLL]!
 	_POP
 	_NEXT
 
 /*********************************************
-	2>R ( d -- ) R: -- d 
+	2>R ( x1 x2 -- ) R: -- x1 x2  
 	pop a double to rstack 
 *********************************************/
 	_HEADER DTOR,3,"2>R"
-	STR TOS,[RSP,#-4]!
-    _POP 
-	STR TOS,[RSP,#-4]!
+	LDR T0, [DSP],#CELLL
+	STR T0,[RSP,#-CELLL]!
+ 	STR TOS,[RSP,#-CELLL]!
 	_POP  
 	_NEXT 	
 
@@ -3652,7 +3665,7 @@ STRCQ:
 	_UNNEST
 
 /********************************
-	DO ( limit start -- )
+	DO ( limit start -- a )
 	initialise a DO...LOOP 
 	or DO...+LOOP 
 ********************************/
@@ -3679,6 +3692,23 @@ DOPLOOP: // ( n -- R: limit counter )
 9:  ldr IP,[IP]
 	_NEXT 
 	
+/******************************
+	?DO ( limit start -- a )	
+    initialise conditional 
+	?DO ... LOOP 	
+	at run time abort loop 
+	if limit = start 
+******************************/
+	_HEADER QDO,COMPO+IMEDD+3,"?DO"
+	_NEST 
+	_COMPI  DDUP
+	_ADR    DO 
+	_COMPI  EQUAL  
+	_COMPI	IFF
+	_COMPI  LEAVE  
+	_COMPI  THENN     
+	_UNNEST 
+
 /***************************
 	+LOOP ( a -- )
 	increment counter 
@@ -4569,6 +4599,8 @@ TOVECTOR:
 *****************************/
 	_HEADER TONFA,4,">NFA"
 	_NEST
+	_DOLIT  -2 
+	_ADR    ANDD 
 	_ADR	TOR			//  
 	_ADR	CNTXT			//  va
 	_ADR	AT			//  nfa
@@ -4588,6 +4620,7 @@ TNAM2:
 	_ADR	DROP			//  0|nfa --
 	_UNNEST			// 0
 
+
 /********************************
     .ID	 ( na -- )
  	Display the name at address.
@@ -4599,6 +4632,7 @@ TNAM2:
 	_ADR	COUNT
 	_DOLIT	0x1F
 	_ADR	ANDD			// mask lexicon bits
+	_ADR	SPACE 
 	_ADR	TYPEE
 	_UNNEST			// display name string
 DOTI1:
