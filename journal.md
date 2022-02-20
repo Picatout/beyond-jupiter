@@ -1,5 +1,19 @@
 2022-02-18
 
+* À faire débogué **MARK** .
+
+* Modifié **&gt;CFA**  maintenant met le bit thumb à 1. Ajuster **DEFER!** en conséquence. 
+
+* Ambiguité en ce qui concerne la valeur retourné par **'**  le bit thumb est à zéro. Incohérence avec "NAME?" et "DEFER@" à voir. 
+
+* Réparé **DEFER**, **DEFER!** et **DEFER@**.
+
+* Ajouté  **ACTION-OF**. 
+
+--------------
+
+* Complété **?DO** et [see.f](see.f).  commit 13:23
+
 * Travail sur **?DO**. 
 
 2022-02-17 
@@ -8,7 +22,7 @@
 
 * Travail sur **?DO** .
 
-* Modifié >NFA pour mettre le bit thumb du cfa à zéro. 
+* Modifié **&gt;NFA** pour mettre le bit thumb du cfa à zéro. 
 
 * Corrigé  **2R&gt;**, **2&gt;R** et ajouté **2R@**. 
 ---

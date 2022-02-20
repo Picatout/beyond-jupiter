@@ -2007,6 +2007,7 @@ FILL2:
 	_POP
 	_NEXT
 
+
 /*****************************
     PACK$	( b u a -- a )
  	Build a counted word with
@@ -2933,6 +2934,8 @@ PARS8:
 	_ADR	ANDD
 	_ADR	PLUS
 	_ADR	ALGND
+	_DOLIT  1
+	_ADR    ORR    // set thum bit 
 	_UNNEST
 
 /***************************************
@@ -3030,8 +3033,8 @@ SEARCH5:
 	_ADR	DROP			// na+1
 	_ADR	ONEM			// na
 	_ADR	DUPP			// na na
-	_ADR	TOCFA			// na ca
-	_ADR	SWAP			// ca na
+	_ADR	TOCFA			// na cfa
+	_ADR	SWAP			// cfa na
 	_UNNEST			//  return with a match
 
 /********************************
@@ -3462,10 +3465,10 @@ QUIT2:
 	_ADR TOKEN 
 	_ADR DUPP 
 	_QBRAN 9f 
-	_ADR NAMEQ // ( a -- ca na | a 0 )
+	_ADR NAMEQ // ( a -- cfa na | a 0 )
 	_ADR QDUP 
 	_QBRAN 8f
-	_ADR CELLM // ( ca la )
+	_ADR CELLM // ( cfa la )
 	_ADR DUPP 
 	_ADR CPP   
 	_ADR STORE
@@ -3960,7 +3963,7 @@ DOLEAVE:
 	_ADR LAST
 	_ADR AT  
 	_ADR TOCFA 
-	_ADR CALLC  
+	_ADR COMMA  
 	_UNNEST 
 
 
@@ -4155,6 +4158,29 @@ CALLC:
 	_ADR COMMA  
 	_UNNEST 
 
+/****************************
+	BUFFER: "name" ( u -- a )
+	create a named buffer of 
+	u bytes 
+	0's the buffer. 
+*****************************/
+	_HEADER BUFFER,7,"BUFFER:"
+	_NEST 
+	_ADR    ALIGN 
+	_ADR	TOKEN
+	_ADR	SNAME
+	_ADR    HERE 
+	_ADR    OVER 
+	_ADR    ALLOT 
+	_DOLIT	0 
+	_ADR	ROT 
+	_ADR	DUPP 
+	_ADR	TOR 
+	_ADR	FILL
+	_ADR	RFROM 
+	_ADR    OVERT 
+	_UNNEST 
+
 
 /*************************
  	:	( -- //  string> )
@@ -4223,8 +4249,6 @@ DODOES:
 	_DOLIT	UNNEST
 	_ADR	CALLC 
 	_ADR COMPI_NEST
-//	_DOLIT RFROM 
-//	_ADR   CALLC
  	_UNNEST 
 
 
@@ -4234,9 +4258,24 @@ DODOES:
 ******************************/
 	_HEADER DEFERAT,6,"DEFER@"
 	_NEST 
-	_ADR TOBODY
+	_ADR CELLP 
 	_ADR AT 
 	_UNNEST 
+
+/*********************************
+	ACTION-OF "name" ( -- xt )
+	push the action token 
+	of defered word "name" 
+*********************************/
+	_HEADER ACTIONOF,IMEDD+9,"ACTION-OF"
+	_NEST 
+	_ADR 	TICK  
+	_ADR 	DEFERAT 
+	_ADR    STATE 
+	_ADR 	AT 
+	_QBRAN 	1f
+	_ADR    COMMA 
+1: 	_UNNEST 
 
 
 /*********************************
@@ -4245,7 +4284,9 @@ DODOES:
 ************************************/
 	_HEADER DEFERSTO,6,"DEFER!"
 	_NEST 
-	_ADR TOBODY 
+	_DOLIT	-2 
+	_ADR	ANDD   // clear thumb bit of cfa2  
+	_ADR 	CELLP  // skip NEST 
 	_ADR STORE 
 	_UNNEST
 
@@ -4255,18 +4296,19 @@ DODOES:
 *****************************/
 	_HEADER DEFER,5,"DEFER"
 	_NEST 
-	_ADR CREAT
-	_DOLIT NOP  
+	_ADR COLON 
+	_DOLIT NO_ACTION  
 	_ADR  CALLC 
-	_DOLIT  AT 
-	_ADR   CALLC 
-	_DOLIT  EXECU
-	_ADR   CALLC   
 	_DOLIT UNNEST 
-	_ADR  CALLC 
+	_ADR  CALLC
+	_ADR  SEMIS  
 	_UNNEST 
 
-
+NO_ACTION:
+	_NEST 
+	_DOLIT 1 
+	_ABORQ 15 , " no action set!"
+	_UNNEST 
 
 /*********************************
 	:NONAME  ( -- xt )
@@ -4284,7 +4326,7 @@ output:
 	_UNNEST 
 
 /*******************************
-	IS cccc ( xt -- )
+	IS cccc ( cfa -- )
 input:
    cccc  defered word name 
    xt    execution token 
@@ -4318,12 +4360,9 @@ input:
 	_ADR	SNAME
 	_ADR	OVERT
 	_ADR	COMPI_NEST 
-	_DOLIT	DOVAR
-	_ADR	CALLC
-	_DOLIT  NOP     // reserved slot    
-	_ADR    CALLC   // for DOES> vector 
-	_DOLIT  UNNEST 
-	_ADR    CALLC 
+	_COMPI	DOVAR
+	_COMPI  NOP     // reserved slot  for DOES> vector   
+	_COMPI  UNNEST 
 	_UNNEST
 
 /*******************************
@@ -4604,8 +4643,6 @@ TOVECTOR:
 *****************************/
 	_HEADER TONFA,4,">NFA"
 	_NEST
-	_DOLIT  -2 
-	_ADR    ANDD 
 	_ADR	TOR			//  
 	_ADR	CNTXT			//  va
 	_ADR	AT			//  nfa
@@ -4613,7 +4650,7 @@ TNAM1:
 	_ADR	DUPP			//  nfa nfa
 	_QBRAN	TNAM2	//  vocabulary end, no match
 	_ADR	DUPP			//  nfa nfa
-	_ADR	TOCFA			//  nfa ca
+	_ADR	TOCFA			//  nfa cfa
 	_ADR	RAT			//  nfa cfa code
 	_ADR	XORR			//  nfa f --
 	_QBRAN	TNAM2
@@ -4743,19 +4780,18 @@ WORS2:
 *************************/	
 	_HEADER MARK,4,"MARK"
 	_NEST
-	_ADR CREAT 
-	_ADR DODOES 
-	_UNNEST
-	_NEST  
-	_ADR RFROM 
-	_DOLIT 8
-	_ADR SUBB
-	_ADR TONFA
-	_ADR CELLM
-	_ADR AT  
-	_ADR LAST 
-	_ADR STORE 
-	_ADR OVERT
+	_ADR    CREAT 
+	_COMPI   DOES
+	_COMPI  LITER 
+	_DOLIT  4*CELLL  
+	_ADR    COMMA 
+	_COMPI  SUBB 
+	_COMPI  TONFA 
+	_COMPI   CELLM
+	_COMPI   AT  
+	_COMPI   LAST 
+	_COMPI   STORE 
+	_COMPI   OVERT
 	_UNNEST 
 
 /*********************************

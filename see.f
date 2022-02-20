@@ -4,8 +4,8 @@
 ;
 
 \ check if unnest cfa 
-: unnest? ( u -- f )
-    $80030BB = 
+: unnest? ( u -- u f )
+    dup $80030BB = 
 ;
 
 \ print address 
@@ -15,12 +15,12 @@
 \  disassemble colon definition 
 : see ( "name" )
     cr 
-    ' adr  
+    ' 1- adr  
     dup @ nest? if 
         ."  {nest}" cr cell+ 
         begin 
             adr 
-            dup @ dup unnest? if adr drop ."  {unnest}" cr exit then 
+            dup @ unnest? if adr 2drop ."  {unnest}" cr exit then 
             >nfa ?dup if 
                 .id 
             else 
