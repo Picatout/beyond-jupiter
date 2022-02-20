@@ -1305,7 +1305,7 @@ ARM GAS  forth.s 			page 1
  519 0528 FFF7FEFF 	 	bl	tv_init
  520 052c FFF7FEFF 	  bl  kbd_init
  521 0530 01F002FC 	  bl  flash_spi_init   
- 522 0534 05F0E2BD 		b COLD 
+ 522 0534 05F006BE 		b COLD 
  523              	
  524              	
  525              	
@@ -1711,7 +1711,7 @@ ARM GAS  forth.s 			page 1
  870 0868 55AA55AA 		.word 0xaa55aa55 /* SEED  */ 
  871 086c 00000000 		.word 0      /* TICKS */
  872 0870 00000000 	    .word 0     /* CD_TIMER */
- 873 0874 0C600000 		.word HI_BOTH  /*'BOOT */
+ 873 0874 54600000 		.word HI_BOTH  /*'BOOT */
  874 0878 201A0000 		.word PS2_QKEY /* query for character */
  875 087c E8120000 	  .word TV_EMIT  /* char output device */
  876 0880 0A000000 	  .word BASEE 	/*BASE */
@@ -1724,10 +1724,10 @@ ARM GAS  forth.s 			page 1
  883 089c 00000000 	  .word 0     // SRCID 
  884 08a0 004E0000 		.word INTER	/*'EVAL */
  885 08a4 00000000 		.word 0			/*HLD */
- 886 08a8 F4600000 		.word _LASTN	/*CONTEXT */
- 887 08ac 60610000 		.word CTOP  	/* FCP end of system dictionnary */
- 888 08b0 FC580020 		.word RAM_ADR+(CTOP-UZERO)	/* CP end of RAM dictionary RAM */
- 889 08b4 F4600000 		.word _LASTN	/*LAST word in dictionary */
+ 886 08a8 3C610000 		.word _LASTN	/*CONTEXT */
+ 887 08ac A8610000 		.word CTOP  	/* FCP end of system dictionnary */
+ 888 08b0 44590020 		.word RAM_ADR+(CTOP-UZERO)	/* CP end of RAM dictionary RAM */
+ 889 08b4 3C610000 		.word _LASTN	/*LAST word in dictionary */
  890 08b8 00000000 		.space  RX_QUEUE_SIZE /* space reserved for rx_queue,head and tail pointer. */
  890      00000000 
  890      00000000 
@@ -10760,7 +10760,7 @@ ARM GAS  forth.s 			page 1
  3476 5054 75310000 		_ADR AT 
  3477 5058 0D390000 		_ADR LAST 
  3478 505c 61310000 		_ADR STORE
- 3479 5060 89570000 		_ADR OVERT 
+ 3479 5060 C1570000 		_ADR OVERT 
  3480 5064 79320000 	8:  _ADR DROP 
  3481 5068 BB2E0000 	9:	_UNNEST 
  3482              	
@@ -10780,7 +10780,7 @@ ARM GAS  forth.s 			page 1
  3493      450000BF 
  3494 507c 504700BF 		_NEST 
  3495 5080 B9500000 		_ADR ITICK
- 3496 5084 F9570000 		_ADR CALLC  
+ 3496 5084 41580000 		_ADR CALLC  
  3497 5088 BB2E0000 		_UNNEST 
  3498              	
  3499              	
@@ -11404,1224 +11404,1252 @@ ARM GAS  forth.s 			page 1
  3982              	/******************************
  3983              	    S"	( -- //  string> )
  3984              	 	Compile an inline 
- 3985              		word literal.
- 3986              	*****************************/
- 3987 560c EC550000 		_HEADER STRQ,IMEDD+COMPO+2,"S\""
- 3987      C2532200 
- 3988 5614 504700BF 		_NEST
- 3989 5618 DF300000 		_COMPI	STRQP
- 3989      95440000 
- 3989      39510000 
- 3990 5624 FD510000 		_ADR	STRCQ
- 3991 5628 BB2E0000 		_UNNEST
- 3992              	
- 3993              	/******************************
- 3994              	    ."	( -- //  string> )
- 3995              	 	Compile an inline word
- 3996              		literal to be typed out 
- 3997              		at run time.
- 3998              	*******************************/
- 3999 562c 10560000 		_HEADER DOTQ,IMEDD+COMPO+2,".\""
- 3999      C22E2200 
- 4000 5634 504700BF 		_NEST
- 4001 5638 DF300000 		_COMPI	DOTQP
- 4001      A1440000 
- 4001      39510000 
- 4002 5644 FD510000 		_ADR	STRCQ
- 4003 5648 BB2E0000 		_UNNEST
- 4004              	
- 4005              	/*********************
- 4006              	  Name compiler
- 4007              	***********************/
+ 3985              		counted literal. 
+ 3986              		at runtime: ( -- a u )
+ 3987              	*****************************/
+ 3988 560c EC550000 		_HEADER STRQ,IMEDD+COMPO+2,"S\""
+ 3988      C2532200 
+ 3989 5614 504700BF 		_NEST
+ 3990 5618 DF300000 		_COMPI	STRQP
+ 3990      95440000 
+ 3990      39510000 
+ 3991 5624 FD510000 		_ADR	STRCQ
+ 3992 5628 BB2E0000 		_UNNEST
+ 3993              	
+ 3994              	/********************************
+ 3995              	EXTENDED CORE 
+ 3996              		C" string" ( -- )
+ 3997              		Compile an inline counted 
+ 3998              		literal.
+ 3999              		at runtime ( -- a )
+ 4000              	*********************************/
+ 4001 562c 10560000 		_HEADER CSTRQ,IMEDD+COMPO+2,"C\""
+ 4001      C2432200 
+ 4002 5634 504700BF 		_NEST 
+ 4003 5638 DF300000 		_COMPI	STRQP
+ 4003      95440000 
+ 4003      39510000 
+ 4004 5644 FD510000 		_ADR	STRCQ 
+ 4005 5648 DF300000 		_COMPI	DROP 
+ 4005      79320000 
+ 4005      39510000 
+ 4006 5654 DF300000 		_COMPI	ONEM  
+ 4006      31340000 
+ 4006      39510000 
+ 4007 5660 BB2E0000 		_UNNEST 
  4008              	
- 4009              	/**************************
- 4010              	    ?UNIQUE	( a -- a )
- 4011              	 	Display a warning 
- 4012              		message if the word 
- 4013              		already exists.
- 4014              	**************************/
- 4015 564c 30560000 		_HEADER UNIQU,7,"?UNIQUE"
- 4015      073F554E 
- 4015      49515545 
- 4016 5658 504700BF 		_NEST
- 4017 565c 89320000 		_ADR	DUPP
- 4018 5660 DD4A0000 		_ADR	NAMEQ			// ?name exists
- 4019 5664 1F310000 		_QBRAN	UNIQ1	// redefinitions are OK
- 4019      84560000 
- 4020 566c A1440000 		_DOTQP	7," reDef "		// but warn the user
- 4020      07207265 
- 4020      44656620 
- 4021 5678 C9320000 		_ADR	OVER
- 4022 567c 71370000 		_ADR	COUNT
- 4023 5680 11440000 		_ADR	TYPEE			// just in case its not planned
- 4024              	UNIQ1:
- 4025 5684 79320000 		_ADR	DROP
- 4026 5688 BB2E0000 		_UNNEST
- 4027              	
+ 4009              	
+ 4010              	/******************************
+ 4011              	    ."	( -- //  string> )
+ 4012              	 	Compile an inline word
+ 4013              		literal to be typed out 
+ 4014              		at run time.
+ 4015              	*******************************/
+ 4016 5664 30560000 		_HEADER DOTQ,IMEDD+COMPO+2,".\""
+ 4016      C22E2200 
+ 4017 566c 504700BF 		_NEST
+ 4018 5670 DF300000 		_COMPI	DOTQP
+ 4018      A1440000 
+ 4018      39510000 
+ 4019 567c FD510000 		_ADR	STRCQ
+ 4020 5680 BB2E0000 		_UNNEST
+ 4021              	
+ 4022              	/*********************
+ 4023              	  Name compiler
+ 4024              	***********************/
+ 4025              	
 ARM GAS  forth.s 			page 192
 
 
- 4028              	/***********************
- 4029              	    $,n	 ( na -- )
- 4030              	 	Build a new dictionary 
- 4031              		name using the data at na.
- 4032              	hidden word 
- 4033              	*******************************/
- 4034              	SNAME:
- 4035 568c 504700BF 		_NEST
- 4036 5690 89320000 		_ADR	DUPP			//  na na
- 4037 5694 95310000 		_ADR	CAT			//  ?null input
- 4038 5698 1F310000 		_QBRAN	SNAM1
- 4038      D4560000 
- 4039 56a0 59560000 		_ADR	UNIQU			//  na
- 4040 56a4 0D390000 		_ADR	LAST			//  na last
- 4041 56a8 75310000 		_ADR	AT			//  na la
- 4042 56ac 39510000 		_ADR	COMMA			//  na
- 4043 56b0 89320000 		_ADR	DUPP			//  na na
- 4044 56b4 0D390000 		_ADR	LAST			//  na na last
- 4045 56b8 61310000 		_ADR	STORE			//  na , save na for vocabulary link
- 4046 56bc 71370000 		_ADR	COUNT			//  na+1 count
- 4047 56c0 C5330000 		_ADR	PLUS			//  na+1+count
- 4048 56c4 2D3D0000 		_ADR	ALGND			//  word boundary
- 4049 56c8 E1380000 		_ADR	CPP
- 4050 56cc 61310000 		_ADR	STORE			//  top of dictionary now
- 4051 56d0 BB2E0000 		_UNNEST
- 4052              	SNAM1:
- 4053 56d4 95440000 		_ADR	STRQP
- 4054 56d8 07       		.byte	7
- 4055 56d9 206E616D 		.ascii " name? "
- 4055      653F20
- 4056 56e0 954D0000 		_ADR	PRT_ABORT
- 4057              	
- 4058              	/************************
- 4059              	    $COMPILE	( a -- )
- 4060              	 	Compile next word to 
- 4061              		code dictionary as 
- 4062              		a token or literal.
- 4063              	**************************/
- 4064 56e4 50560000 		_HEADER SCOMP,8,"$COMPILE"
- 4064      0824434F 
- 4064      4D50494C 
- 4064      450000BF 
- 4065 56f4 504700BF 		_NEST
- 4066 56f8 DD4A0000 		_ADR	NAMEQ
- 4067 56fc D5340000 		_ADR	QDUP	// defined?
- 4068 5700 1F310000 		_QBRAN	SCOM2
- 4068      30570000 
- 4069 5708 75310000 		_ADR	AT
- 4070 570c DF300000 		_DOLIT	IMEDD
- 4070      80000000 
- 4071 5714 45330000 		_ADR	ANDD	// immediate?
- 4072 5718 1F310000 		_QBRAN	SCOM1
- 4072      28570000 
- 4073 5720 F5300000 		_ADR	EXECU
- 4074 5724 BB2E0000 		_UNNEST			// it's immediate, execute
- 4075              	SCOM1:
- 4076 5728 F9570000 		_ADR	CALLC			// it's not immediate, compile
+ 4026              	/**************************
+ 4027              	    ?UNIQUE	( a -- a )
+ 4028              	 	Display a warning 
+ 4029              		message if the word 
+ 4030              		already exists.
+ 4031              	**************************/
+ 4032 5684 68560000 		_HEADER UNIQU,7,"?UNIQUE"
+ 4032      073F554E 
+ 4032      49515545 
+ 4033 5690 504700BF 		_NEST
+ 4034 5694 89320000 		_ADR	DUPP
+ 4035 5698 DD4A0000 		_ADR	NAMEQ			// ?name exists
+ 4036 569c 1F310000 		_QBRAN	UNIQ1	// redefinitions are OK
+ 4036      BC560000 
+ 4037 56a4 A1440000 		_DOTQP	7," reDef "		// but warn the user
+ 4037      07207265 
+ 4037      44656620 
+ 4038 56b0 C9320000 		_ADR	OVER
+ 4039 56b4 71370000 		_ADR	COUNT
+ 4040 56b8 11440000 		_ADR	TYPEE			// just in case its not planned
+ 4041              	UNIQ1:
+ 4042 56bc 79320000 		_ADR	DROP
+ 4043 56c0 BB2E0000 		_UNNEST
+ 4044              	
+ 4045              	/***********************
+ 4046              	    $,n	 ( na -- )
+ 4047              	 	Build a new dictionary 
+ 4048              		name using the data at na.
+ 4049              	hidden word 
+ 4050              	*******************************/
+ 4051              	SNAME:
+ 4052 56c4 504700BF 		_NEST
+ 4053 56c8 89320000 		_ADR	DUPP			//  na na
+ 4054 56cc 95310000 		_ADR	CAT			//  ?null input
+ 4055 56d0 1F310000 		_QBRAN	SNAM1
+ 4055      0C570000 
+ 4056 56d8 91560000 		_ADR	UNIQU			//  na
+ 4057 56dc 0D390000 		_ADR	LAST			//  na last
+ 4058 56e0 75310000 		_ADR	AT			//  na la
+ 4059 56e4 39510000 		_ADR	COMMA			//  na
+ 4060 56e8 89320000 		_ADR	DUPP			//  na na
+ 4061 56ec 0D390000 		_ADR	LAST			//  na na last
+ 4062 56f0 61310000 		_ADR	STORE			//  na , save na for vocabulary link
+ 4063 56f4 71370000 		_ADR	COUNT			//  na+1 count
+ 4064 56f8 C5330000 		_ADR	PLUS			//  na+1+count
+ 4065 56fc 2D3D0000 		_ADR	ALGND			//  word boundary
+ 4066 5700 E1380000 		_ADR	CPP
+ 4067 5704 61310000 		_ADR	STORE			//  top of dictionary now
+ 4068 5708 BB2E0000 		_UNNEST
+ 4069              	SNAM1:
+ 4070 570c 95440000 		_ADR	STRQP
+ 4071 5710 07       		.byte	7
+ 4072 5711 206E616D 		.ascii " name? "
+ 4072      653F20
+ 4073 5718 954D0000 		_ADR	PRT_ABORT
+ 4074              	
+ 4075              	/************************
 ARM GAS  forth.s 			page 193
 
 
- 4077 572c BB2E0000 		_UNNEST	
- 4078              	SCOM2:
- 4079 5730 91430000 		_ADR	NUMBERQ 
- 4080 5734 1F310000 		_QBRAN	SCOM3
- 4080      44570000 
- 4081 573c E5510000 		_ADR	LITER
- 4082 5740 BB2E0000 		_UNNEST			// compile number as integer
- 4083              	SCOM3: // compilation abort 
- 4084 5744 4D570000 		_ADR COLON_ABORT 
- 4085 5748 954D0000 		_ADR	PRT_ABORT			// error
- 4086              	
- 4087              	/********************************
- 4088              	 before aborting a compilation 
- 4089              	 reset HERE and LAST
- 4090              	 to previous values. 
- 4091              	*******************************/
- 4092              	COLON_ABORT:
- 4093 574c 504700BF 		_NEST 
- 4094 5750 0D390000 		_ADR LAST 
- 4095 5754 75310000 		_ADR AT 
- 4096 5758 71340000 		_ADR CELLM 
- 4097 575c 89320000 		_ADR DUPP 
- 4098 5760 E1380000 		_ADR CPP  
- 4099 5764 61310000 		_ADR STORE 
- 4100 5768 75310000 		_ADR AT 
- 4101 576c 0D390000 		_ADR LAST 
- 4102 5770 61310000 		_ADR STORE 
- 4103 5774 89570000 		_ADR OVERT 
- 4104 5778 BB2E0000 		_UNNEST 
- 4105              	
- 4106              	/*********************
- 4107              	    OVERT	( -- )
- 4108              	 	Link a new word 
- 4109              		into the current 
- 4110              		vocabulary.
- 4111              	**********************/
- 4112 577c E8560000 		_HEADER OVERT,5,"OVERT"
- 4112      054F5645 
- 4112      525400BF 
- 4113 5788 504700BF 		_NEST
- 4114 578c 0D390000 		_ADR	LAST
- 4115 5790 75310000 		_ADR	AT
- 4116 5794 CD380000 		_ADR	CNTXT
- 4117 5798 61310000 		_ADR	STORE
- 4118 579c BB2E0000 		_UNNEST
- 4119              	
- 4120              	/**********************
- 4121              	    ;  ( -- )
- 4122              	 	Terminate a colon
- 4123              		definition.
- 4124              	***********************/
- 4125 57a0 80570000 		_HEADER SEMIS,IMEDD+COMPO+1,";"
- 4125      C13B00BF 
- 4126 57a8 504700BF 		_NEST
- 4127 57ac DF300000 		_DOLIT	UNNEST
- 4127      BA2E0000 
- 4128 57b4 F9570000 		_ADR	CALLC
+ 4076              	    $COMPILE	( a -- )
+ 4077              	 	Compile next word to 
+ 4078              		code dictionary as 
+ 4079              		a token or literal.
+ 4080              	**************************/
+ 4081 571c 88560000 		_HEADER SCOMP,8,"$COMPILE"
+ 4081      0824434F 
+ 4081      4D50494C 
+ 4081      450000BF 
+ 4082 572c 504700BF 		_NEST
+ 4083 5730 DD4A0000 		_ADR	NAMEQ
+ 4084 5734 D5340000 		_ADR	QDUP	// defined?
+ 4085 5738 1F310000 		_QBRAN	SCOM2
+ 4085      68570000 
+ 4086 5740 75310000 		_ADR	AT
+ 4087 5744 DF300000 		_DOLIT	IMEDD
+ 4087      80000000 
+ 4088 574c 45330000 		_ADR	ANDD	// immediate?
+ 4089 5750 1F310000 		_QBRAN	SCOM1
+ 4089      60570000 
+ 4090 5758 F5300000 		_ADR	EXECU
+ 4091 575c BB2E0000 		_UNNEST			// it's immediate, execute
+ 4092              	SCOM1:
+ 4093 5760 41580000 		_ADR	CALLC			// it's not immediate, compile
+ 4094 5764 BB2E0000 		_UNNEST	
+ 4095              	SCOM2:
+ 4096 5768 91430000 		_ADR	NUMBERQ 
+ 4097 576c 1F310000 		_QBRAN	SCOM3
+ 4097      7C570000 
+ 4098 5774 E5510000 		_ADR	LITER
+ 4099 5778 BB2E0000 		_UNNEST			// compile number as integer
+ 4100              	SCOM3: // compilation abort 
+ 4101 577c 85570000 		_ADR COLON_ABORT 
+ 4102 5780 954D0000 		_ADR	PRT_ABORT			// error
+ 4103              	
+ 4104              	/********************************
+ 4105              	 before aborting a compilation 
+ 4106              	 reset HERE and LAST
+ 4107              	 to previous values. 
+ 4108              	*******************************/
+ 4109              	COLON_ABORT:
+ 4110 5784 504700BF 		_NEST 
+ 4111 5788 0D390000 		_ADR LAST 
+ 4112 578c 75310000 		_ADR AT 
+ 4113 5790 71340000 		_ADR CELLM 
+ 4114 5794 89320000 		_ADR DUPP 
+ 4115 5798 E1380000 		_ADR CPP  
+ 4116 579c 61310000 		_ADR STORE 
+ 4117 57a0 75310000 		_ADR AT 
+ 4118 57a4 0D390000 		_ADR LAST 
+ 4119 57a8 61310000 		_ADR STORE 
+ 4120 57ac C1570000 		_ADR OVERT 
+ 4121 57b0 BB2E0000 		_UNNEST 
+ 4122              	
+ 4123              	/*********************
+ 4124              	    OVERT	( -- )
+ 4125              	 	Link a new word 
 ARM GAS  forth.s 			page 194
 
 
- 4129 57b8 113D0000 		_ADR    ALIGN 
- 4130 57bc 5D4E0000 		_ADR	LBRAC
- 4131 57c0 89570000 		_ADR	OVERT
- 4132 57c4 BB2E0000 		_UNNEST
- 4133              	
- 4134              	/******************
- 4135              	    ]	   ( -- )
- 4136              	 	Start compiling 
- 4137              		the words in 
- 4138              		the input stream.
- 4139              	*********************/
- 4140 57c8 A4570000 		_HEADER RBRAC,1,"]"
- 4140      015D00BF 
- 4141 57d0 504700BF 		_NEST
- 4142 57d4 DF300000 		_DOLIT	SCOMP
- 4142      F4560000 
- 4143 57dc A1380000 		_ADR	TEVAL
- 4144 57e0 61310000 		_ADR	STORE
- 4145 57e4 DF300000 		_DOLIT  -1
- 4145      FFFFFFFF 
- 4146 57ec A9370000 		_ADR    STATE 
- 4147 57f0 61310000 		_ADR    STORE 
- 4148 57f4 BB2E0000 		_UNNEST
- 4149              	
- 4150              	/****************************
- 4151              	    CALLC	( ca -- )
- 4152              	 	compile ca.
- 4153              	hidden word used by compiler
- 4154              	*****************************/
- 4155              	CALLC:
- 4156 57f8 504700BF 		_NEST
- 4157 57fc DF300000 		_DOLIT 1 
- 4157      01000000 
- 4158 5804 59330000 		_ADR ORR 
- 4159 5808 39510000 		_ADR COMMA  
- 4160 580c BB2E0000 		_UNNEST 
- 4161              	
- 4162              	/****************************
- 4163              		BUFFER: "name" ( u -- a )
- 4164              		create a named buffer of 
- 4165              		u bytes 
- 4166              		0's the buffer. 
- 4167              	*****************************/
- 4168 5810 CC570000 		_HEADER BUFFER,7,"BUFFER:"
- 4168      07425546 
- 4168      4645523A 
- 4169 581c 504700BF 		_NEST 
- 4170 5820 113D0000 		_ADR    ALIGN 
- 4171 5824 49490000 		_ADR	TOKEN
- 4172 5828 8D560000 		_ADR	SNAME
- 4173 582c ED3D0000 		_ADR    HERE 
- 4174 5830 C9320000 		_ADR    OVER 
- 4175 5834 21510000 		_ADR    ALLOT 
- 4176 5838 DF300000 		_DOLIT	0 
- 4176      00000000 
- 4177 5840 E9340000 		_ADR	ROT 
- 4178 5844 89320000 		_ADR	DUPP 
+ 4126              		into the current 
+ 4127              		vocabulary.
+ 4128              	**********************/
+ 4129 57b4 20570000 		_HEADER OVERT,5,"OVERT"
+ 4129      054F5645 
+ 4129      525400BF 
+ 4130 57c0 504700BF 		_NEST
+ 4131 57c4 0D390000 		_ADR	LAST
+ 4132 57c8 75310000 		_ADR	AT
+ 4133 57cc CD380000 		_ADR	CNTXT
+ 4134 57d0 61310000 		_ADR	STORE
+ 4135 57d4 BB2E0000 		_UNNEST
+ 4136              	
+ 4137              	/**********************
+ 4138              	    ;  ( -- )
+ 4139              	 	Terminate a colon
+ 4140              		definition.
+ 4141              	***********************/
+ 4142 57d8 B8570000 		_HEADER SEMIS,IMEDD+COMPO+1,";"
+ 4142      C13B00BF 
+ 4143 57e0 504700BF 		_NEST
+ 4144 57e4 DF300000 		_DOLIT	UNNEST
+ 4144      BA2E0000 
+ 4145 57ec 41580000 		_ADR	CALLC
+ 4146 57f0 113D0000 		_ADR    ALIGN 
+ 4147 57f4 5D4E0000 		_ADR	LBRAC
+ 4148 57f8 C1570000 		_ADR	OVERT
+ 4149 57fc BB2E0000 		_UNNEST
+ 4150              	
+ 4151              	/******************
+ 4152              	    ]	   ( -- )
+ 4153              	 	Start compiling 
+ 4154              		the words in 
+ 4155              		the input stream.
+ 4156              	*********************/
+ 4157 5800 DC570000 		_HEADER RBRAC,1,"]"
+ 4157      015D00BF 
+ 4158 5808 504700BF 		_NEST
+ 4159 580c DF300000 		_DOLIT	SCOMP
+ 4159      2C570000 
+ 4160 5814 A1380000 		_ADR	TEVAL
+ 4161 5818 61310000 		_ADR	STORE
+ 4162 581c DF300000 		_DOLIT  -1
+ 4162      FFFFFFFF 
+ 4163 5824 A9370000 		_ADR    STATE 
+ 4164 5828 61310000 		_ADR    STORE 
+ 4165 582c BB2E0000 		_UNNEST
+ 4166              	
+ 4167              	/****************************
+ 4168              	    COMPILE,	( cfa -- )
+ 4169              	 	compile cfa.
+ 4170              	
+ 4171              	*****************************/
+ 4172 5830 04580000 		_HEADER CALLC,COMPO+IMEDD+8,"COMPILE,"
+ 4172      C8434F4D 
+ 4172      50494C45 
+ 4172      2C0000BF 
 ARM GAS  forth.s 			page 195
 
 
- 4179 5848 05320000 		_ADR	TOR 
- 4180 584c 253F0000 		_ADR	FILL
- 4181 5850 A1310000 		_ADR	RFROM 
- 4182 5854 89570000 		_ADR    OVERT 
- 4183 5858 BB2E0000 		_UNNEST 
- 4184              	
- 4185              	
- 4186              	/*************************
- 4187              	 	:	( -- //  string> )
- 4188              	 	Start a new colon 
- 4189              		definition using 
- 4190              		next word as its name.
- 4191              	**************************/
- 4192 585c 14580000 		_HEADER COLON,1,":"
- 4192      013A00BF 
- 4193 5864 504700BF 		_NEST
- 4194 5868 113D0000 		_ADR    ALIGN 
- 4195 586c 49490000 		_ADR	TOKEN
- 4196 5870 8D560000 		_ADR	SNAME
- 4197 5874 C52E0000 		_ADR	COMPI_NEST 
- 4198 5878 D1570000 		_ADR	RBRAC
- 4199 587c BB2E0000 		_UNNEST
- 4200              	
- 4201              	/*************************
- 4202              	    IMMEDIATE   ( -- )
- 4203              	 	Make the last compiled 
- 4204              		word an immediate word.
- 4205              	***************************/
- 4206 5880 60580000 		_HEADER IMMED,9,"IMMEDIATE"
- 4206      09494D4D 
- 4206      45444941 
- 4206      544500BF 
- 4207 5890 504700BF 		_NEST
- 4208 5894 DF300000 		_DOLIT	IMEDD
- 4208      80000000 
- 4209 589c 0D390000 		_ADR	LAST
- 4210 58a0 75310000 		_ADR	AT
- 4211 58a4 75310000 		_ADR	AT
- 4212 58a8 59330000 		_ADR	ORR
- 4213 58ac 0D390000 		_ADR	LAST
- 4214 58b0 75310000 		_ADR	AT
- 4215 58b4 61310000 		_ADR	STORE
- 4216 58b8 BB2E0000 		_UNNEST
- 4217              	
- 4218              	/******************
- 4219              	  Defining words
- 4220              	******************/
- 4221              	
- 4222              		.p2align 2 
- 4223              	/****************************************
- 4224              	 doDOES> ( -- a )
- 4225              	 runtime action of  DOES>		 
- 4226              	hidden word used by compiler 
- 4227              	***************************************/
- 4228              	DODOES:
- 4229 58bc 504700BF 		_NEST 
- 4230 58c0 D5310000 		_ADR	RAT 
+ 4173 5840 504700BF 		_NEST
+ 4174 5844 DF300000 		_DOLIT 1 
+ 4174      01000000 
+ 4175 584c 59330000 		_ADR ORR 
+ 4176 5850 39510000 		_ADR COMMA  
+ 4177 5854 BB2E0000 		_UNNEST 
+ 4178              	
+ 4179              	
+ 4180              	/****************************
+ 4181              		BUFFER: "name" ( u -- a )
+ 4182              		create a named buffer of 
+ 4183              		u bytes 
+ 4184              		0's the buffer. 
+ 4185              	*****************************/
+ 4186 5858 34580000 		_HEADER BUFFER,7,"BUFFER:"
+ 4186      07425546 
+ 4186      4645523A 
+ 4187 5864 504700BF 		_NEST 
+ 4188 5868 113D0000 		_ADR    ALIGN 
+ 4189 586c 49490000 		_ADR	TOKEN
+ 4190 5870 C5560000 		_ADR	SNAME
+ 4191 5874 ED3D0000 		_ADR    HERE 
+ 4192 5878 C9320000 		_ADR    OVER 
+ 4193 587c 21510000 		_ADR    ALLOT 
+ 4194 5880 DF300000 		_DOLIT	0 
+ 4194      00000000 
+ 4195 5888 E9340000 		_ADR	ROT 
+ 4196 588c 89320000 		_ADR	DUPP 
+ 4197 5890 05320000 		_ADR	TOR 
+ 4198 5894 253F0000 		_ADR	FILL
+ 4199 5898 A1310000 		_ADR	RFROM 
+ 4200 589c C1570000 		_ADR    OVERT 
+ 4201 58a0 BB2E0000 		_UNNEST 
+ 4202              	
+ 4203              	
+ 4204              	/*************************
+ 4205              	 	:	( -- //  string> )
+ 4206              	 	Start a new colon 
+ 4207              		definition using 
+ 4208              		next word as its name.
+ 4209              	**************************/
+ 4210 58a4 5C580000 		_HEADER COLON,1,":"
+ 4210      013A00BF 
+ 4211 58ac 504700BF 		_NEST
+ 4212 58b0 113D0000 		_ADR    ALIGN 
+ 4213 58b4 49490000 		_ADR	TOKEN
+ 4214 58b8 C5560000 		_ADR	SNAME
+ 4215 58bc C52E0000 		_ADR	COMPI_NEST 
+ 4216 58c0 09580000 		_ADR	RBRAC
+ 4217 58c4 BB2E0000 		_UNNEST
+ 4218              	
+ 4219              	/*************************
+ 4220              	    IMMEDIATE   ( -- )
+ 4221              	 	Make the last compiled 
+ 4222              		word an immediate word.
+ 4223              	***************************/
+ 4224 58c8 A8580000 		_HEADER IMMED,9,"IMMEDIATE"
 ARM GAS  forth.s 			page 196
 
 
- 4231 58c4 61340000 		_ADR	CELLP 
- 4232 58c8 21340000 		_ADR	ONEP  
- 4233 58cc 0D390000 		_ADR	LAST 
- 4234 58d0 75310000 		_ADR	AT
- 4235 58d4 69490000 		_ADR	TOCFA
- 4236 58d8 31340000 		_ADR    ONEM  
- 4237 58dc DD5D0000 		_ADR	TOVECTOR  
- 4238 58e0 61310000 		_ADR	STORE
- 4239 58e4 BB2E0000 		_UNNEST 
- 4240              	
- 4241              		.p2align 2
- 4242              	/**********************
- 4243              	  DOES> ( -- )
- 4244              	  compile time action
- 4245              	*************************/
- 4246 58e8 84580000 		_HEADER DOES,IMEDD+COMPO+5,"DOES>"
- 4246      C5444F45 
- 4246      533E00BF 
- 4247 58f4 504700BF 		_NEST 
- 4248 58f8 DF300000 		_COMPI	DODOES 
- 4248      BD580000 
- 4248      39510000 
- 4249 5904 DF300000 		_COMPI	UNNEST 
- 4249      BB2E0000 
- 4249      39510000 
- 4250 5910 C52E0000 		_ADR	COMPI_NEST
- 4251 5914 BB2E0000 	 	_UNNEST 
- 4252              	
- 4253              	
- 4254              	/****************************
- 4255              	  DEFER@ ( cfa1 -- cfa2 )
- 4256              	
- 4257              	******************************/
- 4258 5918 EC580000 		_HEADER DEFERAT,6,"DEFER@"
- 4258      06444546 
- 4258      45524000 
- 4259 5924 504700BF 		_NEST 
- 4260 5928 61340000 		_ADR CELLP 
- 4261 592c 75310000 		_ADR AT 
- 4262 5930 BB2E0000 		_UNNEST 
- 4263              	
- 4264              	/*********************************
- 4265              		ACTION-OF "name" ( -- xt )
- 4266              		push the action token 
- 4267              		of defered word "name" 
- 4268              	*********************************/
- 4269 5934 1C590000 		_HEADER ACTIONOF,IMEDD+9,"ACTION-OF"
- 4269      89414354 
- 4269      494F4E2D 
- 4269      4F4600BF 
- 4270 5944 504700BF 		_NEST 
- 4271 5948 95500000 		_ADR 	TICK  
- 4272 594c 25590000 		_ADR 	DEFERAT 
- 4273 5950 A9370000 		_ADR    STATE 
- 4274 5954 75310000 		_ADR 	AT 
- 4275 5958 1F310000 		_QBRAN 	1f
- 4275      64590000 
+ 4224      09494D4D 
+ 4224      45444941 
+ 4224      544500BF 
+ 4225 58d8 504700BF 		_NEST
+ 4226 58dc DF300000 		_DOLIT	IMEDD
+ 4226      80000000 
+ 4227 58e4 0D390000 		_ADR	LAST
+ 4228 58e8 75310000 		_ADR	AT
+ 4229 58ec 75310000 		_ADR	AT
+ 4230 58f0 59330000 		_ADR	ORR
+ 4231 58f4 0D390000 		_ADR	LAST
+ 4232 58f8 75310000 		_ADR	AT
+ 4233 58fc 61310000 		_ADR	STORE
+ 4234 5900 BB2E0000 		_UNNEST
+ 4235              	
+ 4236              	/******************
+ 4237              	  Defining words
+ 4238              	******************/
+ 4239              	
+ 4240              		.p2align 2 
+ 4241              	/****************************************
+ 4242              	 doDOES> ( -- a )
+ 4243              	 runtime action of  DOES>		 
+ 4244              	hidden word used by compiler 
+ 4245              	***************************************/
+ 4246              	DODOES:
+ 4247 5904 504700BF 		_NEST 
+ 4248 5908 D5310000 		_ADR	RAT 
+ 4249 590c 61340000 		_ADR	CELLP 
+ 4250 5910 21340000 		_ADR	ONEP  
+ 4251 5914 0D390000 		_ADR	LAST 
+ 4252 5918 75310000 		_ADR	AT
+ 4253 591c 69490000 		_ADR	TOCFA
+ 4254 5920 31340000 		_ADR    ONEM  
+ 4255 5924 255E0000 		_ADR	TOVECTOR  
+ 4256 5928 61310000 		_ADR	STORE
+ 4257 592c BB2E0000 		_UNNEST 
+ 4258              	
+ 4259              		.p2align 2
+ 4260              	/**********************
+ 4261              	  DOES> ( -- )
+ 4262              	  compile time action
+ 4263              	*************************/
+ 4264 5930 CC580000 		_HEADER DOES,IMEDD+COMPO+5,"DOES>"
+ 4264      C5444F45 
+ 4264      533E00BF 
+ 4265 593c 504700BF 		_NEST 
+ 4266 5940 DF300000 		_COMPI	DODOES 
+ 4266      05590000 
+ 4266      39510000 
+ 4267 594c DF300000 		_COMPI	UNNEST 
+ 4267      BB2E0000 
+ 4267      39510000 
+ 4268 5958 C52E0000 		_ADR	COMPI_NEST
+ 4269 595c BB2E0000 	 	_UNNEST 
+ 4270              	
+ 4271              	
 ARM GAS  forth.s 			page 197
 
 
- 4276 5960 39510000 		_ADR    COMMA 
- 4277 5964 BB2E0000 	1: 	_UNNEST 
- 4278              	
- 4279              	
- 4280              	/*********************************
- 4281              	 DEFER! ( cfa1 cfa2 -- )
- 4282              	 assign an action to a defered word 
- 4283              	************************************/
- 4284 5968 38590000 		_HEADER DEFERSTO,6,"DEFER!"
- 4284      06444546 
- 4284      45522100 
- 4285 5974 504700BF 		_NEST 
- 4286 5978 DF300000 		_DOLIT	-2 
- 4286      FEFFFFFF 
- 4287 5980 45330000 		_ADR	ANDD   // clear thumb bit of cfa2  
- 4288 5984 61340000 		_ADR 	CELLP  // skip NEST 
- 4289 5988 61310000 		_ADR STORE 
- 4290 598c BB2E0000 		_UNNEST
- 4291              	
- 4292              	/****************************
- 4293              	  DEFER ( "name" -- )
- 4294              	  create a defered definition
- 4295              	*****************************/
- 4296 5990 6C590000 		_HEADER DEFER,5,"DEFER"
- 4296      05444546 
- 4296      455200BF 
- 4297 599c 504700BF 		_NEST 
- 4298 59a0 65580000 		_ADR COLON 
- 4299 59a4 DF300000 		_DOLIT NO_ACTION  
- 4299      C4590000 
- 4300 59ac F9570000 		_ADR  CALLC 
- 4301 59b0 DF300000 		_DOLIT UNNEST 
- 4301      BA2E0000 
- 4302 59b8 F9570000 		_ADR  CALLC
- 4303 59bc A9570000 		_ADR  SEMIS  
- 4304 59c0 BB2E0000 		_UNNEST 
- 4305              	
- 4306              	NO_ACTION:
- 4307 59c4 504700BF 		_NEST 
- 4308 59c8 DF300000 		_DOLIT 1 
- 4308      01000000 
- 4309 59d0 C14D0000 		_ABORQ 15 , " no action set!"
- 4309      0F206E6F 
- 4309      20616374 
- 4309      696F6E20 
- 4309      73657421 
- 4310 59e4 BB2E0000 		_UNNEST 
- 4311              	
- 4312              	/*********************************
- 4313              		:NONAME  ( -- xt )
- 4314              		create a colon word without 
- 4315              		name. 
- 4316              	output:
- 4317              		xt  exécution token of 
- 4318              		new definition
- 4319              	*********************************/
- 4320 59e8 94590000 		_HEADER NONAME,7,":NONAME"
+ 4272              	/****************************
+ 4273              	  DEFER@ ( cfa1 -- cfa2 )
+ 4274              	
+ 4275              	******************************/
+ 4276 5960 34590000 		_HEADER DEFERAT,6,"DEFER@"
+ 4276      06444546 
+ 4276      45524000 
+ 4277 596c 504700BF 		_NEST 
+ 4278 5970 61340000 		_ADR CELLP 
+ 4279 5974 75310000 		_ADR AT 
+ 4280 5978 BB2E0000 		_UNNEST 
+ 4281              	
+ 4282              	/*********************************
+ 4283              		ACTION-OF "name" ( -- xt )
+ 4284              		push the action token 
+ 4285              		of defered word "name" 
+ 4286              	*********************************/
+ 4287 597c 64590000 		_HEADER ACTIONOF,IMEDD+9,"ACTION-OF"
+ 4287      89414354 
+ 4287      494F4E2D 
+ 4287      4F4600BF 
+ 4288 598c 504700BF 		_NEST 
+ 4289 5990 95500000 		_ADR 	TICK  
+ 4290 5994 6D590000 		_ADR 	DEFERAT 
+ 4291 5998 A9370000 		_ADR    STATE 
+ 4292 599c 75310000 		_ADR 	AT 
+ 4293 59a0 1F310000 		_QBRAN 	1f
+ 4293      AC590000 
+ 4294 59a8 39510000 		_ADR    COMMA 
+ 4295 59ac BB2E0000 	1: 	_UNNEST 
+ 4296              	
+ 4297              	
+ 4298              	/*********************************
+ 4299              	 DEFER! ( cfa1 cfa2 -- )
+ 4300              	 assign an action to a defered word 
+ 4301              	************************************/
+ 4302 59b0 80590000 		_HEADER DEFERSTO,6,"DEFER!"
+ 4302      06444546 
+ 4302      45522100 
+ 4303 59bc 504700BF 		_NEST 
+ 4304 59c0 DF300000 		_DOLIT	-2 
+ 4304      FEFFFFFF 
+ 4305 59c8 45330000 		_ADR	ANDD   // clear thumb bit of cfa2  
+ 4306 59cc 61340000 		_ADR 	CELLP  // skip NEST 
+ 4307 59d0 61310000 		_ADR STORE 
+ 4308 59d4 BB2E0000 		_UNNEST
+ 4309              	
+ 4310              	/****************************
+ 4311              	  DEFER ( "name" -- )
+ 4312              	  create a defered definition
+ 4313              	*****************************/
+ 4314 59d8 B4590000 		_HEADER DEFER,5,"DEFER"
+ 4314      05444546 
+ 4314      455200BF 
+ 4315 59e4 504700BF 		_NEST 
+ 4316 59e8 AD580000 		_ADR COLON 
+ 4317 59ec DF300000 		_DOLIT NO_ACTION  
 ARM GAS  forth.s 			page 198
 
 
- 4320      073A4E4F 
- 4320      4E414D45 
- 4321 59f4 504700BF 		_NEST 
- 4322 59f8 ED3D0000 		_ADR 	HERE 
- 4323 59fc C52E0000 		_ADR	COMPI_NEST 
- 4324 5a00 D1570000 		_ADR 	RBRAC
- 4325 5a04 BB2E0000 		_UNNEST 
- 4326              	
- 4327              	/*******************************
- 4328              		IS cccc ( cfa -- )
- 4329              	input:
- 4330              	   cccc  defered word name 
- 4331              	   xt    execution token 
- 4332              	   to be affected to the 
- 4333              	   defered word.
- 4334              	********************************/
- 4335 5a08 EC590000 		_HEADER IS,IMEDD+2,"IS"
- 4335      82495300 
- 4336 5a10 504700BF 		_NEST
- 4337 5a14 A9370000 		_ADR STATE 
- 4338 5a18 75310000 		_ADR AT 
- 4339 5a1c 1F310000 		_QBRAN 1f 
- 4339      445A0000 
- 4340 5a24 DF300000 		_DOLIT ITICK
- 4340      B8500000 
- 4341 5a2c F9570000 		_ADR CALLC  
- 4342 5a30 DF300000 		_DOLIT DEFERSTO
- 4342      74590000 
- 4343 5a38 F9570000 		_ADR CALLC
- 4344 5a3c 47310000 		_BRAN 2f    
- 4344      4C5A0000 
- 4345 5a44 95500000 	1:  _ADR TICK 
- 4346 5a48 75590000 		_ADR DEFERSTO 
- 4347 5a4c BB2E0000 	2:	_UNNEST 
- 4348              	
- 4349              	
- 4350              	/******************************
- 4351              	    CREATE	( -- //  string> )
- 4352              	 	Compile a new array entry 
- 4353              		without allocating code space.
- 4354              	***********************************/
- 4355 5a50 0C5A0000 		_HEADER CREAT,6,"CREATE"
- 4355      06435245 
- 4355      41544500 
- 4356 5a5c 504700BF 		_NEST 
- 4357 5a60 113D0000 		_ADR	ALIGN 
- 4358 5a64 49490000 		_ADR	TOKEN
- 4359 5a68 8D560000 		_ADR	SNAME
- 4360 5a6c 89570000 		_ADR	OVERT
- 4361 5a70 C52E0000 		_ADR	COMPI_NEST 
- 4362 5a74 DF300000 		_COMPI	DOVAR
- 4362      9D5A0000 
- 4362      39510000 
- 4363 5a80 DF300000 		_COMPI  NOP     // reserved slot  for DOES> vector   
- 4363      DD300000 
- 4363      39510000 
- 4364 5a8c DF300000 		_COMPI  UNNEST 
+ 4317      0C5A0000 
+ 4318 59f4 41580000 		_ADR  CALLC 
+ 4319 59f8 DF300000 		_DOLIT UNNEST 
+ 4319      BA2E0000 
+ 4320 5a00 41580000 		_ADR  CALLC
+ 4321 5a04 E1570000 		_ADR  SEMIS  
+ 4322 5a08 BB2E0000 		_UNNEST 
+ 4323              	
+ 4324              	NO_ACTION:
+ 4325 5a0c 504700BF 		_NEST 
+ 4326 5a10 DF300000 		_DOLIT 1 
+ 4326      01000000 
+ 4327 5a18 C14D0000 		_ABORQ 15 , " no action set!"
+ 4327      0F206E6F 
+ 4327      20616374 
+ 4327      696F6E20 
+ 4327      73657421 
+ 4328 5a2c BB2E0000 		_UNNEST 
+ 4329              	
+ 4330              	/*********************************
+ 4331              		:NONAME  ( -- xt )
+ 4332              		create a colon word without 
+ 4333              		name. 
+ 4334              	output:
+ 4335              		xt  exécution token of 
+ 4336              		new definition
+ 4337              	*********************************/
+ 4338 5a30 DC590000 		_HEADER NONAME,7,":NONAME"
+ 4338      073A4E4F 
+ 4338      4E414D45 
+ 4339 5a3c 504700BF 		_NEST 
+ 4340 5a40 ED3D0000 		_ADR 	HERE 
+ 4341 5a44 C52E0000 		_ADR	COMPI_NEST 
+ 4342 5a48 09580000 		_ADR 	RBRAC
+ 4343 5a4c BB2E0000 		_UNNEST 
+ 4344              	
+ 4345              	/*******************************
+ 4346              		IS cccc ( cfa -- )
+ 4347              	input:
+ 4348              	   cccc  defered word name 
+ 4349              	   xt    execution token 
+ 4350              	   to be affected to the 
+ 4351              	   defered word.
+ 4352              	********************************/
+ 4353 5a50 345A0000 		_HEADER IS,IMEDD+2,"IS"
+ 4353      82495300 
+ 4354 5a58 504700BF 		_NEST
+ 4355 5a5c A9370000 		_ADR STATE 
+ 4356 5a60 75310000 		_ADR AT 
+ 4357 5a64 1F310000 		_QBRAN 1f 
+ 4357      8C5A0000 
+ 4358 5a6c DF300000 		_DOLIT ITICK
+ 4358      B8500000 
+ 4359 5a74 41580000 		_ADR CALLC  
+ 4360 5a78 DF300000 		_DOLIT DEFERSTO
+ 4360      BC590000 
+ 4361 5a80 41580000 		_ADR CALLC
 ARM GAS  forth.s 			page 199
 
 
- 4364      BB2E0000 
- 4364      39510000 
- 4365 5a98 BB2E0000 		_UNNEST
+ 4362 5a84 47310000 		_BRAN 2f    
+ 4362      945A0000 
+ 4363 5a8c 95500000 	1:  _ADR TICK 
+ 4364 5a90 BD590000 		_ADR DEFERSTO 
+ 4365 5a94 BB2E0000 	2:	_UNNEST 
  4366              	
- 4367              	/*******************************
- 4368              	  doVAR	( -- a )
- 4369              	  Run time routine for VARIABLE and CREATE.
- 4370              	hidden word used by compiler
- 4371              	********************************/
- 4372              	DOVAR:
- 4373 5a9c 47F8046D 		_PUSH
- 4374 5aa0 6646     		MOV TOS,IP
- 4375 5aa2 06F10806 		ADD TOS,#2*CELLL // >BODY 
- 4376 5aa6 FDF705BA 		_NEXT  
- 4377              	
- 4378              	
- 4379              	/*******************************
- 4380              	    VARIABLE	( -- //  string> )
- 4381              	 	Compile a new variable 
- 4382              		initialized to 0.
- 4383              	***********************************/
- 4384 5aaa 545A0000 		_HEADER VARIA,8,"VARIABLE"
- 4384      08564152 
- 4384      4941424C 
- 4384      4500
- 4385 5ab8 504700BF 		_NEST
- 4386 5abc 5D5A0000 		_ADR	CREAT
- 4387 5ac0 DF300000 		_DOLIT	0
- 4387      00000000 
- 4388 5ac8 39510000 		_ADR	COMMA
- 4389 5acc BB2E0000 		_UNNEST
- 4390              	
- 4391              	/**********************************
- 4392              	    doCON	( -- a ) 
- 4393              	 	Run time routine for CONSTANT.
- 4394              	hidden word used by compiler 
- 4395              	***********************************/
- 4396              	DOCON:
- 4397 5ad0 47F8046D 		_PUSH
- 4398 5ad4 5CF8046B 		LDR.W TOS,[IP],#4 
- 4399 5ad8 FDF7EFB9 		B UNNEST 
- 4400              	
- 4401              	
- 4402              	/***********************************
- 4403              	    CONSTANT	( u -- //  string> )
- 4404              	 	Compile a new constant.
- 4405              	************************************/
- 4406 5adc AE5A0000 		_HEADER CONST,8,"CONSTANT"
- 4406      08434F4E 
- 4406      5354414E 
- 4406      540000BF 
- 4407 5aec 504700BF 		_NEST 
- 4408 5af0 49490000 		_ADR	TOKEN
- 4409 5af4 8D560000 		_ADR	SNAME
- 4410 5af8 89570000 		_ADR	OVERT
- 4411 5afc C52E0000 		_ADR	COMPI_NEST
- 4412 5b00 DF300000 		_DOLIT	DOCON
+ 4367              	
+ 4368              	/******************************
+ 4369              	    CREATE	( -- //  string> )
+ 4370              	 	Compile a new array entry 
+ 4371              		without allocating code space.
+ 4372              	***********************************/
+ 4373 5a98 545A0000 		_HEADER CREAT,6,"CREATE"
+ 4373      06435245 
+ 4373      41544500 
+ 4374 5aa4 504700BF 		_NEST 
+ 4375 5aa8 113D0000 		_ADR	ALIGN 
+ 4376 5aac 49490000 		_ADR	TOKEN
+ 4377 5ab0 C5560000 		_ADR	SNAME
+ 4378 5ab4 C1570000 		_ADR	OVERT
+ 4379 5ab8 C52E0000 		_ADR	COMPI_NEST 
+ 4380 5abc DF300000 		_COMPI	DOVAR
+ 4380      E55A0000 
+ 4380      39510000 
+ 4381 5ac8 DF300000 		_COMPI  NOP     // reserved slot  for DOES> vector   
+ 4381      DD300000 
+ 4381      39510000 
+ 4382 5ad4 DF300000 		_COMPI  UNNEST 
+ 4382      BB2E0000 
+ 4382      39510000 
+ 4383 5ae0 BB2E0000 		_UNNEST
+ 4384              	
+ 4385              	/*******************************
+ 4386              	  doVAR	( -- a )
+ 4387              	  Run time routine for VARIABLE and CREATE.
+ 4388              	hidden word used by compiler
+ 4389              	********************************/
+ 4390              	DOVAR:
+ 4391 5ae4 47F8046D 		_PUSH
+ 4392 5ae8 6646     		MOV TOS,IP
+ 4393 5aea 06F10806 		ADD TOS,#2*CELLL // >BODY 
+ 4394 5aee FDF7E1B9 		_NEXT  
+ 4395              	
+ 4396              	
+ 4397              	/*******************************
+ 4398              	    VARIABLE	( -- //  string> )
+ 4399              	 	Compile a new variable 
+ 4400              		initialized to 0.
+ 4401              	***********************************/
+ 4402 5af2 9C5A0000 		_HEADER VARIA,8,"VARIABLE"
+ 4402      08564152 
+ 4402      4941424C 
+ 4402      4500
+ 4403 5b00 504700BF 		_NEST
+ 4404 5b04 A55A0000 		_ADR	CREAT
+ 4405 5b08 DF300000 		_DOLIT	0
+ 4405      00000000 
 ARM GAS  forth.s 			page 200
 
 
- 4412      D05A0000 
- 4413 5b08 F9570000 		_ADR	CALLC
- 4414 5b0c 39510000 		_ADR	COMMA
- 4415 5b10 DF300000 		_DOLIT	UNNEST 
- 4415      BA2E0000 
- 4416 5b18 F9570000 		_ADR	CALLC  
- 4417 5b1c BB2E0000 		_UNNEST
+ 4406 5b10 39510000 		_ADR	COMMA
+ 4407 5b14 BB2E0000 		_UNNEST
+ 4408              	
+ 4409              	/**********************************
+ 4410              	    doCON	( -- a ) 
+ 4411              	 	Run time routine for CONSTANT.
+ 4412              	hidden word used by compiler 
+ 4413              	***********************************/
+ 4414              	DOCON:
+ 4415 5b18 47F8046D 		_PUSH
+ 4416 5b1c 5CF8046B 		LDR.W TOS,[IP],#4 
+ 4417 5b20 FDF7CBB9 		B UNNEST 
  4418              	
  4419              	
- 4420              	/***********
- 4421              	  Tools
- 4422              	***********/
- 4423              	
- 4424              	/*************************
- 4425              	    dm+	 ( a u -- a )
- 4426              	 	Dump u bytes from a , 
- 4427              		leaving a+u on the stack.
- 4428              		hidden word used by DUMP 
- 4429              	****************************/
- 4430              	DMP:
- 4431 5b20 504700BF 		_NEST
- 4432 5b24 C9320000 		_ADR	OVER
- 4433 5b28 DF300000 		_DOLIT	4
- 4433      04000000 
- 4434 5b30 69450000 		_ADR	UDOTR			// display address
- 4435 5b34 DF300000 		_DOLIT  0         // don't show base char 
- 4435      00000000 
- 4436 5b3c 39380000 		_ADR    BCHR
- 4437 5b40 89320000 		_ADR    DUPP
- 4438 5b44 75310000 		_ADR    AT 
- 4439 5b48 05320000 		_ADR    TOR      // save original value of BCHAR 
- 4440 5b4c 61310000 		_ADR    STORE 
- 4441 5b50 BD430000 		_ADR	SPACE
- 4442 5b54 05320000 		_ADR	TOR			// start count down loop
- 4443 5b58 47310000 		_BRAN	PDUM2			// skip first pass
- 4443      785B0000 
- 4444              	PDUM1:
- 4445 5b60 89320000 	    _ADR	DUPP
- 4446 5b64 95310000 		_ADR	CAT
- 4447 5b68 DF300000 		_DOLIT	3
- 4447      03000000 
- 4448 5b70 69450000 		_ADR	UDOTR			// display numeric data
- 4449 5b74 21340000 		_ADR	ONEP			// increment address
- 4450              	PDUM2:
- 4451 5b78 01310000 	    _ADR	DONXT
- 4452 5b7c 605B0000 		.word	PDUM1	// loop till done
- 4453 5b80 A1310000 		_ADR    RFROM   // restore BCHAR value 
- 4454 5b84 39380000 		_ADR    BCHR 
- 4455 5b88 61310000 		_ADR    STORE 
- 4456 5b8c BB2E0000 		_UNNEST
- 4457              		.p2align 2 
- 4458              	//    DUMP	( a u -- )
- 4459              	// 	Dump u bytes from a, in a formatted manner.
- 4460              	
- 4461              	/**********************
- 4462              		DUMP ( a n -- )
- 4463              		hex dump memory 
+ 4420              	/***********************************
+ 4421              	    CONSTANT	( u -- //  string> )
+ 4422              	 	Compile a new constant.
+ 4423              	************************************/
+ 4424 5b24 F65A0000 		_HEADER CONST,8,"CONSTANT"
+ 4424      08434F4E 
+ 4424      5354414E 
+ 4424      540000BF 
+ 4425 5b34 504700BF 		_NEST 
+ 4426 5b38 49490000 		_ADR	TOKEN
+ 4427 5b3c C5560000 		_ADR	SNAME
+ 4428 5b40 C1570000 		_ADR	OVERT
+ 4429 5b44 C52E0000 		_ADR	COMPI_NEST
+ 4430 5b48 DF300000 		_DOLIT	DOCON
+ 4430      185B0000 
+ 4431 5b50 41580000 		_ADR	CALLC
+ 4432 5b54 39510000 		_ADR	COMMA
+ 4433 5b58 DF300000 		_DOLIT	UNNEST 
+ 4433      BA2E0000 
+ 4434 5b60 41580000 		_ADR	CALLC  
+ 4435 5b64 BB2E0000 		_UNNEST
+ 4436              	
+ 4437              	
+ 4438              	/***********
+ 4439              	  Tools
+ 4440              	***********/
+ 4441              	
+ 4442              	/*************************
+ 4443              	    dm+	 ( a u -- a )
+ 4444              	 	Dump u bytes from a , 
+ 4445              		leaving a+u on the stack.
+ 4446              		hidden word used by DUMP 
+ 4447              	****************************/
+ 4448              	DMP:
+ 4449 5b68 504700BF 		_NEST
+ 4450 5b6c C9320000 		_ADR	OVER
+ 4451 5b70 DF300000 		_DOLIT	4
+ 4451      04000000 
+ 4452 5b78 69450000 		_ADR	UDOTR			// display address
+ 4453 5b7c DF300000 		_DOLIT  0         // don't show base char 
+ 4453      00000000 
+ 4454 5b84 39380000 		_ADR    BCHR
+ 4455 5b88 89320000 		_ADR    DUPP
 ARM GAS  forth.s 			page 201
 
 
- 4464              	*********************/
- 4465 5b90 E05A0000 		_HEADER DUMP,4,"DUMP"
- 4465      0444554D 
- 4465      500000BF 
- 4466 5b9c 504700BF 		_NEST
- 4467 5ba0 DF300000 		_DOLIT  15 
- 4467      0F000000 
- 4468 5ba8 C5330000 		_ADR    PLUS 
- 4469 5bac DF300000 		_DOLIT  0xFFFFFFF0 
- 4469      F0FFFFFF 
- 4470 5bb4 45330000 		_ADR    ANDD 
- 4471 5bb8 99320000 		_ADR    SWAP 
- 4472 5bbc DF300000 		_DOLIT  0xFFFFFFFC
- 4472      FCFFFFFF 
- 4473 5bc4 45330000 		_ADR    ANDD 
- 4474 5bc8 99320000 		_ADR    SWAP 
- 4475 5bcc 21380000 		_ADR	BASE
- 4476 5bd0 75310000 		_ADR	AT
- 4477 5bd4 05320000 		_ADR	TOR
- 4478 5bd8 21410000 		_ADR	HEX			// save radix,set hex
- 4479 5bdc DF300000 		_DOLIT	16
- 4479      10000000 
- 4480 5be4 8D3C0000 		_ADR	SLASH			// change count to lines
- 4481 5be8 05320000 		_ADR	TOR
- 4482 5bec 47310000 		_BRAN	DUMP4			// start count down loop
- 4482      1C5C0000 
- 4483              	DUMP1:
- 4484 5bf4 45440000 	    _ADR	CR
- 4485 5bf8 DF300000 		_DOLIT	16
- 4485      10000000 
- 4486 5c00 39350000 		_ADR	DDUP
- 4487 5c04 215B0000 		_ADR	DMP			// display numeric
- 4488 5c08 E9340000 		_ADR	ROT
- 4489 5c0c E9340000 		_ADR	ROT
- 4490 5c10 BD430000 		_ADR	SPACE
- 4491 5c14 BD430000 		_ADR	SPACE
- 4492 5c18 11440000 		_ADR	TYPEE			// display printable characters
- 4493              	DUMP4:
- 4494 5c1c 01310000 	  _DONXT	DUMP1	// loop till done
- 4494      F45B0000 
- 4495              	DUMP3:
- 4496 5c24 79320000 		_ADR	DROP
- 4497 5c28 A1310000 		_ADR	RFROM
- 4498 5c2c 21380000 		_ADR	BASE
- 4499 5c30 61310000 		_ADR	STORE			// restore radix
- 4500 5c34 BB2E0000 		_UNNEST
- 4501              	
- 4502              	/*******************************
- 4503              	   TRACE. display in hexadecimal
- 4504              	   TRACE. use a different buffer 
- 4505              	   than DOT  to avoid current 
- 4506              	   display overwrite.
- 4507              	*******************************/ 
- 4508              	TDOT: // ( u -- )
- 4509 5c38 504700BF 		_NEST 
- 4510 5c3c 21380000 		_ADR BASE 
- 4511 5c40 75310000 		_ADR AT 
+ 4456 5b8c 75310000 		_ADR    AT 
+ 4457 5b90 05320000 		_ADR    TOR      // save original value of BCHAR 
+ 4458 5b94 61310000 		_ADR    STORE 
+ 4459 5b98 BD430000 		_ADR	SPACE
+ 4460 5b9c 05320000 		_ADR	TOR			// start count down loop
+ 4461 5ba0 47310000 		_BRAN	PDUM2			// skip first pass
+ 4461      C05B0000 
+ 4462              	PDUM1:
+ 4463 5ba8 89320000 	    _ADR	DUPP
+ 4464 5bac 95310000 		_ADR	CAT
+ 4465 5bb0 DF300000 		_DOLIT	3
+ 4465      03000000 
+ 4466 5bb8 69450000 		_ADR	UDOTR			// display numeric data
+ 4467 5bbc 21340000 		_ADR	ONEP			// increment address
+ 4468              	PDUM2:
+ 4469 5bc0 01310000 	    _ADR	DONXT
+ 4470 5bc4 A85B0000 		.word	PDUM1	// loop till done
+ 4471 5bc8 A1310000 		_ADR    RFROM   // restore BCHAR value 
+ 4472 5bcc 39380000 		_ADR    BCHR 
+ 4473 5bd0 61310000 		_ADR    STORE 
+ 4474 5bd4 BB2E0000 		_UNNEST
+ 4475              		.p2align 2 
+ 4476              	//    DUMP	( a u -- )
+ 4477              	// 	Dump u bytes from a, in a formatted manner.
+ 4478              	
+ 4479              	/**********************
+ 4480              		DUMP ( a n -- )
+ 4481              		hex dump memory 
+ 4482              	*********************/
+ 4483 5bd8 285B0000 		_HEADER DUMP,4,"DUMP"
+ 4483      0444554D 
+ 4483      500000BF 
+ 4484 5be4 504700BF 		_NEST
+ 4485 5be8 DF300000 		_DOLIT  15 
+ 4485      0F000000 
+ 4486 5bf0 C5330000 		_ADR    PLUS 
+ 4487 5bf4 DF300000 		_DOLIT  0xFFFFFFF0 
+ 4487      F0FFFFFF 
+ 4488 5bfc 45330000 		_ADR    ANDD 
+ 4489 5c00 99320000 		_ADR    SWAP 
+ 4490 5c04 DF300000 		_DOLIT  0xFFFFFFFC
+ 4490      FCFFFFFF 
+ 4491 5c0c 45330000 		_ADR    ANDD 
+ 4492 5c10 99320000 		_ADR    SWAP 
+ 4493 5c14 21380000 		_ADR	BASE
+ 4494 5c18 75310000 		_ADR	AT
+ 4495 5c1c 05320000 		_ADR	TOR
+ 4496 5c20 21410000 		_ADR	HEX			// save radix,set hex
+ 4497 5c24 DF300000 		_DOLIT	16
+ 4497      10000000 
+ 4498 5c2c 8D3C0000 		_ADR	SLASH			// change count to lines
+ 4499 5c30 05320000 		_ADR	TOR
+ 4500 5c34 47310000 		_BRAN	DUMP4			// start count down loop
+ 4500      645C0000 
+ 4501              	DUMP1:
+ 4502 5c3c 45440000 	    _ADR	CR
+ 4503 5c40 DF300000 		_DOLIT	16
 ARM GAS  forth.s 			page 202
 
 
- 4512 5c44 05320000 		_ADR TOR
- 4513 5c48 21410000 		_ADR HEX  
- 4514 5c4c B5380000 		_ADR HLD 
- 4515 5c50 75310000 		_ADR AT 
- 4516 5c54 05320000 		_ADR TOR   // R: base *hold 
- 4517 5c58 ED3D0000 		_ADR HERE 
- 4518 5c5c DF300000 		_DOLIT 160 
- 4518      A0000000 
- 4519 5c64 C5330000 		_ADR PLUS
- 4520 5c68 89320000 		_ADR DUPP 
- 4521 5c6c 05320000 		_ADR TOR  
- 4522 5c70 B5380000 		_ADR HLD 
- 4523 5c74 61310000 		_ADR STORE
- 4524 5c78 DF300000 		_DOLIT 0  
- 4524      00000000 
- 4525 5c80 71400000 		_ADR DIGS  
- 4526 5c84 79320000 		_ADR DROP
- 4527 5c88 DF300000 		_DOLIT '$'
- 4527      24000000 
- 4528 5c90 25400000 		_ADR HOLD 
- 4529 5c94 B5380000 		_ADR HLD 
- 4530 5c98 75310000 		_ADR AT
- 4531 5c9c A1310000 		_ADR RFROM   
- 4532 5ca0 C9320000 		_ADR OVER 
- 4533 5ca4 D5330000 		_ADR SUBB 
- 4534 5ca8 BD430000 		_ADR SPACE 
- 4535 5cac 11440000 		_ADR TYPEE 
- 4536 5cb0 A1310000 		_ADR RFROM 
- 4537 5cb4 B5380000 		_ADR HLD 
- 4538 5cb8 61310000 		_ADR STORE 
- 4539 5cbc A1310000 		_ADR RFROM 
- 4540 5cc0 21380000 		_ADR BASE 
- 4541 5cc4 61310000 		_ADR STORE 
- 4542 5cc8 BB2E0000 		_UNNEST 
- 4543              	
- 4544              	/**********************
- 4545              	   .S	  ( ... -- ... )
- 4546              	 	Display the contents 
- 4547              		of the data stack.
- 4548              	*************************/
- 4549 5ccc 945B0000 		_HEADER DOTS,2,".S"
- 4549      022E5300 
- 4550 5cd4 504700BF 		_NEST
- 4551 5cd8 953D0000 		_ADR	DEPTH	// stack depth
- 4552 5cdc 05320000 		_ADR	TOR		// start count down loop
- 4553 5ce0 47310000 		_BRAN	DOTS2  // skip first pass
- 4553      F45C0000 
- 4554              	DOTS1:
- 4555 5ce8 D5310000 		_ADR	RAT
- 4556 5cec B93D0000 		_ADR	PICK
- 4557 5cf0 395C0000 		_ADR	TDOT // index stack, display contents
- 4558              	DOTS2:
- 4559 5cf4 01310000 		_DONXT	DOTS1 // loop till done
- 4559      E85C0000 
- 4560 5cfc 45440000 		_ADR	CR 
- 4561 5d00 BB2E0000 		_UNNEST
- 4562              	
+ 4503      10000000 
+ 4504 5c48 39350000 		_ADR	DDUP
+ 4505 5c4c 695B0000 		_ADR	DMP			// display numeric
+ 4506 5c50 E9340000 		_ADR	ROT
+ 4507 5c54 E9340000 		_ADR	ROT
+ 4508 5c58 BD430000 		_ADR	SPACE
+ 4509 5c5c BD430000 		_ADR	SPACE
+ 4510 5c60 11440000 		_ADR	TYPEE			// display printable characters
+ 4511              	DUMP4:
+ 4512 5c64 01310000 	  _DONXT	DUMP1	// loop till done
+ 4512      3C5C0000 
+ 4513              	DUMP3:
+ 4514 5c6c 79320000 		_ADR	DROP
+ 4515 5c70 A1310000 		_ADR	RFROM
+ 4516 5c74 21380000 		_ADR	BASE
+ 4517 5c78 61310000 		_ADR	STORE			// restore radix
+ 4518 5c7c BB2E0000 		_UNNEST
+ 4519              	
+ 4520              	/*******************************
+ 4521              	   TRACE. display in hexadecimal
+ 4522              	   TRACE. use a different buffer 
+ 4523              	   than DOT  to avoid current 
+ 4524              	   display overwrite.
+ 4525              	*******************************/ 
+ 4526              	TDOT: // ( u -- )
+ 4527 5c80 504700BF 		_NEST 
+ 4528 5c84 21380000 		_ADR BASE 
+ 4529 5c88 75310000 		_ADR AT 
+ 4530 5c8c 05320000 		_ADR TOR
+ 4531 5c90 21410000 		_ADR HEX  
+ 4532 5c94 B5380000 		_ADR HLD 
+ 4533 5c98 75310000 		_ADR AT 
+ 4534 5c9c 05320000 		_ADR TOR   // R: base *hold 
+ 4535 5ca0 ED3D0000 		_ADR HERE 
+ 4536 5ca4 DF300000 		_DOLIT 160 
+ 4536      A0000000 
+ 4537 5cac C5330000 		_ADR PLUS
+ 4538 5cb0 89320000 		_ADR DUPP 
+ 4539 5cb4 05320000 		_ADR TOR  
+ 4540 5cb8 B5380000 		_ADR HLD 
+ 4541 5cbc 61310000 		_ADR STORE
+ 4542 5cc0 DF300000 		_DOLIT 0  
+ 4542      00000000 
+ 4543 5cc8 71400000 		_ADR DIGS  
+ 4544 5ccc 79320000 		_ADR DROP
+ 4545 5cd0 DF300000 		_DOLIT '$'
+ 4545      24000000 
+ 4546 5cd8 25400000 		_ADR HOLD 
+ 4547 5cdc B5380000 		_ADR HLD 
+ 4548 5ce0 75310000 		_ADR AT
+ 4549 5ce4 A1310000 		_ADR RFROM   
+ 4550 5ce8 C9320000 		_ADR OVER 
+ 4551 5cec D5330000 		_ADR SUBB 
+ 4552 5cf0 BD430000 		_ADR SPACE 
+ 4553 5cf4 11440000 		_ADR TYPEE 
+ 4554 5cf8 A1310000 		_ADR RFROM 
+ 4555 5cfc B5380000 		_ADR HLD 
 ARM GAS  forth.s 			page 203
 
 
- 4563              	RBASE: 
- 4564 5d04 47F8046D 		_PUSH 
- 4565 5d08 4FF68076 		_MOV32 TOS,RPP 
- 4565      C2F20106 
- 4566 5d10 FDF7D0B8 		_NEXT 
- 4567              	
- 4568              	
- 4569              	/**************************
- 4570              	  R.  display return stack 
- 4571              	**************************/
- 4572              	RDOT: 
- 4573 5d14 504700BF 		_NEST 
- 4574 5d18 055D0000 		_ADR RBASE
- 4575 5d1c 65320000 		_ADR RPAT 
- 4576 5d20 D5330000 		_ADR SUBB
- 4577 5d24 A5340000 		_ADR CELLSL   
- 4578 5d28 DF300000 		_DOLIT 2
- 4578      02000000 
- 4579 5d30 D5330000 		_ADR SUBB 
- 4580 5d34 05320000 		_ADR TOR
- 4581 5d38 055D0000 		_ADR RBASE 
- 4582 5d3c 71340000 	1:	_ADR CELLM 
- 4583 5d40 89320000 		_ADR DUPP 
- 4584 5d44 75310000 		_ADR AT 
- 4585 5d48 395C0000 		_ADR TDOT 
- 4586 5d4c A1310000 		_ADR RFROM   
- 4587 5d50 31340000 		_ADR ONEM 
- 4588 5d54 89320000 		_ADR DUPP
- 4589 5d58 05320000 		_ADR TOR 
- 4590 5d5c 3D360000 		_ADR ZEQUAL   
- 4591 5d60 1F310000 		_QBRAN 1b
- 4591      3C5D0000 
- 4592 5d68 A1310000 		_ADR RFROM  
- 4593 5d6c 11350000 		_ADR DDROP
- 4594 5d70 45440000 		_ADR CR   
- 4595 5d74 BB2E0000 		_UNNEST 
- 4596              	
- 4597              	/**************************
- 4598              		TRACE ( -- )
- 4599              		display stacks content 
- 4600              	**************************/
- 4601 5d78 D05C0000 		_HEADER TRACE,5,"TRACE"
- 4601      05545241 
- 4601      434500BF 
- 4602 5d84 504700BF 		_NEST
- 4603 5d88 45440000 		_ADR CR 
- 4604 5d8c DF300000 		_DOLIT '>' 
- 4604      3E000000 
- 4605 5d94 DF300000 		_DOLIT 'S'
- 4605      53000000 
- 4606 5d9c 7D2F0000 		_ADR EMIT 
- 4607 5da0 7D2F0000 		_ADR EMIT  
- 4608 5da4 D55C0000 		_ADR DOTS
- 4609 5da8 DF300000 		_DOLIT '>'
- 4609      3E000000 
- 4610 5db0 DF300000 		_DOLIT 'R'
- 4610      52000000 
+ 4556 5d00 61310000 		_ADR STORE 
+ 4557 5d04 A1310000 		_ADR RFROM 
+ 4558 5d08 21380000 		_ADR BASE 
+ 4559 5d0c 61310000 		_ADR STORE 
+ 4560 5d10 BB2E0000 		_UNNEST 
+ 4561              	
+ 4562              	/**********************
+ 4563              	   .S	  ( ... -- ... )
+ 4564              	 	Display the contents 
+ 4565              		of the data stack.
+ 4566              	*************************/
+ 4567 5d14 DC5B0000 		_HEADER DOTS,2,".S"
+ 4567      022E5300 
+ 4568 5d1c 504700BF 		_NEST
+ 4569 5d20 953D0000 		_ADR	DEPTH	// stack depth
+ 4570 5d24 05320000 		_ADR	TOR		// start count down loop
+ 4571 5d28 47310000 		_BRAN	DOTS2  // skip first pass
+ 4571      3C5D0000 
+ 4572              	DOTS1:
+ 4573 5d30 D5310000 		_ADR	RAT
+ 4574 5d34 B93D0000 		_ADR	PICK
+ 4575 5d38 815C0000 		_ADR	TDOT // index stack, display contents
+ 4576              	DOTS2:
+ 4577 5d3c 01310000 		_DONXT	DOTS1 // loop till done
+ 4577      305D0000 
+ 4578 5d44 45440000 		_ADR	CR 
+ 4579 5d48 BB2E0000 		_UNNEST
+ 4580              	
+ 4581              	RBASE: 
+ 4582 5d4c 47F8046D 		_PUSH 
+ 4583 5d50 4FF68076 		_MOV32 TOS,RPP 
+ 4583      C2F20106 
+ 4584 5d58 FDF7ACB8 		_NEXT 
+ 4585              	
+ 4586              	
+ 4587              	/**************************
+ 4588              	  R.  display return stack 
+ 4589              	**************************/
+ 4590              	RDOT: 
+ 4591 5d5c 504700BF 		_NEST 
+ 4592 5d60 4D5D0000 		_ADR RBASE
+ 4593 5d64 65320000 		_ADR RPAT 
+ 4594 5d68 D5330000 		_ADR SUBB
+ 4595 5d6c A5340000 		_ADR CELLSL   
+ 4596 5d70 DF300000 		_DOLIT 2
+ 4596      02000000 
+ 4597 5d78 D5330000 		_ADR SUBB 
+ 4598 5d7c 05320000 		_ADR TOR
+ 4599 5d80 4D5D0000 		_ADR RBASE 
+ 4600 5d84 71340000 	1:	_ADR CELLM 
+ 4601 5d88 89320000 		_ADR DUPP 
+ 4602 5d8c 75310000 		_ADR AT 
+ 4603 5d90 815C0000 		_ADR TDOT 
+ 4604 5d94 A1310000 		_ADR RFROM   
+ 4605 5d98 31340000 		_ADR ONEM 
+ 4606 5d9c 89320000 		_ADR DUPP
+ 4607 5da0 05320000 		_ADR TOR 
 ARM GAS  forth.s 			page 204
 
 
- 4611 5db8 7D2F0000 		_ADR EMIT 
- 4612 5dbc 7D2F0000 		_ADR EMIT 
- 4613 5dc0 155D0000 		_ADR RDOT 
- 4614 5dc4 BB2E0000 		_UNNEST 
- 4615              	
- 4616              	
- 4617              	/****************************
- 4618              	  >BODY  ( xt -- adr )
- 4619              	  get parameter field address
- 4620              	  from code field address 
- 4621              	****************************/
- 4622 5dc8 7C5D0000 		_HEADER TOBODY,5,">BODY"
- 4622      053E424F 
- 4622      445900BF 
- 4623 5dd4 06F11006 		add TOS,#4*CELLL   
- 4624 5dd8 FDF76CB8 		_NEXT 		
- 4625              	
- 4626              	/*****************************
- 4627              		>VECTOR ( xt -- adr )
- 4628              		for words defined by 
- 4629              		CREATE  return 
- 4630              		address vector slot 
- 4631              		for DOES> 
- 4632              	hidden word.	
- 4633              	*****************************/
- 4634              	TOVECTOR:
- 4635 5ddc 06F10806 		add TOS,#2*CELLL
- 4636 5de0 FDF768B8 		_NEXT 
- 4637              	
- 4638              	/*****************************
- 4639              	    >NFA	( cfa -- nfa | F )
- 4640              	 	Convert code address 
- 4641              		to a name address.
- 4642              	*****************************/
- 4643 5de4 CC5D0000 		_HEADER TONFA,4,">NFA"
- 4643      043E4E46 
- 4643      410000BF 
- 4644 5df0 504700BF 		_NEST
- 4645 5df4 05320000 		_ADR	TOR			//  
- 4646 5df8 CD380000 		_ADR	CNTXT			//  va
- 4647 5dfc 75310000 		_ADR	AT			//  nfa
- 4648              	TNAM1:
- 4649 5e00 89320000 		_ADR	DUPP			//  nfa nfa
- 4650 5e04 1F310000 		_QBRAN	TNAM2	//  vocabulary end, no match
- 4650      345E0000 
- 4651 5e0c 89320000 		_ADR	DUPP			//  nfa nfa
- 4652 5e10 69490000 		_ADR	TOCFA			//  nfa cfa
- 4653 5e14 D5310000 		_ADR	RAT			//  nfa cfa code
- 4654 5e18 6D330000 		_ADR	XORR			//  nfa f --
- 4655 5e1c 1F310000 		_QBRAN	TNAM2
- 4655      345E0000 
- 4656 5e24 71340000 		_ADR	CELLM			//  la 
- 4657 5e28 75310000 		_ADR	AT			//  next_nfa
- 4658 5e2c 47310000 		_BRAN	TNAM1
- 4658      005E0000 
- 4659              	TNAM2:	
- 4660 5e34 A1310000 		_ADR	RFROM
+ 4608 5da4 3D360000 		_ADR ZEQUAL   
+ 4609 5da8 1F310000 		_QBRAN 1b
+ 4609      845D0000 
+ 4610 5db0 A1310000 		_ADR RFROM  
+ 4611 5db4 11350000 		_ADR DDROP
+ 4612 5db8 45440000 		_ADR CR   
+ 4613 5dbc BB2E0000 		_UNNEST 
+ 4614              	
+ 4615              	/**************************
+ 4616              		TRACE ( -- )
+ 4617              		display stacks content 
+ 4618              	**************************/
+ 4619 5dc0 185D0000 		_HEADER TRACE,5,"TRACE"
+ 4619      05545241 
+ 4619      434500BF 
+ 4620 5dcc 504700BF 		_NEST
+ 4621 5dd0 45440000 		_ADR CR 
+ 4622 5dd4 DF300000 		_DOLIT '>' 
+ 4622      3E000000 
+ 4623 5ddc DF300000 		_DOLIT 'S'
+ 4623      53000000 
+ 4624 5de4 7D2F0000 		_ADR EMIT 
+ 4625 5de8 7D2F0000 		_ADR EMIT  
+ 4626 5dec 1D5D0000 		_ADR DOTS
+ 4627 5df0 DF300000 		_DOLIT '>'
+ 4627      3E000000 
+ 4628 5df8 DF300000 		_DOLIT 'R'
+ 4628      52000000 
+ 4629 5e00 7D2F0000 		_ADR EMIT 
+ 4630 5e04 7D2F0000 		_ADR EMIT 
+ 4631 5e08 5D5D0000 		_ADR RDOT 
+ 4632 5e0c BB2E0000 		_UNNEST 
+ 4633              	
+ 4634              	
+ 4635              	/****************************
+ 4636              	  >BODY  ( xt -- adr )
+ 4637              	  get parameter field address
+ 4638              	  from code field address 
+ 4639              	****************************/
+ 4640 5e10 C45D0000 		_HEADER TOBODY,5,">BODY"
+ 4640      053E424F 
+ 4640      445900BF 
+ 4641 5e1c 06F11006 		add TOS,#4*CELLL   
+ 4642 5e20 FDF748B8 		_NEXT 		
+ 4643              	
+ 4644              	/*****************************
+ 4645              		>VECTOR ( xt -- adr )
+ 4646              		for words defined by 
+ 4647              		CREATE  return 
+ 4648              		address vector slot 
+ 4649              		for DOES> 
+ 4650              	hidden word.	
+ 4651              	*****************************/
+ 4652              	TOVECTOR:
+ 4653 5e24 06F10806 		add TOS,#2*CELLL
+ 4654 5e28 FDF744B8 		_NEXT 
+ 4655              	
 ARM GAS  forth.s 			page 205
 
 
- 4661 5e38 79320000 		_ADR	DROP			//  0|nfa --
- 4662 5e3c BB2E0000 		_UNNEST			// 0
- 4663              	
- 4664              	
- 4665              	/********************************
- 4666              	    .ID	 ( na -- )
- 4667              	 	Display the name at address.
- 4668              	********************************/
- 4669 5e40 E85D0000 		_HEADER DOTID,3,".ID"
- 4669      032E4944 
- 4670 5e48 504700BF 		_NEST
- 4671 5e4c D5340000 		_ADR	QDUP			// if zero no name
- 4672 5e50 1F310000 		_QBRAN	DOTI1
- 4672      745E0000 
- 4673 5e58 71370000 		_ADR	COUNT
- 4674 5e5c DF300000 		_DOLIT	0x1F
- 4674      1F000000 
- 4675 5e64 45330000 		_ADR	ANDD			// mask lexicon bits
- 4676 5e68 BD430000 		_ADR	SPACE 
- 4677 5e6c 11440000 		_ADR	TYPEE
- 4678 5e70 BB2E0000 		_UNNEST			// display name string
- 4679              	DOTI1:
- 4680 5e74 A1440000 		_DOTQP	9," {noName}"
- 4680      09207B6E 
- 4680      6F4E616D 
- 4680      657D00BF 
- 4681 5e84 BB2E0000 		_UNNEST
+ 4656              	/*****************************
+ 4657              	    >NFA	( cfa -- nfa | F )
+ 4658              	 	Convert code address 
+ 4659              		to a name address.
+ 4660              	*****************************/
+ 4661 5e2c 145E0000 		_HEADER TONFA,4,">NFA"
+ 4661      043E4E46 
+ 4661      410000BF 
+ 4662 5e38 504700BF 		_NEST
+ 4663 5e3c 05320000 		_ADR	TOR			//  
+ 4664 5e40 CD380000 		_ADR	CNTXT			//  va
+ 4665 5e44 75310000 		_ADR	AT			//  nfa
+ 4666              	TNAM1:
+ 4667 5e48 89320000 		_ADR	DUPP			//  nfa nfa
+ 4668 5e4c 1F310000 		_QBRAN	TNAM2	//  vocabulary end, no match
+ 4668      7C5E0000 
+ 4669 5e54 89320000 		_ADR	DUPP			//  nfa nfa
+ 4670 5e58 69490000 		_ADR	TOCFA			//  nfa cfa
+ 4671 5e5c D5310000 		_ADR	RAT			//  nfa cfa code
+ 4672 5e60 6D330000 		_ADR	XORR			//  nfa f --
+ 4673 5e64 1F310000 		_QBRAN	TNAM2
+ 4673      7C5E0000 
+ 4674 5e6c 71340000 		_ADR	CELLM			//  la 
+ 4675 5e70 75310000 		_ADR	AT			//  next_nfa
+ 4676 5e74 47310000 		_BRAN	TNAM1
+ 4676      485E0000 
+ 4677              	TNAM2:	
+ 4678 5e7c A1310000 		_ADR	RFROM
+ 4679 5e80 79320000 		_ADR	DROP			//  0|nfa --
+ 4680 5e84 BB2E0000 		_UNNEST			// 0
+ 4681              	
  4682              	
- 4683              		.equ WANT_SEE, 0  // set to 1 if you want SEE 
- 4684              	.if WANT_SEE 
- 4685              	/*******************************
- 4686              	    SEE	 ( -- //  string> )
- 4687              	 	A simple decompiler.
- 4688              	*******************************/
- 4689              		_HEADER SEE,3,"SEE"
- 4690              		_NEST
- 4691              		_ADR	TICK	//  ca --, starting address
- 4692              		_ADR	CR	
- 4693              		_DOLIT	20
- 4694              		_ADR	TOR
- 4695              	SEE1:
- 4696              		_ADR	CELLP			//  a
- 4697              		_ADR	DUPP			//  a a
- 4698              		_ADR	DECOMP		//  a
- 4699              		_DONXT	SEE1
- 4700              		_ADR	DROP
- 4701              		_UNNEST
- 4702              	
- 4703              	/*************************
- 4704              	 	DECOMPILE ( a -- )
- 4705              	 	Convert code in a.  
- 4706              		Display name of command or as data.
- 4707              	*************************************/
- 4708              		_HEADER DECOMP,9,"DECOMPILE"
- 4709              		_NEST
- 4710              		_ADR	DUPP			//  a a
- 4711              	// 	_ADR	TOR			//  a
+ 4683              	/********************************
+ 4684              	    .ID	 ( na -- )
+ 4685              	 	Display the name at address.
+ 4686              	********************************/
+ 4687 5e88 305E0000 		_HEADER DOTID,3,".ID"
+ 4687      032E4944 
+ 4688 5e90 504700BF 		_NEST
+ 4689 5e94 D5340000 		_ADR	QDUP			// if zero no name
+ 4690 5e98 1F310000 		_QBRAN	DOTI1
+ 4690      BC5E0000 
+ 4691 5ea0 71370000 		_ADR	COUNT
+ 4692 5ea4 DF300000 		_DOLIT	0x1F
+ 4692      1F000000 
+ 4693 5eac 45330000 		_ADR	ANDD			// mask lexicon bits
+ 4694 5eb0 BD430000 		_ADR	SPACE 
+ 4695 5eb4 11440000 		_ADR	TYPEE
+ 4696 5eb8 BB2E0000 		_UNNEST			// display name string
+ 4697              	DOTI1:
+ 4698 5ebc A1440000 		_DOTQP	9," {noName}"
+ 4698      09207B6E 
+ 4698      6F4E616D 
+ 4698      657D00BF 
+ 4699 5ecc BB2E0000 		_UNNEST
+ 4700              	
+ 4701              		.equ WANT_SEE, 0  // set to 1 if you want SEE 
 ARM GAS  forth.s 			page 206
 
 
- 4712              		_ADR	AT			//  a code
- 4713              		_ADR	DUPP			//  a code code
- 4714              		_DOLIT	0xF800D000 //0xF800F800
- 4715              		_ADR	ANDD
- 4716              		_DOLIT	0xF000D000 //0xF800F000
- 4717              		_ADR	EQUAL			//  a code ?
- 4718              		_ADR	INVER 
- 4719              		_QBRAN	DECOM2	//  not a command
- 4720              		//  a valid_code --, extract address and display name
- 4721              		MOVW	IP,#0xFFE
- 4722              		MOV	WP,TOS
- 4723              		LSL	TOS,TOS,#21		//  get bits 22-12
- 4724              		ASR	TOS,TOS,#9		//  with sign extension
- 4725              		LSR	WP,WP,#15		//  get bits 11-1
- 4726              		AND	WP,WP,IP		//  retain only bits 11-1
- 4727              		ORR	TOS,TOS,WP		//  get bits 22-1
- 4728              		NOP
- 4729              		_ADR	OVER			//  a offset a
- 4730              		_ADR	PLUS			//  a target-4
- 4731              		_ADR	CELLP			//  a target
- 4732              		_ADR	TONFA			//  a na/0 --, is it a name?
- 4733              		_ADR	QDUP			//  name address or zero
- 4734              		_QBRAN	DECOM1
- 4735              		_ADR	SPACE			//  a na
- 4736              		_ADR	DOTID			//  a --, display name
- 4737              	// 	_ADR	RFROM			//  a
- 4738              		_ADR	DROP
- 4739              		_UNNEST
- 4740              	DECOM1:	// _ADR	RFROM		//  a
- 4741              		_ADR	AT			//  data
- 4742              		_ADR	UDOT			//  display data
- 4743              		_UNNEST
- 4744              	DECOM2:
- 4745              		_ADR	UDOT
- 4746              	// 	_ADR	RFROM
- 4747              		_ADR	DROP
- 4748              		_UNNEST
- 4749              	.endif 
- 4750              	
- 4751              	
- 4752              	/*********************
- 4753              	    WORDS	( -- )
- 4754              	 	Display the names 
- 4755              		in the context vocabulary.
- 4756              	*******************************/
- 4757 5e88 445E0000 		_HEADER WORDS,5,"WORDS"
- 4757      05574F52 
- 4757      445300BF 
- 4758 5e94 504700BF 		_NEST
- 4759 5e98 45440000 		_ADR	CR
- 4760 5e9c CD380000 		_ADR	CNTXT
- 4761 5ea0 75310000 		_ADR	AT			// only in context
- 4762              	WORS1:
- 4763 5ea4 D5340000 		_ADR	QDUP			// ?at end of list
- 4764 5ea8 1F310000 		_QBRAN	WORS2
- 4764      CC5E0000 
- 4765 5eb0 89320000 		_ADR	DUPP
+ 4702              	.if WANT_SEE 
+ 4703              	/*******************************
+ 4704              	    SEE	 ( -- //  string> )
+ 4705              	 	A simple decompiler.
+ 4706              	*******************************/
+ 4707              		_HEADER SEE,3,"SEE"
+ 4708              		_NEST
+ 4709              		_ADR	TICK	//  ca --, starting address
+ 4710              		_ADR	CR	
+ 4711              		_DOLIT	20
+ 4712              		_ADR	TOR
+ 4713              	SEE1:
+ 4714              		_ADR	CELLP			//  a
+ 4715              		_ADR	DUPP			//  a a
+ 4716              		_ADR	DECOMP		//  a
+ 4717              		_DONXT	SEE1
+ 4718              		_ADR	DROP
+ 4719              		_UNNEST
+ 4720              	
+ 4721              	/*************************
+ 4722              	 	DECOMPILE ( a -- )
+ 4723              	 	Convert code in a.  
+ 4724              		Display name of command or as data.
+ 4725              	*************************************/
+ 4726              		_HEADER DECOMP,9,"DECOMPILE"
+ 4727              		_NEST
+ 4728              		_ADR	DUPP			//  a a
+ 4729              	// 	_ADR	TOR			//  a
+ 4730              		_ADR	AT			//  a code
+ 4731              		_ADR	DUPP			//  a code code
+ 4732              		_DOLIT	0xF800D000 //0xF800F800
+ 4733              		_ADR	ANDD
+ 4734              		_DOLIT	0xF000D000 //0xF800F000
+ 4735              		_ADR	EQUAL			//  a code ?
+ 4736              		_ADR	INVER 
+ 4737              		_QBRAN	DECOM2	//  not a command
+ 4738              		//  a valid_code --, extract address and display name
+ 4739              		MOVW	IP,#0xFFE
+ 4740              		MOV	WP,TOS
+ 4741              		LSL	TOS,TOS,#21		//  get bits 22-12
+ 4742              		ASR	TOS,TOS,#9		//  with sign extension
+ 4743              		LSR	WP,WP,#15		//  get bits 11-1
+ 4744              		AND	WP,WP,IP		//  retain only bits 11-1
+ 4745              		ORR	TOS,TOS,WP		//  get bits 22-1
+ 4746              		NOP
+ 4747              		_ADR	OVER			//  a offset a
+ 4748              		_ADR	PLUS			//  a target-4
+ 4749              		_ADR	CELLP			//  a target
+ 4750              		_ADR	TONFA			//  a na/0 --, is it a name?
+ 4751              		_ADR	QDUP			//  name address or zero
+ 4752              		_QBRAN	DECOM1
+ 4753              		_ADR	SPACE			//  a na
+ 4754              		_ADR	DOTID			//  a --, display name
+ 4755              	// 	_ADR	RFROM			//  a
+ 4756              		_ADR	DROP
+ 4757              		_UNNEST
+ 4758              	DECOM1:	// _ADR	RFROM		//  a
 ARM GAS  forth.s 			page 207
 
 
- 4766 5eb4 BD430000 		_ADR	SPACE
- 4767 5eb8 495E0000 		_ADR	DOTID			// display a name
- 4768 5ebc 71340000 		_ADR	CELLM
- 4769 5ec0 75310000 		_ADR	AT
- 4770 5ec4 47310000 		_BRAN	WORS1
- 4770      A45E0000 
- 4771              	WORS2:
- 4772 5ecc BB2E0000 		_UNNEST
- 4773              	
- 4774              	
- 4775              	/*************************
- 4776              		MARK <string> ( -- )
- 4777              	    create forget point 
- 4778              		in dictionary 
- 4779              	*************************/	
- 4780 5ed0 8C5E0000 		_HEADER MARK,4,"MARK"
- 4780      044D4152 
- 4780      4B0000BF 
- 4781 5edc 504700BF 		_NEST
- 4782 5ee0 5D5A0000 		_ADR	CREAT 
- 4783 5ee4 BD580000 		_ADR	DODOES
- 4784 5ee8 BB2E0000 		_UNNEST 
- 4785 5eec 504700BF 		_NEST 
- 4786 5ef0 DF300000 		_DOLIT	4*CELLL  
- 4786      10000000 
- 4787 5ef8 D5330000 		_ADR	SUBB
- 4788 5efc 21340000 		_ADR	ONEP  
- 4789 5f00 F15D0000 		_ADR	TONFA 
- 4790 5f04 71340000 		_ADR	CELLM
- 4791 5f08 75310000 		_ADR	AT  
- 4792 5f0c 0D390000 		_ADR	LAST 
- 4793 5f10 61310000 		_ADR	STORE 
- 4794 5f14 89570000 		_ADR	OVERT
- 4795 5f18 BB2E0000 		_UNNEST 
- 4796              	
- 4797              	/*********************************
- 4798              		ARRAY "name" ( n -- )
- 4799              	    create an array of n elements 
- 4800              	*********************************/
- 4801 5f1c D45E0000 		_HEADER ARRAY,5,"ARRAY"
- 4801      05415252 
- 4801      415900BF 
- 4802 5f28 504700BF 		_NEST 
- 4803 5f2c 49490000 		_ADR	TOKEN
- 4804 5f30 8D560000 		_ADR	SNAME
- 4805 5f34 89570000 		_ADR	OVERT
- 4806 5f38 C52E0000 		_ADR	COMPI_NEST
- 4807 5f3c DF300000 		_DOLIT	DO_ARRAY
- 4807      685F0000 
- 4808 5f44 F9570000 		_ADR	CALLC
- 4809 5f48 DF300000 		_DOLIT	UNNEST 
- 4809      BA2E0000 
- 4810 5f50 F9570000 		_ADR	CALLC  
- 4811 5f54 DF300000 		_DOLIT  4 
- 4811      04000000 
- 4812 5f5c E5330000 		_ADR    STAR 
- 4813 5f60 21510000 		_ADR    ALLOT 
+ 4759              		_ADR	AT			//  data
+ 4760              		_ADR	UDOT			//  display data
+ 4761              		_UNNEST
+ 4762              	DECOM2:
+ 4763              		_ADR	UDOT
+ 4764              	// 	_ADR	RFROM
+ 4765              		_ADR	DROP
+ 4766              		_UNNEST
+ 4767              	.endif 
+ 4768              	
+ 4769              	
+ 4770              	/*********************
+ 4771              	    WORDS	( -- )
+ 4772              	 	Display the names 
+ 4773              		in the context vocabulary.
+ 4774              	*******************************/
+ 4775 5ed0 8C5E0000 		_HEADER WORDS,5,"WORDS"
+ 4775      05574F52 
+ 4775      445300BF 
+ 4776 5edc 504700BF 		_NEST
+ 4777 5ee0 45440000 		_ADR	CR
+ 4778 5ee4 CD380000 		_ADR	CNTXT
+ 4779 5ee8 75310000 		_ADR	AT			// only in context
+ 4780              	WORS1:
+ 4781 5eec D5340000 		_ADR	QDUP			// ?at end of list
+ 4782 5ef0 1F310000 		_QBRAN	WORS2
+ 4782      145F0000 
+ 4783 5ef8 89320000 		_ADR	DUPP
+ 4784 5efc BD430000 		_ADR	SPACE
+ 4785 5f00 915E0000 		_ADR	DOTID			// display a name
+ 4786 5f04 71340000 		_ADR	CELLM
+ 4787 5f08 75310000 		_ADR	AT
+ 4788 5f0c 47310000 		_BRAN	WORS1
+ 4788      EC5E0000 
+ 4789              	WORS2:
+ 4790 5f14 BB2E0000 		_UNNEST
+ 4791              	
+ 4792              	
+ 4793              	/*************************
+ 4794              		MARK <string> ( -- )
+ 4795              	    create forget point 
+ 4796              		in dictionary 
+ 4797              	*************************/	
+ 4798 5f18 D45E0000 		_HEADER MARK,4,"MARK"
+ 4798      044D4152 
+ 4798      4B0000BF 
+ 4799 5f24 504700BF 		_NEST
+ 4800 5f28 A55A0000 		_ADR	CREAT 
+ 4801 5f2c 05590000 		_ADR	DODOES
+ 4802 5f30 BB2E0000 		_UNNEST 
+ 4803 5f34 504700BF 		_NEST 
+ 4804 5f38 DF300000 		_DOLIT	4*CELLL  
+ 4804      10000000 
+ 4805 5f40 D5330000 		_ADR	SUBB
+ 4806 5f44 21340000 		_ADR	ONEP  
+ 4807 5f48 395E0000 		_ADR	TONFA 
+ 4808 5f4c 71340000 		_ADR	CELLM
 ARM GAS  forth.s 			page 208
 
 
- 4814 5f64 BB2E0000 		_UNNEST 	
- 4815              	
- 4816              	// does> du array
- 4817              	DO_ARRAY:
- 4818 5f68 504700BF 		_NEST  
- 4819 5f6c DF300000 		_DOLIT 4 
- 4819      04000000 
- 4820 5f74 E5330000 		_ADR STAR  
- 4821 5f78 D5310000 		_ADR RAT  
- 4822 5f7c 61340000 		_ADR CELLP 
- 4823 5f80 C5330000 		_ADR PLUS  
- 4824 5f84 BB2E0000 		_UNNEST 
- 4825              	
- 4826              	
- 4827              	/****************
- 4828              	  cold start
- 4829              	*****************/
- 4830              	
- 4831              	/**********************************
- 4832              	    VER	 ( -- n )
- 4833              	 	Return the version 
- 4834              		number of this implementation.
- 4835              	hidden word used by COLD
- 4836              	**********************************/
- 4837              	VERSN:
- 4838 5f88 504700BF 		_NEST
- 4839 5f8c DF300000 		_DOLIT	VER*256+EXT
- 4839      00010000 
- 4840 5f94 BB2E0000 		_UNNEST
- 4841              	
- 4842              	/*********************
- 4843              	    hi	  ( -- )
- 4844              	 	Display the sign-on 
- 4845              		message.
- 4846              	***********************/
- 4847 5f98 205F0000 		_HEADER HI,2,"HI"
- 4847      02484900 
- 4848 5fa0 504700BF 		_NEST
- 4849 5fa4 45440000 		_ADR	CR	// initialize I/O
- 4850 5fa8 A1440000 		_DOTQP	17, "beyond Jupiter, v" 
- 4850      11626579 
- 4850      6F6E6420 
- 4850      4A757069 
- 4850      7465722C 
- 4851 5fc0 21380000 		_ADR	BASE
- 4852 5fc4 75310000 		_ADR	AT
- 4853 5fc8 21410000 		_ADR	HEX	// save radix
- 4854 5fcc 895F0000 		_ADR	VERSN
- 4855 5fd0 05400000 		_ADR	BDIGS
- 4856 5fd4 DF300000 		_DOLIT  0 
- 4856      00000000 
- 4857 5fdc 51400000 		_ADR	DIG
- 4858 5fe0 51400000 		_ADR	DIG
- 4859 5fe4 DF300000 		_DOLIT	'.'
- 4859      2E000000 
- 4860 5fec 25400000 		_ADR	HOLD
- 4861 5ff0 71400000 		_ADR	DIGS
+ 4809 5f50 75310000 		_ADR	AT  
+ 4810 5f54 0D390000 		_ADR	LAST 
+ 4811 5f58 61310000 		_ADR	STORE 
+ 4812 5f5c C1570000 		_ADR	OVERT
+ 4813 5f60 BB2E0000 		_UNNEST 
+ 4814              	
+ 4815              	/*********************************
+ 4816              		ARRAY "name" ( n -- )
+ 4817              	    create an array of n elements 
+ 4818              	*********************************/
+ 4819 5f64 1C5F0000 		_HEADER ARRAY,5,"ARRAY"
+ 4819      05415252 
+ 4819      415900BF 
+ 4820 5f70 504700BF 		_NEST 
+ 4821 5f74 49490000 		_ADR	TOKEN
+ 4822 5f78 C5560000 		_ADR	SNAME
+ 4823 5f7c C1570000 		_ADR	OVERT
+ 4824 5f80 C52E0000 		_ADR	COMPI_NEST
+ 4825 5f84 DF300000 		_DOLIT	DO_ARRAY
+ 4825      B05F0000 
+ 4826 5f8c 41580000 		_ADR	CALLC
+ 4827 5f90 DF300000 		_DOLIT	UNNEST 
+ 4827      BA2E0000 
+ 4828 5f98 41580000 		_ADR	CALLC  
+ 4829 5f9c DF300000 		_DOLIT  4 
+ 4829      04000000 
+ 4830 5fa4 E5330000 		_ADR    STAR 
+ 4831 5fa8 21510000 		_ADR    ALLOT 
+ 4832 5fac BB2E0000 		_UNNEST 	
+ 4833              	
+ 4834              	// does> du array
+ 4835              	DO_ARRAY:
+ 4836 5fb0 504700BF 		_NEST  
+ 4837 5fb4 DF300000 		_DOLIT 4 
+ 4837      04000000 
+ 4838 5fbc E5330000 		_ADR STAR  
+ 4839 5fc0 D5310000 		_ADR RAT  
+ 4840 5fc4 61340000 		_ADR CELLP 
+ 4841 5fc8 C5330000 		_ADR PLUS  
+ 4842 5fcc BB2E0000 		_UNNEST 
+ 4843              	
+ 4844              	
+ 4845              	/****************
+ 4846              	  cold start
+ 4847              	*****************/
+ 4848              	
+ 4849              	/**********************************
+ 4850              	    VER	 ( -- n )
+ 4851              	 	Return the version 
+ 4852              		number of this implementation.
+ 4853              	hidden word used by COLD
+ 4854              	**********************************/
+ 4855              	VERSN:
+ 4856 5fd0 504700BF 		_NEST
+ 4857 5fd4 DF300000 		_DOLIT	VER*256+EXT
+ 4857      00010000 
+ 4858 5fdc BB2E0000 		_UNNEST
 ARM GAS  forth.s 			page 209
 
 
- 4862 5ff4 CD400000 		_ADR	EDIGS
- 4863 5ff8 11440000 		_ADR	TYPEE	// format version number
- 4864 5ffc 21380000 		_ADR	BASE
- 4865 6000 61310000 		_ADR	STORE
- 4866 6004 45440000 		_ADR	CR
- 4867 6008 BB2E0000 		_UNNEST			// restore radix
- 4868              	
- 4869              	/***********************
- 4870              	   HI_BOTH ( -- )
- 4871              	   display sign-on 
- 4872              	   on both CONSOLE
- 4873              	***********************/
- 4874              	HI_BOTH:
- 4875 600c 504700BF 	    _NEST 
- 4876 6010 010C0000 		_ADR LOCAL 
- 4877 6014 310C0000 		_ADR CONSOLE 
- 4878 6018 A15F0000 		_ADR HI 
- 4879 601c 190C0000 		_ADR SERIAL 
- 4880 6020 310C0000 		_ADR CONSOLE 
- 4881 6024 A15F0000 		_ADR HI
- 4882 6028 BB2E0000 		_UNNEST 
- 4883              	
- 4884              	/**********************
- 4885              	 check if PS2 keyboard 
- 4886              	 present.
- 4887              	**********************/
- 4888              	PS2_QUERY: 
- 4889 602c 504700BF 		_NEST 
- 4890 6030 DF300000 		_DOLIT 400 
- 4890      90010000 
- 4891 6038 15300000 		_ADR PAUSE
- 4892 603c 211A0000 		_ADR PS2_QKEY
- 4893 6040 1F310000 		_QBRAN 1f
- 4893      5C600000 
- 4894 6048 DF300000 		_DOLIT BAT_OK 
- 4894      AA000000 
- 4895 6050 6D330000 		_ADR XORR 
- 4896 6054 1F310000 		_QBRAN 9f 
- 4896      A0600000 
- 4897 605c 091C0000 	1:	_ADR KBD_RST
- 4898 6060 DF300000 		_DOLIT BAT_OK 
- 4898      AA000000 
- 4899 6068 6D330000 		_ADR XORR  
- 4900 606c 1F310000 		_QBRAN 9f  
- 4900      A0600000 
- 4901              	// no ps2 keyboard 
- 4902              	// swith to serial console
- 4903 6074 45440000 		_ADR CR 
- 4904 6078 A1440000 		_DOTQP 25,"no PS2 keyboard detected."
- 4904      196E6F20 
- 4904      50533220 
- 4904      6B657962 
- 4904      6F617264 
- 4905 6098 190C0000 		_ADR SERIAL 
- 4906 609c 310C0000 		_ADR CONSOLE 
- 4907 60a0 BB2E0000 	9:	_UNNEST 
- 4908              	
+ 4859              	
+ 4860              	/*********************
+ 4861              	    hi	  ( -- )
+ 4862              	 	Display the sign-on 
+ 4863              		message.
+ 4864              	***********************/
+ 4865 5fe0 685F0000 		_HEADER HI,2,"HI"
+ 4865      02484900 
+ 4866 5fe8 504700BF 		_NEST
+ 4867 5fec 45440000 		_ADR	CR	// initialize I/O
+ 4868 5ff0 A1440000 		_DOTQP	17, "beyond Jupiter, v" 
+ 4868      11626579 
+ 4868      6F6E6420 
+ 4868      4A757069 
+ 4868      7465722C 
+ 4869 6008 21380000 		_ADR	BASE
+ 4870 600c 75310000 		_ADR	AT
+ 4871 6010 21410000 		_ADR	HEX	// save radix
+ 4872 6014 D15F0000 		_ADR	VERSN
+ 4873 6018 05400000 		_ADR	BDIGS
+ 4874 601c DF300000 		_DOLIT  0 
+ 4874      00000000 
+ 4875 6024 51400000 		_ADR	DIG
+ 4876 6028 51400000 		_ADR	DIG
+ 4877 602c DF300000 		_DOLIT	'.'
+ 4877      2E000000 
+ 4878 6034 25400000 		_ADR	HOLD
+ 4879 6038 71400000 		_ADR	DIGS
+ 4880 603c CD400000 		_ADR	EDIGS
+ 4881 6040 11440000 		_ADR	TYPEE	// format version number
+ 4882 6044 21380000 		_ADR	BASE
+ 4883 6048 61310000 		_ADR	STORE
+ 4884 604c 45440000 		_ADR	CR
+ 4885 6050 BB2E0000 		_UNNEST			// restore radix
+ 4886              	
+ 4887              	/***********************
+ 4888              	   HI_BOTH ( -- )
+ 4889              	   display sign-on 
+ 4890              	   on both CONSOLE
+ 4891              	***********************/
+ 4892              	HI_BOTH:
+ 4893 6054 504700BF 	    _NEST 
+ 4894 6058 010C0000 		_ADR LOCAL 
+ 4895 605c 310C0000 		_ADR CONSOLE 
+ 4896 6060 E95F0000 		_ADR HI 
+ 4897 6064 190C0000 		_ADR SERIAL 
+ 4898 6068 310C0000 		_ADR CONSOLE 
+ 4899 606c E95F0000 		_ADR HI
+ 4900 6070 BB2E0000 		_UNNEST 
+ 4901              	
+ 4902              	/**********************
+ 4903              	 check if PS2 keyboard 
+ 4904              	 present.
+ 4905              	**********************/
+ 4906              	PS2_QUERY: 
+ 4907 6074 504700BF 		_NEST 
+ 4908 6078 DF300000 		_DOLIT 400 
 ARM GAS  forth.s 			page 210
 
 
- 4909              	/*************************
- 4910              	   check PA8 to 
- 4911              	   select console 
- 4912              	   PA8 -> low  LOCAL 
- 4913              	   PA8 -> high SERIAL 
- 4914              	*************************/
- 4915              	IF_SENSE:
- 4916 60a4 504700BF 		_NEST 
- 4917 60a8 010C0000 		_ADR LOCAL 
- 4918 60ac DF300000 		_DOLIT (GPIOA_BASE_ADR+GPIO_IDR) 
- 4918      10000240 
- 4919 60b4 75310000 		_ADR AT 
- 4920 60b8 DF300000 		_DOLIT (1<<8)
- 4920      00010000 
- 4921 60c0 45330000 		_ADR ANDD 
- 4922 60c4 1F310000 		_QBRAN 9f 
- 4922      D0600000 
- 4923 60cc 21340000 		_ADR ONEP 
- 4924 60d0 310C0000 	9:  _ADR CONSOLE 
- 4925 60d4 BB2E0000 		_UNNEST 
+ 4908      90010000 
+ 4909 6080 15300000 		_ADR PAUSE
+ 4910 6084 211A0000 		_ADR PS2_QKEY
+ 4911 6088 1F310000 		_QBRAN 1f
+ 4911      A4600000 
+ 4912 6090 DF300000 		_DOLIT BAT_OK 
+ 4912      AA000000 
+ 4913 6098 6D330000 		_ADR XORR 
+ 4914 609c 1F310000 		_QBRAN 9f 
+ 4914      E8600000 
+ 4915 60a4 091C0000 	1:	_ADR KBD_RST
+ 4916 60a8 DF300000 		_DOLIT BAT_OK 
+ 4916      AA000000 
+ 4917 60b0 6D330000 		_ADR XORR  
+ 4918 60b4 1F310000 		_QBRAN 9f  
+ 4918      E8600000 
+ 4919              	// no ps2 keyboard 
+ 4920              	// swith to serial console
+ 4921 60bc 45440000 		_ADR CR 
+ 4922 60c0 A1440000 		_DOTQP 25,"no PS2 keyboard detected."
+ 4922      196E6F20 
+ 4922      50533220 
+ 4922      6B657962 
+ 4922      6F617264 
+ 4923 60e0 190C0000 		_ADR SERIAL 
+ 4924 60e4 310C0000 		_ADR CONSOLE 
+ 4925 60e8 BB2E0000 	9:	_UNNEST 
  4926              	
- 4927              	/****************************
- 4928              	   display READY on active
- 4929              	   console
- 4930              	***************************/
- 4931              	READY:
- 4932 60d8 504700BF 	    _NEST 
- 4933 60dc A1440000 		_DOTQP 5,"READY"
- 4933      05524541 
- 4933      445900BF 
- 4934 60e8 45440000 		_ADR  CR 
- 4935 60ec BB2E0000 	    _UNNEST 
- 4936              	
- 4937              	/********************
- 4938              	    COLD	( -- )
- 4939              	 	The high level cold 
- 4940              		start sequence.
- 4941              	**************************/
- 4942 60f0 9C5F0000 		.word	LINK 
- 4943              		LINK = . 
- 4944 60f4 04       	_LASTN:	.byte  4
- 4945 60f5 434F4C44 		.ascii "COLD"
- 4946 60f9 0000BF   		.p2align 2	
- 4947              	COLD:
- 4948 60fc 00B5FAF7 		_CALL forth_init 
- 4948      1BFA5DF8 
- 4948      04EB
- 4949 6106 DFF85CC0 		ldr IP,=COLD1 
- 4950 610a FCF7D3BE 		_NEXT
- 4951 610e 00BF     		.p2align 2 
- 4952              	COLD1:
- 4953 6110 DF300000 		_DOLIT  0 
- 4953      00000000 
- 4954 6118 49300000 		_ADR ULED // turn off user LED 
- 4955 611c DF300000 		_DOLIT	UZERO
- 4955      64080000 
- 4956 6124 DF300000 		_DOLIT	UPP
+ 4927              	/*************************
+ 4928              	   check PA8 to 
+ 4929              	   select console 
+ 4930              	   PA8 -> low  LOCAL 
+ 4931              	   PA8 -> high SERIAL 
+ 4932              	*************************/
+ 4933              	IF_SENSE:
+ 4934 60ec 504700BF 		_NEST 
+ 4935 60f0 010C0000 		_ADR LOCAL 
+ 4936 60f4 DF300000 		_DOLIT (GPIOA_BASE_ADR+GPIO_IDR) 
+ 4936      10000240 
+ 4937 60fc 75310000 		_ADR AT 
+ 4938 6100 DF300000 		_DOLIT (1<<8)
+ 4938      00010000 
+ 4939 6108 45330000 		_ADR ANDD 
+ 4940 610c 1F310000 		_QBRAN 9f 
+ 4940      18610000 
+ 4941 6114 21340000 		_ADR ONEP 
+ 4942 6118 310C0000 	9:  _ADR CONSOLE 
+ 4943 611c BB2E0000 		_UNNEST 
+ 4944              	
+ 4945              	/****************************
+ 4946              	   display READY on active
+ 4947              	   console
+ 4948              	***************************/
+ 4949              	READY:
+ 4950 6120 504700BF 	    _NEST 
+ 4951 6124 A1440000 		_DOTQP 5,"READY"
+ 4951      05524541 
 ARM GAS  forth.s 			page 211
 
 
- 4956      00000020 
- 4957 612c DF300000 		_DOLIT	ULAST-UZERO
- 4957      C0000000 
- 4958 6134 DD3E0000 		_ADR	WMOVE 			// initialize user area
- 4959 6138 DD4F0000 		_ADR	PRESE			// initialize stack and TIB
- 4960 613c B51E0000 		_ADR	WR_DIS          // disable WEL bit in U3 spi flash  
- 4961 6140 2D600000 		_ADR 	PS2_QUERY  
- 4962 6144 09380000 		_ADR	TBOOT
- 4963 6148 793E0000 		_ADR	ATEXE			// application boot
- 4964 614c 89570000 		_ADR	OVERT
- 4965 6150 A5600000 		_ADR	IF_SENSE
- 4966 6154 D9600000 		_ADR    READY 
- 4967 6158 47310000 		_BRAN	QUIT			// start interpretation
- 4967      F44F0000 
- 4968              	COLD2:
- 4969              		.p2align 2 	
- 4970              	CTOP:
- 4971 6160 FFFFFFFF 		.word	0XFFFFFFFF		//  keep CTOP even
- 4972              	
- 4973              	
- 4974 6164 10610000 	  .end 
+ 4951      445900BF 
+ 4952 6130 45440000 		_ADR  CR 
+ 4953 6134 BB2E0000 	    _UNNEST 
+ 4954              	
+ 4955              	/********************
+ 4956              	    COLD	( -- )
+ 4957              	 	The high level cold 
+ 4958              		start sequence.
+ 4959              	**************************/
+ 4960 6138 E45F0000 		.word	LINK 
+ 4961              		LINK = . 
+ 4962 613c 04       	_LASTN:	.byte  4
+ 4963 613d 434F4C44 		.ascii "COLD"
+ 4964 6141 0000BF   		.p2align 2	
+ 4965              	COLD:
+ 4966 6144 00B5FAF7 		_CALL forth_init 
+ 4966      F7F95DF8 
+ 4966      04EB
+ 4967 614e DFF85CC0 		ldr IP,=COLD1 
+ 4968 6152 FCF7AFBE 		_NEXT
+ 4969 6156 00BF     		.p2align 2 
+ 4970              	COLD1:
+ 4971 6158 DF300000 		_DOLIT  0 
+ 4971      00000000 
+ 4972 6160 49300000 		_ADR ULED // turn off user LED 
+ 4973 6164 DF300000 		_DOLIT	UZERO
+ 4973      64080000 
+ 4974 616c DF300000 		_DOLIT	UPP
+ 4974      00000020 
+ 4975 6174 DF300000 		_DOLIT	ULAST-UZERO
+ 4975      C0000000 
+ 4976 617c DD3E0000 		_ADR	WMOVE 			// initialize user area
+ 4977 6180 DD4F0000 		_ADR	PRESE			// initialize stack and TIB
+ 4978 6184 B51E0000 		_ADR	WR_DIS          // disable WEL bit in U3 spi flash  
+ 4979 6188 75600000 		_ADR 	PS2_QUERY  
+ 4980 618c 09380000 		_ADR	TBOOT
+ 4981 6190 793E0000 		_ADR	ATEXE			// application boot
+ 4982 6194 C1570000 		_ADR	OVERT
+ 4983 6198 ED600000 		_ADR	IF_SENSE
+ 4984 619c 21610000 		_ADR    READY 
+ 4985 61a0 47310000 		_BRAN	QUIT			// start interpretation
+ 4985      F44F0000 
+ 4986              	COLD2:
+ 4987              		.p2align 2 	
+ 4988              	CTOP:
+ 4989 61a8 FFFFFFFF 		.word	0XFFFFFFFF		//  keep CTOP even
+ 4990              	
+ 4991              	
+ 4992 61ac 58610000 	  .end 
 ARM GAS  forth.s 			page 212
 
 
@@ -13143,7 +13171,7 @@ DEFINED SYMBOLS
              tvout.s:74     .text:0000000000000d78 tv_init
            ps2_kbd.s:307    .text:0000000000001924 kbd_init
          spi-flash.s:41     .text:0000000000001d38 flash_spi_init
-             forth.s:4947   .text:00000000000060fc COLD
+             forth.s:4965   .text:0000000000006144 COLD
              forth.s:83     .text:0000000000002eac NEST
               init.s:554    .text:000000000000057e wait_hserdy
               init.s:575    .text:00000000000005a0 wait_pllrdy
@@ -13159,16 +13187,16 @@ DEFINED SYMBOLS
               init.s:808    .text:00000000000007f6 output_type
               init.s:831    .text:000000000000081e gpio_speed
               init.s:869    .text:0000000000000864 $d
-             forth.s:4874   .text:000000000000600c HI_BOTH
+             forth.s:4892   .text:0000000000006054 HI_BOTH
            ps2_kbd.s:396    .text:0000000000001a20 PS2_QKEY
              tvout.s:563    .text:00000000000012e8 TV_EMIT
 ARM GAS  forth.s 			page 221
 
 
              forth.s:3308   .text:0000000000004e00 INTER
-             forth.s:4944   .text:00000000000060f4 _LASTN
-             forth.s:4970   .text:0000000000006160 CTOP
-             forth.s:4943   .text:00000000000060f4 LINK
+             forth.s:4962   .text:000000000000613c _LASTN
+             forth.s:4988   .text:00000000000061a8 CTOP
+             forth.s:4961   .text:000000000000613c LINK
               init.s:915    .text:0000000000000924 $d
        environment.s:32     .text:0000000000000954 _ENVQ
        environment.s:32     .text:0000000000000964 ENVQ
@@ -14741,13 +14769,13 @@ DEFINED SYMBOLS
              forth.s:3464   .text:0000000000005018 _FORGET
              forth.s:3464   .text:0000000000005020 FORGET
              forth.s:3466   .text:0000000000005024 $d
-             forth.s:4112   .text:0000000000005788 OVERT
+             forth.s:4129   .text:00000000000057c0 OVERT
              forth.s:3493   .text:000000000000506c $d
              forth.s:3493   .text:0000000000005070 _POSTPONE
              forth.s:3493   .text:000000000000507c POSTPONE
              forth.s:3495   .text:0000000000005080 $d
              forth.s:3518   .text:00000000000050b8 ITICK
-             forth.s:4155   .text:00000000000057f8 CALLC
+             forth.s:4172   .text:0000000000005840 CALLC
              forth.s:3505   .text:0000000000005090 _TICK
              forth.s:3505   .text:0000000000005092 $t
              forth.s:3505   .text:0000000000005094 TICK
@@ -14880,211 +14908,214 @@ DEFINED SYMBOLS
              forth.s:3976   .text:00000000000055ec _ABRTQ
              forth.s:3976   .text:00000000000055f4 ABRTQ
              forth.s:3978   .text:00000000000055f8 $d
-             forth.s:3987   .text:0000000000005610 _STRQ
-             forth.s:3987   .text:0000000000005614 STRQ
-             forth.s:3989   .text:0000000000005618 $d
-             forth.s:3999   .text:0000000000005630 _DOTQ
-             forth.s:3999   .text:0000000000005634 DOTQ
-             forth.s:4001   .text:0000000000005638 $d
-             forth.s:4015   .text:0000000000005650 _UNIQU
-             forth.s:4015   .text:0000000000005658 $t
-             forth.s:4015   .text:0000000000005658 UNIQU
-             forth.s:4017   .text:000000000000565c $d
-             forth.s:4024   .text:0000000000005684 UNIQ1
-             forth.s:4021   .text:0000000000005678 $d
-             forth.s:4034   .text:000000000000568c SNAME
-             forth.s:4035   .text:000000000000568c $t
-             forth.s:4036   .text:0000000000005690 $d
-             forth.s:4052   .text:00000000000056d4 SNAM1
-             forth.s:4064   .text:00000000000056e8 _SCOMP
-             forth.s:4064   .text:00000000000056f4 SCOMP
-             forth.s:4066   .text:00000000000056f8 $d
-             forth.s:4078   .text:0000000000005730 SCOM2
-             forth.s:4075   .text:0000000000005728 SCOM1
-             forth.s:4083   .text:0000000000005744 SCOM3
+             forth.s:3988   .text:0000000000005610 _STRQ
+             forth.s:3988   .text:0000000000005614 STRQ
+             forth.s:3990   .text:0000000000005618 $d
+             forth.s:4001   .text:0000000000005630 _CSTRQ
+             forth.s:4001   .text:0000000000005634 CSTRQ
+             forth.s:4003   .text:0000000000005638 $d
+             forth.s:4016   .text:0000000000005668 _DOTQ
+             forth.s:4016   .text:000000000000566c DOTQ
+             forth.s:4018   .text:0000000000005670 $d
+             forth.s:4032   .text:0000000000005688 _UNIQU
+             forth.s:4032   .text:0000000000005690 $t
+             forth.s:4032   .text:0000000000005690 UNIQU
+             forth.s:4034   .text:0000000000005694 $d
+             forth.s:4041   .text:00000000000056bc UNIQ1
+             forth.s:4038   .text:00000000000056b0 $d
+             forth.s:4051   .text:00000000000056c4 SNAME
+             forth.s:4052   .text:00000000000056c4 $t
+             forth.s:4053   .text:00000000000056c8 $d
+             forth.s:4069   .text:000000000000570c SNAM1
+             forth.s:4081   .text:0000000000005720 _SCOMP
+             forth.s:4081   .text:000000000000572c SCOMP
+             forth.s:4083   .text:0000000000005730 $d
 ARM GAS  forth.s 			page 250
 
 
-             forth.s:4092   .text:000000000000574c COLON_ABORT
-             forth.s:4093   .text:000000000000574c $t
-             forth.s:4094   .text:0000000000005750 $d
-             forth.s:4112   .text:0000000000005780 _OVERT
-             forth.s:4112   .text:0000000000005786 $t
-             forth.s:4114   .text:000000000000578c $d
-             forth.s:4125   .text:00000000000057a4 _SEMIS
-             forth.s:4125   .text:00000000000057a6 $t
-             forth.s:4125   .text:00000000000057a8 SEMIS
-             forth.s:4127   .text:00000000000057ac $d
-             forth.s:4140   .text:00000000000057cc _RBRAC
-             forth.s:4140   .text:00000000000057ce $t
-             forth.s:4140   .text:00000000000057d0 RBRAC
-             forth.s:4142   .text:00000000000057d4 $d
-             forth.s:4156   .text:00000000000057f8 $t
-             forth.s:4157   .text:00000000000057fc $d
-             forth.s:4168   .text:0000000000005814 _BUFFER
-             forth.s:4168   .text:000000000000581c $t
-             forth.s:4168   .text:000000000000581c BUFFER
-             forth.s:4170   .text:0000000000005820 $d
-             forth.s:4192   .text:0000000000005860 _COLON
-             forth.s:4192   .text:0000000000005862 $t
-             forth.s:4192   .text:0000000000005864 COLON
-             forth.s:4194   .text:0000000000005868 $d
-             forth.s:4206   .text:0000000000005884 _IMMED
-             forth.s:4206   .text:000000000000588e $t
-             forth.s:4206   .text:0000000000005890 IMMED
-             forth.s:4208   .text:0000000000005894 $d
-             forth.s:4222   .text:00000000000058bc $t
-             forth.s:4228   .text:00000000000058bc DODOES
-             forth.s:4230   .text:00000000000058c0 $d
-             forth.s:4634   .text:0000000000005ddc TOVECTOR
-             forth.s:4246   .text:00000000000058e8 $d
-             forth.s:4246   .text:00000000000058ec _DOES
-             forth.s:4246   .text:00000000000058f2 $t
-             forth.s:4246   .text:00000000000058f4 DOES
-             forth.s:4248   .text:00000000000058f8 $d
-             forth.s:4258   .text:000000000000591c _DEFERAT
-             forth.s:4258   .text:0000000000005924 DEFERAT
-             forth.s:4260   .text:0000000000005928 $d
-             forth.s:4269   .text:0000000000005938 _ACTIONOF
-             forth.s:4269   .text:0000000000005942 $t
-             forth.s:4269   .text:0000000000005944 ACTIONOF
-             forth.s:4271   .text:0000000000005948 $d
-             forth.s:4284   .text:000000000000596c _DEFERSTO
-             forth.s:4284   .text:0000000000005974 DEFERSTO
-             forth.s:4286   .text:0000000000005978 $d
-             forth.s:4296   .text:0000000000005994 _DEFER
-             forth.s:4296   .text:000000000000599a $t
-             forth.s:4296   .text:000000000000599c DEFER
-             forth.s:4298   .text:00000000000059a0 $d
-             forth.s:4306   .text:00000000000059c4 NO_ACTION
-             forth.s:4307   .text:00000000000059c4 $t
-             forth.s:4308   .text:00000000000059c8 $d
-             forth.s:4310   .text:00000000000059e4 $d
-             forth.s:4320   .text:00000000000059ec _NONAME
-             forth.s:4320   .text:00000000000059f4 $t
+             forth.s:4095   .text:0000000000005768 SCOM2
+             forth.s:4092   .text:0000000000005760 SCOM1
+             forth.s:4100   .text:000000000000577c SCOM3
+             forth.s:4109   .text:0000000000005784 COLON_ABORT
+             forth.s:4110   .text:0000000000005784 $t
+             forth.s:4111   .text:0000000000005788 $d
+             forth.s:4129   .text:00000000000057b8 _OVERT
+             forth.s:4129   .text:00000000000057be $t
+             forth.s:4131   .text:00000000000057c4 $d
+             forth.s:4142   .text:00000000000057dc _SEMIS
+             forth.s:4142   .text:00000000000057de $t
+             forth.s:4142   .text:00000000000057e0 SEMIS
+             forth.s:4144   .text:00000000000057e4 $d
+             forth.s:4157   .text:0000000000005804 _RBRAC
+             forth.s:4157   .text:0000000000005806 $t
+             forth.s:4157   .text:0000000000005808 RBRAC
+             forth.s:4159   .text:000000000000580c $d
+             forth.s:4172   .text:0000000000005834 _CALLC
+             forth.s:4174   .text:0000000000005844 $d
+             forth.s:4186   .text:000000000000585c _BUFFER
+             forth.s:4186   .text:0000000000005864 $t
+             forth.s:4186   .text:0000000000005864 BUFFER
+             forth.s:4188   .text:0000000000005868 $d
+             forth.s:4210   .text:00000000000058a8 _COLON
+             forth.s:4210   .text:00000000000058aa $t
+             forth.s:4210   .text:00000000000058ac COLON
+             forth.s:4212   .text:00000000000058b0 $d
+             forth.s:4224   .text:00000000000058cc _IMMED
+             forth.s:4224   .text:00000000000058d6 $t
+             forth.s:4224   .text:00000000000058d8 IMMED
+             forth.s:4226   .text:00000000000058dc $d
+             forth.s:4240   .text:0000000000005904 $t
+             forth.s:4246   .text:0000000000005904 DODOES
+             forth.s:4248   .text:0000000000005908 $d
+             forth.s:4652   .text:0000000000005e24 TOVECTOR
+             forth.s:4264   .text:0000000000005930 $d
+             forth.s:4264   .text:0000000000005934 _DOES
+             forth.s:4264   .text:000000000000593a $t
+             forth.s:4264   .text:000000000000593c DOES
+             forth.s:4266   .text:0000000000005940 $d
+             forth.s:4276   .text:0000000000005964 _DEFERAT
+             forth.s:4276   .text:000000000000596c DEFERAT
+             forth.s:4278   .text:0000000000005970 $d
+             forth.s:4287   .text:0000000000005980 _ACTIONOF
+             forth.s:4287   .text:000000000000598a $t
+             forth.s:4287   .text:000000000000598c ACTIONOF
+             forth.s:4289   .text:0000000000005990 $d
+             forth.s:4302   .text:00000000000059b4 _DEFERSTO
+             forth.s:4302   .text:00000000000059bc DEFERSTO
+             forth.s:4304   .text:00000000000059c0 $d
+             forth.s:4314   .text:00000000000059dc _DEFER
+             forth.s:4314   .text:00000000000059e2 $t
+             forth.s:4314   .text:00000000000059e4 DEFER
+             forth.s:4316   .text:00000000000059e8 $d
+             forth.s:4324   .text:0000000000005a0c NO_ACTION
+             forth.s:4325   .text:0000000000005a0c $t
+             forth.s:4326   .text:0000000000005a10 $d
 ARM GAS  forth.s 			page 251
 
 
-             forth.s:4320   .text:00000000000059f4 NONAME
-             forth.s:4322   .text:00000000000059f8 $d
-             forth.s:4335   .text:0000000000005a0c _IS
-             forth.s:4335   .text:0000000000005a10 IS
-             forth.s:4337   .text:0000000000005a14 $d
-             forth.s:4355   .text:0000000000005a54 _CREAT
-             forth.s:4355   .text:0000000000005a5c CREAT
-             forth.s:4357   .text:0000000000005a60 $d
-             forth.s:4372   .text:0000000000005a9c DOVAR
-             forth.s:4373   .text:0000000000005a9c $t
-             forth.s:4384   .text:0000000000005aaa $d
-             forth.s:4384   .text:0000000000005aae _VARIA
-             forth.s:4384   .text:0000000000005ab8 VARIA
-             forth.s:4386   .text:0000000000005abc $d
-             forth.s:4396   .text:0000000000005ad0 DOCON
-             forth.s:4397   .text:0000000000005ad0 $t
-             forth.s:4406   .text:0000000000005adc $d
-             forth.s:4406   .text:0000000000005ae0 _CONST
-             forth.s:4406   .text:0000000000005aec CONST
-             forth.s:4408   .text:0000000000005af0 $d
-             forth.s:4430   .text:0000000000005b20 DMP
-             forth.s:4431   .text:0000000000005b20 $t
-             forth.s:4432   .text:0000000000005b24 $d
-             forth.s:4450   .text:0000000000005b78 PDUM2
-             forth.s:4444   .text:0000000000005b60 PDUM1
-             forth.s:4465   .text:0000000000005b90 $d
-             forth.s:4465   .text:0000000000005b94 _DUMP
-             forth.s:4465   .text:0000000000005b9c DUMP
-             forth.s:4467   .text:0000000000005ba0 $d
-             forth.s:4493   .text:0000000000005c1c DUMP4
-             forth.s:4483   .text:0000000000005bf4 DUMP1
-             forth.s:4495   .text:0000000000005c24 DUMP3
-             forth.s:4508   .text:0000000000005c38 TDOT
-             forth.s:4509   .text:0000000000005c38 $t
-             forth.s:4510   .text:0000000000005c3c $d
-             forth.s:4549   .text:0000000000005cd0 _DOTS
-             forth.s:4549   .text:0000000000005cd4 DOTS
-             forth.s:4551   .text:0000000000005cd8 $d
-             forth.s:4558   .text:0000000000005cf4 DOTS2
-             forth.s:4554   .text:0000000000005ce8 DOTS1
-             forth.s:4563   .text:0000000000005d04 RBASE
-             forth.s:4564   .text:0000000000005d04 $t
-             forth.s:4572   .text:0000000000005d14 RDOT
-             forth.s:4574   .text:0000000000005d18 $d
-             forth.s:4601   .text:0000000000005d7c _TRACE
-             forth.s:4601   .text:0000000000005d82 $t
-             forth.s:4601   .text:0000000000005d84 TRACE
-             forth.s:4603   .text:0000000000005d88 $d
-             forth.s:4622   .text:0000000000005dcc _TOBODY
-             forth.s:4622   .text:0000000000005dd2 $t
-             forth.s:4622   .text:0000000000005dd4 TOBODY
-             forth.s:4643   .text:0000000000005de4 $d
-             forth.s:4643   .text:0000000000005de8 _TONFA
-             forth.s:4643   .text:0000000000005df0 TONFA
-             forth.s:4645   .text:0000000000005df4 $d
-             forth.s:4648   .text:0000000000005e00 TNAM1
-             forth.s:4659   .text:0000000000005e34 TNAM2
+             forth.s:4328   .text:0000000000005a2c $d
+             forth.s:4338   .text:0000000000005a34 _NONAME
+             forth.s:4338   .text:0000000000005a3c $t
+             forth.s:4338   .text:0000000000005a3c NONAME
+             forth.s:4340   .text:0000000000005a40 $d
+             forth.s:4353   .text:0000000000005a54 _IS
+             forth.s:4353   .text:0000000000005a58 IS
+             forth.s:4355   .text:0000000000005a5c $d
+             forth.s:4373   .text:0000000000005a9c _CREAT
+             forth.s:4373   .text:0000000000005aa4 CREAT
+             forth.s:4375   .text:0000000000005aa8 $d
+             forth.s:4390   .text:0000000000005ae4 DOVAR
+             forth.s:4391   .text:0000000000005ae4 $t
+             forth.s:4402   .text:0000000000005af2 $d
+             forth.s:4402   .text:0000000000005af6 _VARIA
+             forth.s:4402   .text:0000000000005b00 VARIA
+             forth.s:4404   .text:0000000000005b04 $d
+             forth.s:4414   .text:0000000000005b18 DOCON
+             forth.s:4415   .text:0000000000005b18 $t
+             forth.s:4424   .text:0000000000005b24 $d
+             forth.s:4424   .text:0000000000005b28 _CONST
+             forth.s:4424   .text:0000000000005b34 CONST
+             forth.s:4426   .text:0000000000005b38 $d
+             forth.s:4448   .text:0000000000005b68 DMP
+             forth.s:4449   .text:0000000000005b68 $t
+             forth.s:4450   .text:0000000000005b6c $d
+             forth.s:4468   .text:0000000000005bc0 PDUM2
+             forth.s:4462   .text:0000000000005ba8 PDUM1
+             forth.s:4483   .text:0000000000005bd8 $d
+             forth.s:4483   .text:0000000000005bdc _DUMP
+             forth.s:4483   .text:0000000000005be4 DUMP
+             forth.s:4485   .text:0000000000005be8 $d
+             forth.s:4511   .text:0000000000005c64 DUMP4
+             forth.s:4501   .text:0000000000005c3c DUMP1
+             forth.s:4513   .text:0000000000005c6c DUMP3
+             forth.s:4526   .text:0000000000005c80 TDOT
+             forth.s:4527   .text:0000000000005c80 $t
+             forth.s:4528   .text:0000000000005c84 $d
+             forth.s:4567   .text:0000000000005d18 _DOTS
+             forth.s:4567   .text:0000000000005d1c DOTS
+             forth.s:4569   .text:0000000000005d20 $d
+             forth.s:4576   .text:0000000000005d3c DOTS2
+             forth.s:4572   .text:0000000000005d30 DOTS1
+             forth.s:4581   .text:0000000000005d4c RBASE
+             forth.s:4582   .text:0000000000005d4c $t
+             forth.s:4590   .text:0000000000005d5c RDOT
+             forth.s:4592   .text:0000000000005d60 $d
+             forth.s:4619   .text:0000000000005dc4 _TRACE
+             forth.s:4619   .text:0000000000005dca $t
+             forth.s:4619   .text:0000000000005dcc TRACE
+             forth.s:4621   .text:0000000000005dd0 $d
+             forth.s:4640   .text:0000000000005e14 _TOBODY
+             forth.s:4640   .text:0000000000005e1a $t
+             forth.s:4640   .text:0000000000005e1c TOBODY
+             forth.s:4661   .text:0000000000005e2c $d
+             forth.s:4661   .text:0000000000005e30 _TONFA
+             forth.s:4661   .text:0000000000005e38 TONFA
 ARM GAS  forth.s 			page 252
 
 
-             forth.s:4669   .text:0000000000005e44 _DOTID
-             forth.s:4669   .text:0000000000005e48 $t
-             forth.s:4669   .text:0000000000005e48 DOTID
-             forth.s:4671   .text:0000000000005e4c $d
-             forth.s:4679   .text:0000000000005e74 DOTI1
-             forth.s:4680   .text:0000000000005e82 $t
-             forth.s:4681   .text:0000000000005e84 $d
-             forth.s:4683   *ABS*:0000000000000000 WANT_SEE
-             forth.s:4757   .text:0000000000005e8c _WORDS
-             forth.s:4757   .text:0000000000005e92 $t
-             forth.s:4757   .text:0000000000005e94 WORDS
-             forth.s:4759   .text:0000000000005e98 $d
-             forth.s:4762   .text:0000000000005ea4 WORS1
-             forth.s:4771   .text:0000000000005ecc WORS2
-             forth.s:4780   .text:0000000000005ed4 _MARK
-             forth.s:4780   .text:0000000000005edc MARK
-             forth.s:4782   .text:0000000000005ee0 $d
-             forth.s:4785   .text:0000000000005eec $t
-             forth.s:4786   .text:0000000000005ef0 $d
-             forth.s:4801   .text:0000000000005f20 _ARRAY
-             forth.s:4801   .text:0000000000005f26 $t
-             forth.s:4801   .text:0000000000005f28 ARRAY
-             forth.s:4803   .text:0000000000005f2c $d
-             forth.s:4817   .text:0000000000005f68 DO_ARRAY
-             forth.s:4818   .text:0000000000005f68 $t
-             forth.s:4819   .text:0000000000005f6c $d
-             forth.s:4837   .text:0000000000005f88 VERSN
-             forth.s:4838   .text:0000000000005f88 $t
-             forth.s:4839   .text:0000000000005f8c $d
-             forth.s:4847   .text:0000000000005f9c _HI
-             forth.s:4847   .text:0000000000005fa0 HI
-             forth.s:4849   .text:0000000000005fa4 $d
-             forth.s:4850   .text:0000000000005fbe $t
-             forth.s:4851   .text:0000000000005fc0 $d
-             forth.s:4875   .text:000000000000600c $t
-             forth.s:4876   .text:0000000000006010 $d
-             forth.s:4888   .text:000000000000602c PS2_QUERY
-             forth.s:4889   .text:000000000000602c $t
-             forth.s:4890   .text:0000000000006030 $d
-             forth.s:4904   .text:0000000000006096 $t
-             forth.s:4905   .text:0000000000006098 $d
-             forth.s:4915   .text:00000000000060a4 IF_SENSE
-             forth.s:4916   .text:00000000000060a4 $t
-             forth.s:4917   .text:00000000000060a8 $d
-             forth.s:4931   .text:00000000000060d8 READY
-             forth.s:4932   .text:00000000000060d8 $t
-             forth.s:4933   .text:00000000000060dc $d
-             forth.s:4933   .text:00000000000060e6 $t
-             forth.s:4934   .text:00000000000060e8 $d
-             forth.s:4952   .text:0000000000006110 COLD1
-             forth.s:4953   .text:0000000000006110 $d
-             forth.s:4968   .text:0000000000006160 COLD2
-             forth.s:4971   .text:0000000000006160 $d
-             forth.s:4974   .text:0000000000006164 $d
-              init.s:170    .text:0000000000000061 $d
-              init.s:170    .text:0000000000000062 $t
-              init.s:213    .text:00000000000000fd $d
+             forth.s:4663   .text:0000000000005e3c $d
+             forth.s:4666   .text:0000000000005e48 TNAM1
+             forth.s:4677   .text:0000000000005e7c TNAM2
+             forth.s:4687   .text:0000000000005e8c _DOTID
+             forth.s:4687   .text:0000000000005e90 $t
+             forth.s:4687   .text:0000000000005e90 DOTID
+             forth.s:4689   .text:0000000000005e94 $d
+             forth.s:4697   .text:0000000000005ebc DOTI1
+             forth.s:4698   .text:0000000000005eca $t
+             forth.s:4699   .text:0000000000005ecc $d
+             forth.s:4701   *ABS*:0000000000000000 WANT_SEE
+             forth.s:4775   .text:0000000000005ed4 _WORDS
+             forth.s:4775   .text:0000000000005eda $t
+             forth.s:4775   .text:0000000000005edc WORDS
+             forth.s:4777   .text:0000000000005ee0 $d
+             forth.s:4780   .text:0000000000005eec WORS1
+             forth.s:4789   .text:0000000000005f14 WORS2
+             forth.s:4798   .text:0000000000005f1c _MARK
+             forth.s:4798   .text:0000000000005f24 MARK
+             forth.s:4800   .text:0000000000005f28 $d
+             forth.s:4803   .text:0000000000005f34 $t
+             forth.s:4804   .text:0000000000005f38 $d
+             forth.s:4819   .text:0000000000005f68 _ARRAY
+             forth.s:4819   .text:0000000000005f6e $t
+             forth.s:4819   .text:0000000000005f70 ARRAY
+             forth.s:4821   .text:0000000000005f74 $d
+             forth.s:4835   .text:0000000000005fb0 DO_ARRAY
+             forth.s:4836   .text:0000000000005fb0 $t
+             forth.s:4837   .text:0000000000005fb4 $d
+             forth.s:4855   .text:0000000000005fd0 VERSN
+             forth.s:4856   .text:0000000000005fd0 $t
+             forth.s:4857   .text:0000000000005fd4 $d
+             forth.s:4865   .text:0000000000005fe4 _HI
+             forth.s:4865   .text:0000000000005fe8 HI
+             forth.s:4867   .text:0000000000005fec $d
+             forth.s:4868   .text:0000000000006006 $t
+             forth.s:4869   .text:0000000000006008 $d
+             forth.s:4893   .text:0000000000006054 $t
+             forth.s:4894   .text:0000000000006058 $d
+             forth.s:4906   .text:0000000000006074 PS2_QUERY
+             forth.s:4907   .text:0000000000006074 $t
+             forth.s:4908   .text:0000000000006078 $d
+             forth.s:4922   .text:00000000000060de $t
+             forth.s:4923   .text:00000000000060e0 $d
+             forth.s:4933   .text:00000000000060ec IF_SENSE
+             forth.s:4934   .text:00000000000060ec $t
+             forth.s:4935   .text:00000000000060f0 $d
+             forth.s:4949   .text:0000000000006120 READY
+             forth.s:4950   .text:0000000000006120 $t
+             forth.s:4951   .text:0000000000006124 $d
+             forth.s:4951   .text:000000000000612e $t
+             forth.s:4952   .text:0000000000006130 $d
+             forth.s:4970   .text:0000000000006158 COLD1
+             forth.s:4971   .text:0000000000006158 $d
+             forth.s:4986   .text:00000000000061a8 COLD2
+             forth.s:4989   .text:00000000000061a8 $d
+             forth.s:4992   .text:00000000000061ac $d
 ARM GAS  forth.s 			page 253
 
 
+              init.s:170    .text:0000000000000061 $d
+              init.s:170    .text:0000000000000062 $t
+              init.s:213    .text:00000000000000fd $d
               init.s:213    .text:00000000000000fe $t
               init.s:276    .text:000000000000022f $d
               init.s:281    .text:000000000000023f $d
@@ -15139,12 +15170,12 @@ DEFINED SYMBOLS
            ps2_kbd.s:633    .text:0000000000001cfb $d
            ps2_kbd.s:633    .text:0000000000001cfc $t
          spi-flash.s:85     .text:0000000000001de7 $d
-         spi-flash.s:85     .text:0000000000001de8 $t
-         spi-flash.s:151    .text:0000000000001eb3 $d
-         spi-flash.s:151    .text:0000000000001eb4 $t
 ARM GAS  forth.s 			page 254
 
 
+         spi-flash.s:85     .text:0000000000001de8 $t
+         spi-flash.s:151    .text:0000000000001eb3 $d
+         spi-flash.s:151    .text:0000000000001eb4 $t
          spi-flash.s:238    .text:0000000000001ff7 $d
          spi-flash.s:238    .text:0000000000001ff8 $t
          spi-flash.s:256    .text:0000000000002033 $d
@@ -15199,12 +15230,12 @@ DEFINED SYMBOLS
              forth.s:192    .text:0000000000002f7a $t
              forth.s:228    .text:0000000000002f97 $d
              forth.s:228    .text:0000000000002f98 $t
-             forth.s:275    .text:0000000000003045 $d
-             forth.s:275    .text:0000000000003046 $t
-             forth.s:292    .text:0000000000003073 $d
 ARM GAS  forth.s 			page 255
 
 
+             forth.s:275    .text:0000000000003045 $d
+             forth.s:275    .text:0000000000003046 $t
+             forth.s:292    .text:0000000000003073 $d
              forth.s:292    .text:0000000000003074 $t
              forth.s:306    .text:000000000000309d $d
              forth.s:306    .text:000000000000309e $t
@@ -15259,12 +15290,12 @@ DEFINED SYMBOLS
              forth.s:884    .text:00000000000034fb $d
              forth.s:884    .text:00000000000034fc $t
              forth.s:913    .text:0000000000003537 $d
-             forth.s:913    .text:0000000000003538 $t
-             forth.s:923    .text:000000000000354b $d
-             forth.s:923    .text:000000000000354c $t
 ARM GAS  forth.s 			page 256
 
 
+             forth.s:913    .text:0000000000003538 $t
+             forth.s:923    .text:000000000000354b $d
+             forth.s:923    .text:000000000000354c $t
              forth.s:936    .text:0000000000003569 $d
              forth.s:936    .text:000000000000356a $t
              forth.s:981    .text:00000000000035d1 $d
@@ -15319,12 +15350,12 @@ DEFINED SYMBOLS
              forth.s:1643   .text:0000000000003c14 $t
              forth.s:1692   .text:0000000000003c53 $d
              forth.s:1692   .text:0000000000003c54 $t
-             forth.s:1743   .text:0000000000003ccb $d
-             forth.s:1743   .text:0000000000003ccc $t
-             forth.s:1835   .text:0000000000003db5 $d
 ARM GAS  forth.s 			page 257
 
 
+             forth.s:1743   .text:0000000000003ccb $d
+             forth.s:1743   .text:0000000000003ccc $t
+             forth.s:1835   .text:0000000000003db5 $d
              forth.s:1835   .text:0000000000003db6 $t
              forth.s:1863   .text:0000000000003de9 $d
              forth.s:1863   .text:0000000000003dea $t
@@ -15379,12 +15410,12 @@ DEFINED SYMBOLS
              forth.s:3308   .text:0000000000004dff $d
              forth.s:3308   .text:0000000000004e00 $t
              forth.s:3362   .text:0000000000004ec7 $d
-             forth.s:3362   .text:0000000000004ec8 $t
-             forth.s:3374   .text:0000000000004ef1 $d
-             forth.s:3374   .text:0000000000004ef2 $t
 ARM GAS  forth.s 			page 258
 
 
+             forth.s:3362   .text:0000000000004ec8 $t
+             forth.s:3374   .text:0000000000004ef1 $d
+             forth.s:3374   .text:0000000000004ef2 $t
              forth.s:3401   .text:0000000000004f39 $d
              forth.s:3401   .text:0000000000004f3a $t
              forth.s:3438   .text:0000000000004fdb $d
@@ -15417,39 +15448,43 @@ DEFINED SYMBOLS
              forth.s:3939   .text:0000000000005592 $t
              forth.s:3976   .text:00000000000055f3 $d
              forth.s:3976   .text:00000000000055f4 $t
-             forth.s:3987   .text:0000000000005613 $d
-             forth.s:3987   .text:0000000000005614 $t
-             forth.s:3999   .text:0000000000005633 $d
-             forth.s:3999   .text:0000000000005634 $t
-             forth.s:4064   .text:00000000000056f1 $d
-             forth.s:4064   .text:00000000000056f2 $t
-             forth.s:4258   .text:0000000000005923 $d
-             forth.s:4258   .text:0000000000005924 $t
-             forth.s:4284   .text:0000000000005973 $d
-             forth.s:4284   .text:0000000000005974 $t
-             forth.s:4335   .text:0000000000005a0f $d
-             forth.s:4335   .text:0000000000005a10 $t
-             forth.s:4355   .text:0000000000005a5b $d
-             forth.s:4355   .text:0000000000005a5c $t
-             forth.s:4384   .text:0000000000005ab7 $d
-             forth.s:4384   .text:0000000000005ab8 $t
-             forth.s:4406   .text:0000000000005ae9 $d
-             forth.s:4406   .text:0000000000005aea $t
-             forth.s:4465   .text:0000000000005b99 $d
-             forth.s:4465   .text:0000000000005b9a $t
-             forth.s:4549   .text:0000000000005cd3 $d
-             forth.s:4549   .text:0000000000005cd4 $t
-             forth.s:4643   .text:0000000000005ded $d
-             forth.s:4643   .text:0000000000005dee $t
-             forth.s:4780   .text:0000000000005ed9 $d
+             forth.s:3988   .text:0000000000005613 $d
+             forth.s:3988   .text:0000000000005614 $t
+             forth.s:4001   .text:0000000000005633 $d
+             forth.s:4001   .text:0000000000005634 $t
+             forth.s:4016   .text:000000000000566b $d
+             forth.s:4016   .text:000000000000566c $t
+             forth.s:4081   .text:0000000000005729 $d
+             forth.s:4081   .text:000000000000572a $t
+             forth.s:4172   .text:000000000000583d $d
+             forth.s:4172   .text:000000000000583e $t
+             forth.s:4276   .text:000000000000596b $d
+             forth.s:4276   .text:000000000000596c $t
+             forth.s:4302   .text:00000000000059bb $d
+             forth.s:4302   .text:00000000000059bc $t
+             forth.s:4353   .text:0000000000005a57 $d
+             forth.s:4353   .text:0000000000005a58 $t
+             forth.s:4373   .text:0000000000005aa3 $d
+             forth.s:4373   .text:0000000000005aa4 $t
+             forth.s:4402   .text:0000000000005aff $d
+             forth.s:4402   .text:0000000000005b00 $t
+             forth.s:4424   .text:0000000000005b31 $d
+             forth.s:4424   .text:0000000000005b32 $t
 ARM GAS  forth.s 			page 259
 
 
-             forth.s:4780   .text:0000000000005eda $t
-             forth.s:4847   .text:0000000000005f9f $d
-             forth.s:4847   .text:0000000000005fa0 $t
-             forth.s:4946   .text:00000000000060f9 $d
-             forth.s:4946   .text:00000000000060fa $t
+             forth.s:4483   .text:0000000000005be1 $d
+             forth.s:4483   .text:0000000000005be2 $t
+             forth.s:4567   .text:0000000000005d1b $d
+             forth.s:4567   .text:0000000000005d1c $t
+             forth.s:4661   .text:0000000000005e35 $d
+             forth.s:4661   .text:0000000000005e36 $t
+             forth.s:4798   .text:0000000000005f21 $d
+             forth.s:4798   .text:0000000000005f22 $t
+             forth.s:4865   .text:0000000000005fe7 $d
+             forth.s:4865   .text:0000000000005fe8 $t
+             forth.s:4964   .text:0000000000006141 $d
+             forth.s:4964   .text:0000000000006142 $t
 
 UNDEFINED SYMBOLS
 _mstack

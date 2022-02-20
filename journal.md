@@ -1,5 +1,13 @@
 2022-02-20 
 
+* commit 15:38 
+
+* Ajour de **COMPILE, ( cfa -- ) **. immediate word to compile cfa.  
+
+* Ajout de **C"** .
+
+------------------
+
 * commit à 11:50
 
 *  Débogué **MARK**. Solution mettre le bit thumb à 1 avant d'appeller **&GT;NFA** dans le code qui suit le **DOES&GT;**. 

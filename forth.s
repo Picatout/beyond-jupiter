@@ -3982,13 +3982,30 @@ DOLEAVE:
 /******************************
     S"	( -- //  string> )
  	Compile an inline 
-	word literal.
+	counted literal. 
+	at runtime: ( -- a u )
 *****************************/
 	_HEADER STRQ,IMEDD+COMPO+2,"S\""
 	_NEST
 	_COMPI	STRQP
 	_ADR	STRCQ
 	_UNNEST
+
+/********************************
+EXTENDED CORE 
+	C" string" ( -- )
+	Compile an inline counted 
+	literal.
+	at runtime ( -- a )
+*********************************/
+	_HEADER CSTRQ,IMEDD+COMPO+2,"C\""
+	_NEST 
+	_COMPI	STRQP
+	_ADR	STRCQ 
+	_COMPI	DROP 
+	_COMPI	ONEM  
+	_UNNEST 
+
 
 /******************************
     ."	( -- //  string> )
@@ -4148,16 +4165,17 @@ COLON_ABORT:
 	_UNNEST
 
 /****************************
-    CALLC	( ca -- )
- 	compile ca.
-hidden word used by compiler
+    COMPILE,	( cfa -- )
+ 	compile cfa.
+
 *****************************/
-CALLC:
+	_HEADER CALLC,COMPO+IMEDD+8,"COMPILE,"
 	_NEST
 	_DOLIT 1 
 	_ADR ORR 
 	_ADR COMMA  
 	_UNNEST 
+
 
 /****************************
 	BUFFER: "name" ( u -- a )
@@ -4296,10 +4314,12 @@ DODOES:
 	_HEADER DEFER,5,"DEFER"
 	_NEST 
 	_ADR COLON 
+// runtime code 
 	_DOLIT NO_ACTION  
 	_ADR  CALLC 
 	_DOLIT UNNEST 
 	_ADR  CALLC
+// end of runtime code 	
 	_ADR  SEMIS  
 	_UNNEST 
 
