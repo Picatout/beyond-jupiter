@@ -1,4 +1,12 @@
-2022-02-18
+2022-02-20 
+
+* commit à 11:50
+
+*  Débogué **MARK**. Solution mettre le bit thumb à 1 avant d'appeller **&GT;NFA** dans le code qui suit le **DOES&GT;**. 
+
+*  Débogué DODOES, qui ne fonctionnait plus suite la modificaton de **&gt;CFA** qui met le bit thumb à 1.
+
+2022-02-19
 
 * À faire débogué **MARK** .
 
@@ -16,7 +24,7 @@
 
 * Travail sur **?DO**. 
 
-2022-02-17 
+2022-02-18
 
 * 23:07 commit 
 
@@ -48,6 +56,8 @@ d'un nouveau mot. Cette possibilité existe si **ALLOT** est utilisé avec un ar
 *  Débogué **DOES>** commit 11:41
 
 * Modifié **CREATE** et **VARIABLE** 
+
+2022-02-17 
 
 * bogue dans ABORT et DOES>. 22:23 commit.
 

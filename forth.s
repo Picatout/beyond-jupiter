@@ -329,7 +329,8 @@ input:
  	do nothing.
 *********************/
 	_HEADER NOP,3,"NOP"
-	_NEXT 
+	_NEXT
+	  
  
 /********************
     doLIT	( -- w )
@@ -4221,20 +4222,20 @@ CALLC:
 	.p2align 2 
 /****************************************
  doDOES> ( -- a )
- runtime action of 		 
- leave parameter field address on stack 
+ runtime action of  DOES>		 
 hidden word used by compiler 
 ***************************************/
 DODOES:
 	_NEST 
-	_ADR	RFROM
+	_ADR	RAT 
 	_ADR	CELLP 
 	_ADR	ONEP  
-	_ADR LAST 
-	_ADR AT
-	_ADR TOCFA 
-	_ADR TOVECTOR  
-	_ADR STORE  
+	_ADR	LAST 
+	_ADR	AT
+	_ADR	TOCFA
+	_ADR    ONEM  
+	_ADR	TOVECTOR  
+	_ADR	STORE
 	_UNNEST 
 
 	.p2align 2
@@ -4244,11 +4245,9 @@ DODOES:
 *************************/
 	_HEADER DOES,IMEDD+COMPO+5,"DOES>"
 	_NEST 
-	_DOLIT DODOES 
-	_ADR CALLC 
-	_DOLIT	UNNEST
-	_ADR	CALLC 
-	_ADR COMPI_NEST
+	_COMPI	DODOES 
+	_COMPI	UNNEST 
+	_ADR	COMPI_NEST
  	_UNNEST 
 
 
@@ -4780,18 +4779,19 @@ WORS2:
 *************************/	
 	_HEADER MARK,4,"MARK"
 	_NEST
-	_ADR    CREAT 
-	_COMPI   DOES
-	_COMPI  LITER 
-	_DOLIT  4*CELLL  
-	_ADR    COMMA 
-	_COMPI  SUBB 
-	_COMPI  TONFA 
-	_COMPI   CELLM
-	_COMPI   AT  
-	_COMPI   LAST 
-	_COMPI   STORE 
-	_COMPI   OVERT
+	_ADR	CREAT 
+	_ADR	DODOES
+	_UNNEST 
+	_NEST 
+	_DOLIT	4*CELLL  
+	_ADR	SUBB
+	_ADR	ONEP  
+	_ADR	TONFA 
+	_ADR	CELLM
+	_ADR	AT  
+	_ADR	LAST 
+	_ADR	STORE 
+	_ADR	OVERT
 	_UNNEST 
 
 /*********************************

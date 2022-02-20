@@ -192,8 +192,8 @@
 
 	// POSTPONE COMPILE 
 	.macro _COMPI name 
-	_DOLIT \name 
-	_ADR CALLC 
+	_DOLIT	\name + 1
+	_ADR	COMMA 
 	.endm 
 
 	.macro _ABORQ len,name 
