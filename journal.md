@@ -1,5 +1,15 @@
 2022-02-20 
 
+* commit 22:00 
+
+* Renommé  **MARK** **MARKER** pour être conforme au standard.
+
+* Ajout des mots **ERASE**, **FALSE** et **TRUE**. 
+
+* Ajout des mots **HOLDS**, **NIP**, **PARSE-NAME**, **TUCK**, **ROLL** . 
+
+-------------------------------
+p
 * commit 15:38 
 
 * Ajour de **COMPILE, ( cfa -- ) **. immediate word to compile cfa.  

@@ -564,6 +564,15 @@ BRAN:
 	_NEXT 
 
 /*********************************
+CORE EXTENSION 
+	NIP ( x1 x2 -- x2 )
+	throw next element 
+*********************************/
+	_HEADER NIP,3,"NIP"
+	ADD DSP,#CELLL 
+	_NEXT 
+
+/*********************************
     DUP	 ( w -- w w )
  	Duplicate the top stack item.
 *********************************/
@@ -866,6 +875,58 @@ BRAN:
     STRNE	TOS,[DSP,#-4]!
 	_NEXT
 
+/************************************
+ CORE EXTENSION 
+	TUCK ( x1 x2 -- x2 x1 x2 )
+***********************************/
+	_HEADER TUCK,4,"TUCK"
+	_PUSH 
+	LDR TOS, [DSP,#CELLL]
+	_NEXT 
+
+/************************************
+ CORE EXTENSION 
+	ROLL ( Xu Xu-1 .. X0 u -- Xu-1 ... X0 Xu )
+**********************************************/
+	_HEADER ROLL,4,"ROLL"
+	_NEST 
+	_ADR QDUP 
+	_QBRAN 9f 
+	_ADR  DUPP 
+	_DOLIT 1 
+	_ADR   EQUAL 
+	_QBRAN 1f 
+	_ADR  DROP 
+	_ADR  SWAP 
+	_BRAN 9f 
+1:  _ADR  TOR 	
+	_ADR  RAT
+	_ADR  PICK 	
+	_ADR  SPAT
+	_ADR  DUPP 
+	_ADR  CELLP 
+	_ADR  RFROM
+	_ADR  ONEP  
+	_ADR  CELLS 
+	_ADR  WMOVE  
+	_ADR  DROP 
+9:	_UNNEST 
+/*
+	MOV T0, TOS
+	CBZ T0, 9f 
+	MOV T1, T0   // COUNTER   
+	SUBB T0, #1 
+	SLL T0, #2 
+	_POP
+	MOV T2, TOS 
+	LDR TOS,[DSP,T0]
+	MOV T2, [DSP,T0]
+	SUBS T1,#1
+	BEQ  9f 
+
+9:	_NEXT 
+*/
+
 /***********************************
     ROT	( w1 w2 w3 -- w2 w3 w1 )
  	Rotate top 3 items.
@@ -1020,6 +1081,27 @@ BRAN:
 	add T0,#1 
 	b 1b 
 2:  mov TOS,T0 
+	_NEXT 
+
+/**********************
+CORE EXTENSION 
+	FALSE ( -- 0 )
+	return false flag 
+***********************/
+	_HEADER FALSE,5,"FALSE"
+	_PUSH 
+	EOR TOS,TOS 
+	_NEXT 
+
+/**********************
+CORE EXTENSION 
+	TRUE ( -- -1 )
+	return true flag 
+***********************/
+	_HEADER TRUE,4,"TRUE"
+	_PUSH 
+	EOR TOS,TOS
+	MVN TOS,TOS 
 	_NEXT 
 
 
@@ -1964,7 +2046,7 @@ CMOV2:
  	Copy u byte from a1 to a2
 	round u to upper modulo 4 
 *******************************/
-	_HEADER WMOVE,4,"WMOVE"
+	_HEADER WMOVE,5,"WMOVE"
 	MOV T0,#4
 	ADD TOS,#3 
 	BIC TOS,#3
@@ -2007,6 +2089,23 @@ FILL1:
 FILL2:
 	_POP
 	_NEXT
+
+/*****************************
+CORE EXTENSION 
+	ERASE ( a u -- )
+	fill u bytes with zeros 
+	starting at a 
+*****************************/
+	_HEADER ERASE,5,"ERASE"
+	_NEST 
+	_ADR	DUPP 
+	_ADR	ZGREAT 
+	_QBRAN	1f 
+	_DOLIT	0 
+	_ADR	FILL 
+	_UNNEST 
+1:   _ADR	DDROP 
+	_UNNEST 
 
 
 /*****************************
@@ -2097,6 +2196,26 @@ FILL2:
 	_ADR	STORE
 	_ADR	CSTOR
 	_UNNEST
+
+/********************************
+CORE EXTENSION 
+	HOLDS ( c-addr u -- )
+	add string to pictured 
+	numeric output.
+*********************************/
+	_HEADER HOLDS,5,"HOLDS" 
+	_NEST 
+	_ADR	HLD   
+	_ADR	AT     // c-addr u a 
+	_ADR	OVER 
+	_ADR	SUBB 
+	_ADR	DUPP 
+	_ADR	HLD 
+	_ADR	STORE
+	_ADR	SWAP  
+	_ADR	CMOVE  
+	_UNNEST 
+
 
 /***********************
     #	   ( ud -- ud )
@@ -2809,6 +2928,7 @@ PARS8:
 	_UNNEST
 
 /************************************
+ CORE EXTENSION 
     PARSE	( c -- b u //  string> )
  	Scan input stream and return 
 	counted string delimited by c.
@@ -2830,6 +2950,19 @@ PARS8:
 	_ADR	INN
 	_ADR	PSTOR
 	_UNNEST
+
+/************************************
+ CORE EXTENSION 
+	PARSE-NAME ( -- b u )
+	space delimited parse input 
+	buffer 
+*************************************/
+	_HEADER PARSENAME,10,"PARSE-NAME"
+	_NEST 
+	_ADR	BLANK  
+	_ADR	PARSE 
+	_UNNEST 
+
 
 /*******************************
     .(	  ( -- )
@@ -4793,11 +4926,11 @@ WORS2:
 
 
 /*************************
-	MARK <string> ( -- )
+	MARKER <string> ( -- )
     create forget point 
 	in dictionary 
 *************************/	
-	_HEADER MARK,4,"MARK"
+	_HEADER MARKER,6,"MARKER"
 	_NEST
 	_ADR	CREAT 
 	_ADR	DODOES
