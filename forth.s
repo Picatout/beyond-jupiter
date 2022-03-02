@@ -4088,6 +4088,71 @@ DOLEAVE:
 	_UNNEST
 
 /**********************************
+	CASE ( -- 0 )
+	put a 0 on stack as a marker 
+	for end of BRANCH list to 
+	resolve by ENDCASE 
+***********************************/
+	_HEADER CASE,COMPO+IMEDD+4,"CASE"
+	_NEST 
+	_DOLIT 0 
+	_UNNEST 
+
+/**********************************
+	OF ( -- a )
+	compile code for value comparison
+	and add address of slot to be 
+	resolved by ENDOF 
+*********************************/
+	_HEADER OF,COMPO+IMEDD+2,"OF"
+	_NEST 
+	_COMPI OVER 
+	_COMPI EQUAL  
+	_COMPI QBRAN 
+	_ADR	HERE  
+	_DOLIT 0 
+	_ADR COMMA 
+	_UNNEST
+
+/**********************************
+	ENDOF ( a1 -- a2 )
+	resolve QBRAN of predecing OF 
+	and add slot for forward BRANCH 
+	to be resolved by ENDCASE 
+**********************************/
+	_HEADER ENDOF,COMPO+IMEDD+5,"ENDOF"
+	_NEST
+	_COMPI	BRAN 
+	_DOLIT	0 
+	_ADR	COMMA 
+	_ADR	HERE 
+	_ADR	SWAP 
+	_ADR	STORE 
+	_ADR	HERE 
+	_ADR	CELLM 
+	_UNNEST 
+
+/*************************************
+	ENDCASE ( 0...a  -- )
+	compile code for DROP 
+	and resolve forward BRANCH 
+	for each OF 
+*************************************/
+	_HEADER ENDCASE,COMPO+IMEDD+7,"ENDCASE"
+	_NEST 
+	_COMPI DROP 
+1:	_ADR QDUP 
+	_QBRAN 2f 
+	_ADR HERE
+	_ADR CELLM 	
+	_ADR SWAP 
+	_ADR STORE 
+	_BRAN 1b 
+2:
+	_UNNEST 
+
+
+/**********************************
 	RECURSE ( -- )
 	compile recursive call to 
 	actual defined word 

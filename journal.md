@@ -1,3 +1,7 @@
+2022-03-01
+
+* Ajout de **CASE**, **OF**, **ENDOF** et **ENDCASE**. 
+
 2022-02-20 
 
 * commit 22:00 
