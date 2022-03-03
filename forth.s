@@ -1420,6 +1420,19 @@ CRRNT:
 	ADD	TOS,UP,#USER_CTOP
 	_NEXT
 
+/*****************************
+CORE EXT 
+	UNUSED ( -- n )
+	return free bytes in 
+	user RAM 
+*****************************/
+	_HEADER UNUSED,6,"UNUSED"
+	_PUSH 
+	LDR T0,[UP,#USER_CTOP]
+	_MOV32 TOS,DEND 
+	SUB TOS,T0 
+	_NEXT 
+
 /****************************
    FCP ( -- a )
   Point ot top of Forth 
@@ -3361,6 +3374,56 @@ ACCP4:
 	_ADR	STORE
 	_UNNEST
 
+/*****************************
+  CORE EXT 
+  REFILL ( -- )
+  if SOURCE-ID== 0 call QUERY 
+  and return TRUE 
+  if SOURCE-ID=1 return FALSE 
+******************************/
+	_HEADER REFILL,6,"REFILL"
+	_NEST 
+	_ADR	SOURCID 
+	_QBRAN	1f
+	_ADR	FALSE 
+	_UNNEST 
+1:  _ADR	QUERY 
+	_ADR	TRUE 
+	_UNNEST 
+
+/*****************************
+  CORE EXT 
+	SAVE-INPUT ( -- n )
+	if SOURCE-ID=0 STACK >IN @ 
+	if SOURCE-ID=1 do nothing 
+*****************************/
+	_HEADER SAVEINP,10,"SAVE-INPUT"
+	_NEST 
+	_ADR SOURCID 
+	_QBRAN 1f 
+	_UNNEST 
+1:  _ADR	INN 
+	_ADR	AT 
+	_UNNEST 
+
+/*****************************
+  CORE EXT 
+	RESTORE-INPUT ( n -- flag )
+	if SOURCE-ID=0 n -> >IN stack FALSE 
+	if SOURCE-ID=1 stack TRUE 
+***************************************/
+	_HEADER RESTINP,13,"RESTORE-INPUT"
+	_NEST 
+	_ADR	SOURCID 
+	_QBRAN	1f
+	_ADR	TRUE 
+	_UNNEST 
+1:  _ADR	INN  
+	_ADR	STORE 
+	_ADR	FALSE 
+	_UNNEST 
+
+
 /********************
   Error handling
 ********************/
@@ -4180,7 +4243,7 @@ DOLEAVE:
 /******************************
     S"	( -- //  string> )
  	Compile an inline 
-	counted literal. 
+	counted string. 
 	at runtime: ( -- a u )
 *****************************/
 	_HEADER STRQ,IMEDD+COMPO+2,"S\""
@@ -4188,6 +4251,139 @@ DOLEAVE:
 	_COMPI	STRQP
 	_ADR	STRCQ
 	_UNNEST
+
+/********************************
+CORE EXT 
+	S\" ( -- )
+	compile and inline counted 
+	string with escaped char.
+********************************/
+	_HEADER STRSLHQ,COMPO+IMEDD+3,"S\\\""
+	_NEST 
+	_COMPI	STRQP
+	_ADR	HERE   
+	_DOLIT	0 
+	_ADR	CCOMMA // space for count 
+1:	_ADR	GETC
+	_ADR	QDUP 
+	_QBRAN  4f 
+	_ADR	DUPP 
+	_DOLIT	'\\' 
+	_ADR	EQUAL
+	_QBRAN	2f
+	_ADR	ESCAPE
+	_BRAN	3f 
+2:  _ADR	DUPP 
+	_DOLIT	'"' 
+	_ADR	EQUAL 
+	_QBRAN	3f
+	_ADR	DROP 
+4:	_ADR	HERE 
+	_ADR	OVER
+	_ADR	ONEP   
+	_ADR	SUBB
+	_ADR	SWAP 
+	_ADR	CSTOR  
+	_ADR	ALIGN 
+	_UNNEST   
+3:	
+	_ADR	CCOMMA 
+	_BRAN	1b 
+
+GETC: 
+	ldr T0,[UP,#TIBUF]
+	ldr T1,[UP,#TOIN]
+	ldr T2,[UP,#NTIBB]
+	_PUSH
+	mov TOS,#0  
+	cmp	T1,T2 
+	beq 1f 
+	Ldrb TOS,[T0,T1]
+	add  T1,#1 
+	str T1,[UP,#TOIN]
+1:	_NEXT 
+
+// replace escaped character 
+ESCAPE: 
+	_NEST 
+	_ADR	DROP 
+	_ADR	GETC  
+	_ADR	DUPP
+	_QBRAN  5f 
+	_ADR	DUPP 
+	_DOLIT	'"' 
+	_ADR	EQUAL 
+	_QBRAN  1f 
+	_UNNEST 
+1: 	_ADR	DUPP 
+	_DOLIT	'\\' 
+	_ADR	EQUAL 
+	_QBRAN  2f 
+	_UNNEST 	
+2:	_DOLIT	0X20 
+	_ADR	ORR   // convert to lower case 
+	_ADR	DUPP 
+	_DOLIT	'x' 
+	_ADR	EQUAL 
+	_QBRAN  3f 
+	_ADR	PARSE_HEX 
+	_UNNEST 
+3:  _DOLIT	'a' 
+	_ADR	SUBB
+	_ADR	DUPP 
+	_ADR	ZLESS 
+	_QBRAN	4f
+	_UNNEST 
+4:  _DOLIT	esc_char 
+	_ADR	PLUS 
+	_ADR	CAT 
+5:	_UNNEST 
+
+PARSE_HEX:
+	_NEST 
+	_ADR 	DROP 
+	_ADR	GETC 
+	_ADR	DUPP 
+	_QBRAN	2f
+	_ADR	TO_HEX 
+1:	_DOLIT	16 
+	_ADR	STAR 
+	_ADR	TOR 
+	_ADR	GETC
+	_ADR	DUPP 
+	_QBRAN	3f 
+	_ADR	TO_HEX 
+3:	_ADR	RFROM 
+	_ADR	PLUS 
+2:	_UNNEST 
+
+
+TO_HEX: 
+	_NEST 
+	_DOLIT	'0' 
+	_ADR	SUBB 
+	_ADR	DUPP 
+	_DOLIT	9 
+	_ADR	GREAT 
+	_QBRAN	1f 
+	_DOLIT	7 
+	_ADR	SUBB  
+1:
+	_UNNEST 
+
+
+esc_char:  .byte 7,8,'c','d',27,12,'g','h','i','j','k',10,13,10,'o','p',34,13,'s',9,'u',11,'x','y',0
+
+
+/********************
+    $,\"	( -- )
+ 	Compile a literal 
+	escaped string up to next " .
+hidden word 
+************************/
+STRCSLHQ:
+
+
 
 /********************************
 EXTENDED CORE 
@@ -4615,6 +4811,40 @@ DOCON:
 	_PUSH
 	LDR.W TOS,[IP],#4 
 	B UNNEST 
+
+
+/***********************************
+CORE EXT 
+	VALUE name ( x -- )
+	create a value object and 
+	assign x to it. 
+***********************************/
+	_HEADER VALUE,5,"VALUE" 
+	_NEST 
+	_ADR CREAT 
+	_DOLIT AT 
+	_DOLIT	1 
+	_ADR	ORR 
+	_ADR	HERE 
+	_DOLIT	8 
+	_ADR	SUBB 
+	_ADR	STORE 
+	_ADR	COMMA 
+	_UNNEST 
+
+/***********************************
+CORE EXT 
+	TO name ( x -- )
+    assign a new value to name 
+***********************************/
+	_HEADER TO,2,"TO"
+	_NEST 
+	_ADR	TICK 
+	_ADR	ONEM 
+	_DOLIT	4*CELLL
+	_ADR	PLUS  
+	_ADR	STORE 
+	_UNNEST 
 
 
 /***********************************

@@ -1,3 +1,13 @@
+2022-03-02
+
+* Ajout de **TO** et  **VALUE**. Core extension complété.  
+
+* Ajout de **UNUSED** 
+
+* Ajout de  **S\"** 
+
+* Ajout de **REFILL**, **SAVE-INPUT** et **RESTORE-INPUT**. 
+
 2022-03-01
 
 * Ajout de **CASE**, **OF**, **ENDOF** et **ENDCASE**. 
@@ -13,7 +23,7 @@
 * Ajout des mots **HOLDS**, **NIP**, **PARSE-NAME**, **TUCK**, **ROLL** . 
 
 -------------------------------
-p
+
 * commit 15:38 
 
 * Ajour de **COMPILE, ( cfa -- ) **. immediate word to compile cfa.  
