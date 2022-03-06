@@ -906,7 +906,12 @@ UZERO:
     .word 0 /* FBASE */ 
     .word 0 /* BEEP_DTMR */
     .word 0 /* CSTATE */ 
+    .word 0 /* BLKID */
+    .word 0,0,0,0 /* BLKN,  array BLKN[4] */
+    .word BLK_BUFFS  /* BLKN, blocks buffers base addres */
+    .word 0 /* SRCID last block listed */   
     .word 0,0 
+
 ULAST:
 
 // used by _HEADER macro 

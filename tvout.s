@@ -210,7 +210,7 @@ state_video_out:
 1: // video output
    ldr T0,[UP,#VID_BUFFER]
    sub T1,#(VIDEO_FIRST_LINE+1) 
-   mov T3,#160
+   mov T3,#BPR 
    mul T1,T3 
    add T0,T1  
    _MOV32 T1,VID_GPIO 

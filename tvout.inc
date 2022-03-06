@@ -16,7 +16,6 @@
      along with beyond-Jupiter.  If not, see <http://www.gnu.org/licenses/>.
 
 ***************************************************************************/
-
   .equ HRES, 320  // horizontal resolution
   .equ VRES, 200   // vertical resolution
   .equ BPP, 4     // bits per pixel

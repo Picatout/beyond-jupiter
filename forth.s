@@ -253,10 +253,10 @@ KEY2:
 
 
 /****************************************
- PAUSE ( u -- ) 
+ MS ( u -- ) 
  suspend execution for u milliseconds
 ****************************************/
-	_HEADER PAUSE,5,"PAUSE"
+	_HEADER PAUSE,2,"MS"
 	_NEST 
 	_ADR TIMER 
 	_ADR STORE 
@@ -1296,12 +1296,13 @@ CORE EXTENSION
 	_NEXT 	
 
 /****************************************
-  MSEC ( -- a)
- return address of milliseconds counter
+  TICKS ( -- u )
+ return milliseconds since last reset or
+ power up. 
 ****************************************/
-	_HEADER MSEC,4,"MSEC"
+	_HEADER MSEC,5,"TICKS"
     _PUSH
-    ADD TOS,UP,#TICKS
+    LDR TOS,[UP,#TICKS]
     _NEXT 
 
 /*************************
@@ -2595,6 +2596,23 @@ TYPE2:
 	_UNNEST
 
 /***************************
+	\TYPE ( b u )
+	like TYPE but without 
+	filtering 
+***************************/
+	_HEADER SLTYPE,5,"\\TYPE"
+	_NEST 
+	_ADR	TOR 
+	_BRAN	2f 
+1:	_ADR	COUNT 
+	_ADR	EMIT 
+2:  _DONXT	1b 
+	_ADR	DROP 
+	_UNNEST 
+
+
+
+/***************************
     CR	  ( -- )
  	Output a carriage return
 	and a line feed.
@@ -3612,6 +3630,10 @@ output:
 	_ADR   STORE 
 	_DOLIT UPP+SRC 
 	_ADR   DSTOR
+	// clear BLK 
+	_DOLIT	0 
+	_ADR	BLK 
+	_ADR	AT 
 	_ADR   EVAL 
     // restore original source specs 
 	_ADR   DRFROM 

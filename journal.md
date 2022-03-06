@@ -1,3 +1,17 @@
+2022-03-05
+
+* travail sur [blocks.s](blocks.s)
+
+
+2022-03-03
+
+* Renommé  **PAUSE** **MS** pour conformité au standard 
+
+* Ajout de **\TYPE** pour imprimer les chaînes contenant des caractères de contrôles.
+
+* Débuter travail sur [block.s](block.s)
+
+
 2022-03-02
 
 * Ajout de **TO** et  **VALUE**. Core extension complété.  
