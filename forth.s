@@ -3631,9 +3631,6 @@ output:
 	_DOLIT UPP+SRC 
 	_ADR   DSTOR
 	// clear BLK 
-	_DOLIT	0 
-	_ADR	BLK 
-	_ADR	AT 
 	_ADR   EVAL 
     // restore original source specs 
 	_ADR   DRFROM 
@@ -3641,9 +3638,6 @@ output:
 	_ADR   DSTOR 
 	_ADR   RFROM 
 	_DOLIT UPP+TOIN 
-	_ADR   STORE 
-	_DOLIT 0 
-	_DOLIT UPP+SRCID 
 	_ADR   STORE 
 	_UNNEST 
 
@@ -4594,26 +4588,23 @@ COLON_ABORT:
 
 
 /****************************
-	BUFFER: "name" ( u -- a )
+	BUFFER: "name" ( u -- )
 	create a named buffer of 
 	u bytes 
 	0's the buffer. 
+	at execution "name" return 
+	buffer address 
 *****************************/
-	_HEADER BUFFER,7,"BUFFER:"
+	_HEADER BUFFERCOL,7,"BUFFER:"
 	_NEST 
-	_ADR    ALIGN 
-	_ADR	TOKEN
-	_ADR	SNAME
-	_ADR    HERE 
-	_ADR    OVER 
-	_ADR    ALLOT 
-	_DOLIT	0 
-	_ADR	ROT 
-	_ADR	DUPP 
-	_ADR	TOR 
+	_ADR    CREAT
+	_ADR    HERE    // u a-adr 
+	_ADR    OVER    // u a-adr u 
+	_ADR    ALLOT   // u a-adr
+	_ADR	ALIGN 
+	_ADR	SWAP    // a-adr u 
+	_DOLIT	0       // a-adr u 0 
 	_ADR	FILL
-	_ADR	RFROM 
-	_ADR    OVERT 
 	_UNNEST 
 
 

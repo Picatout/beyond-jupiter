@@ -30,6 +30,8 @@
     PIN_MISO = 6 
     PIN_MOSI = 7 
 
+    FLASH_SECTOR_SIZE= 4096 
+
 /*****************************
   initialize SPI peripheral 
   pinout:
@@ -104,6 +106,59 @@ flash_spi_init:
     mov r2,#1 
     _CALL gpio_out 
     _NEXT 
+
+
+/****************************
+    WB-BUFF ( -- a-adr )
+    return address of 
+    flash write back buffer 
+****************************/
+    _HEADER WB_BUF,7,"WB-BUFF"
+    _PUSH 
+    _MOV32     TOS,WB_BUFF
+    _NEXT
+
+/****************************
+    RD-SECTOR ( a -- )
+    read a W25Q128FV sector 
+    in WB-BUFFER 
+****************************/ 
+    _HEADER RD_SECT,9,"RD-SECTOR"
+    _NEST 
+    _DOLIT  WB_BUFF 
+    _DOLIT  FLASH_SECTOR_SIZE 
+    _ADR    ROT 
+    _ADR    RD_BLK 
+    _UNNEST 
+
+/*****************************
+    WR-SECTOR ( a -- )
+    write WB-BUFF to W25Q128FV
+    at address 'a' 
+input:
+    a   flash chip address
+        a is sector aligned 
+        The sector must be erased
+******************************/
+    _HEADER WR_SECT,9,"WR-SECTOR"
+    _NEST 
+    _ADR    WB_BUF // a b
+    _ADR    SWAP   // b a 
+    _ADR    DDUP   // b a b a   
+    _DOLIT  16 
+    _ADR    TOR 
+    _BRAN   4f 
+1:  _DOLIT  256
+    _ADR    SWAP  // b a b 256 a    
+    _ADR    WR_BLK  
+    _DOLIT  256  //  b a 256 
+    _ADR    DUPP  // b a 256 256  
+    _ADR    DPLUS // b+256 a+256
+    _ADR    DDUP // b a b a 
+4:  _DONXT  1b
+    _ADR    DDROP
+    _ADR    DDROP           
+    _UNNEST 
 
 
 /****************************
@@ -217,10 +272,13 @@ sr_cmd: .byte 5,0x35,0x15
 
 
 /****************************
-   ERASE-BLK ( a -- )
-   erase 4Ko block  
+   ERASE-SECTOR ( a -- )
+   erase 4Ko sector 
+input:
+    a     sector address on 
+          flash memory.
 ***************************/
-    _HEADER ERASE_BLK,9,"ERASE-BLK"
+    _HEADER ERASE_SECT,12,"ERASE-SECTOR"
     _NEST 
     _ADR WR_ENBL
     _ADR CHIP_SEL 
@@ -286,8 +344,8 @@ sr_cmd: .byte 5,0x35,0x15
     _BRAN 2f 
 1:  _ADR DUPP 
     _ADR CAT 
-    _ADR DUPP 
-    _ADR HDOT
+//    _ADR DUPP 
+//    _ADR HDOT
     _ADR WR_BYTE 
     _ADR ONEP
 2:  _DONXT 1b 
@@ -302,11 +360,12 @@ sr_cmd: .byte 5,0x35,0x15
    -----------------
    name: 16 bytes null padded 
    size: 4 bytes
-   blocks count: 4 bytes
-   update counter: 4 bytes  
-   block size: 4KB 
-   free block: first byte 0xFF 
-   erased file: first byte 0x00
+   sectors count: 4 bytes
+   update counter: 4 bytes
+   signature: IMAG for image files, DATA for others  
+   sector size: 4KB 
+   free sector: first byte 0xFF 
+   erased file: first byte 0xFF
 ********************************/
 
 /*******************************
@@ -338,22 +397,29 @@ sr_cmd: .byte 5,0x35,0x15
 
 /*******************************
     SAVE 'name' ( -- ) 
-    save program in flash 
+    save current data space image 
+    on flash chip. 
+    This file can be reloaded 
+    using LOAD 
+    This file as an IMAG signature  
 ********************************/
     _HEADER SAVE,4,"SAVE"
     _NEST 
 
     _UNNEST 
 
-/******************************
-    LOAD 'name ( -- )
-    load program from flash 
-******************************/
+
+/*********************************
+    LOAD 'name' ( i*x -- j*x )
+    load image file previously saved 
+    using SAVE. The file must 
+    have an IMAG signature 
+********************************/
     _HEADER LOAD,4,"LOAD"
     _NEST 
 
     _UNNEST 
 
-
+    
 
     

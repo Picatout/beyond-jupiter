@@ -42,9 +42,9 @@ NOTE:  these blocks will be stored on the flash memory on board of BLACK PILL.
    BLKN[4]
 
    record {
-       updated: byte; 
-       free: byte; 
        block_nbr: word;  
+       updated: byte; 
+       not_used: byte; // this byte is not used   
    }
 
 *******************************/
@@ -62,6 +62,79 @@ NOTE:  these blocks will be stored on the flash memory on board of BLACK PILL.
     _NEXT 
 
 
+/*******************************
+    IN-BUFFER? ( u -- n )
+   check if block u is in 
+   a buffer 
+input:
+    U   block number 
+output: 
+    n   buffer number | -1 
+********************************/
+IN_BUFFERQ: 
+    MOV     T1,#BLKN 
+0:  LDRH    T0,[UP,T1]
+    CMP     T0,TOS 
+    BNE     1f
+    SUB     T1,#BLKN  
+    LSR     TOS,T1,#2  
+    _NEXT 
+1:  ADD     T1,#8
+    CMP     T1,#BLKN+32  
+    BLT     0b    
+    MOV     TOS,#-1 
+    _NEXT 
+
+
+/******************************
+    BUFF-ADR ( n -- a-addr )
+    return address of buffer n 
+input:
+    n       buffer number 
+output:
+    a-addr  buffer address
+******************************/
+    _HEADER BUFF_ADR,8,"BUFF-ADR" 
+    ADD     T0,UP,#BLKB 
+    LSL     TOS,#10 // N*1024 
+    ADD     TOS,T0 
+    _NEXT 
+
+/******************************
+    BUFF-FREE? ( -- n )
+    check for a free buffer 
+output:
+    n       free buffer# | -1 
+*******************************/
+    _HEADER BUFF_FREE,9,"BUFF-FREE"
+    _PUSH 
+    MOV     T0,#BLKN  
+1:  LDRH    T1,[UP,T0]
+    CBZ     T1, 2f 
+    ADD     T0,#4 
+    CMP     T0,#BLKN+16 
+    BLT     1b 
+    MOV     TOS,#-1 
+    _NEXT 
+2:  SUB     TOS,T0,#BLKN     
+    LSR     TOS,#2
+    _NEXT 
+
+
+/*****************************
+    BUFF-NEXT  ( -- n )
+    return the oldest buffer#
+*****************************/
+BUFF_OLD:     
+    _PUSH 
+    EOR     TOS,TOS 
+    EOR     T2,T2 
+    MOV     T0,#BLKN+3 
+1:  LDRB    T1,[UP,T0]
+    CMP     T1,T2 
+    BLT     2f 
+    MOV     T2,T1 
+
 /******************************
     BLOCK ( u -- a-addr )
     select block number u 
@@ -74,8 +147,21 @@ output:
 *********************************/
     _HEADER BLOCK,5,"BLOCK"
     _NEST 
-
+    _ADR    DUPP 
+    _ADR    IN_BUFFERQ
+    _ADR    DUPP 
+    _ADR    ZLESS 
+    _TBRAN  4f 
+    _ADR    OVER  
+    _ADR    BLKID  
+    _ADR    STORE
+    _ADR    BUFF_ADR  
     _UNNEST 
+4:  _ADR    BUFF_FREE 
+    _ADR    DUPP 
+    _ADR    ZLESS 
+    _QBRAN  8f     // free buffer 
+//  no free buffer free one 
 
 
 /********************************
@@ -86,7 +172,7 @@ input:
 output:
     a-addr   address of buffer 
 ********************************/
-    _HEADRE BUFFER,6,"BUFFER"
+    _HEADER BUFFER,6,"BUFFER"
     _NEST 
 
     _UNNEST 
@@ -159,7 +245,7 @@ output:
     _HEADER SRC,3,"SRC"
     _PUSH 
     MOV TOS,UP
-    ADD TOS,SRC 
+    ADD TOS,#SRCID 
     _NEST 
 
 /***************************************

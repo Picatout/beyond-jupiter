@@ -1,6 +1,19 @@
+2022-03-11
+
+* Ajout de **WB-BUFF**, **RD-SECTOR**, **WR-SECTOR** renommé **ERASE-BLK** **ERASE-SECTOR**.
+
+* Travail sur [spi-flash.s](spi-flash.s).
+
+* Retiré [blocks.s](blocks.s) du projet. Je vais utiliser un système de fichier simplifié à la place. Voir [spi-flash.s](spi-flash.s).
+
+* Corrigé mot **BUFFER:** dont la sémantique était incorrecte.
+
+* Ajout d'un tampon write-back **WB_BUFF**  de 4096 octets pour la mémoire flash **W25Q128FV**. Cette taille correspond à celle d'un secteur du **W25Q128FV**. 
+
 2022-03-10
 
 * Continuer travail sur [blocks.s](blocks.s)
+
 2022-03-05
 
 * travail sur [blocks.s](blocks.s)

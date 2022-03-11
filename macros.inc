@@ -50,10 +50,10 @@
 	.equ TIB_SIZE, 80  // 80 bytes,  input transaction buffer size. 
 	.equ SPP ,	RPP-208	/*top of data stack (SP0) groing down */
 	.equ VID_BUFF, SPP-128-32000 /* video buffer */
-	.equ BLK_BUFFS, VID_BUFF-4096 /* reserve 4K for blocks buffers */ 
+	.equ WB_BUFF, VID_BUFF-4096 /* flash memory write back buffer */ 
 	.equ UPP ,	RAM_ADR	 /* start of user area (UP0) */
 	.equ DTOP,  RAM_ADR+0x512 
-	.equ DEND , BLK_BUFFS-4  /*usable RAM end */
+	.equ DEND , WB_BUFF-4  /*usable RAM end */
     .equ MAPOFFSET, RAM_ADR-0x8000200
 
 	.equ COMPO ,	0x040	/*lexicon compile only */ 
@@ -115,11 +115,6 @@
   .equ VFBASE, VFPSW+4 
   .equ BEEP_DTMR, VFBASE+4 // BEEP duration timer 
   .equ CSTATE, BEEP_DTMR+4 // compilation state 
-// BLOCK words extension 
-   .equ BLKID, CSTATE+4  // active block number  
-   .equ BLKN, BLKID+4    // array block#[4]
-   .equ BLKB, BLKN+16    // block buffers base address 
-   .equ SRCID, BLKB+4 
 
 
 /***********************************************
