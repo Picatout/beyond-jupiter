@@ -5134,7 +5134,7 @@ TNAM2:
 	_ADR	COUNT
 	_DOLIT	0x1F
 	_ADR	ANDD			// mask lexicon bits
-	_ADR	SPACE 
+//	_ADR	SPACE 
 	_ADR	TYPEE
 	_UNNEST			// display name string
 DOTI1:
@@ -5209,7 +5209,6 @@ DECOM2:
 	_UNNEST
 .endif 
 
-
 /*********************
     WORDS	( -- )
  	Display the names 
@@ -5217,6 +5216,8 @@ DECOM2:
 *******************************/
 	_HEADER WORDS,5,"WORDS"
 	_NEST
+	_DOLIT  0   
+	_ADR	TOR // columns count 
 	_ADR	CR
 	_ADR	CNTXT
 	_ADR	AT			// only in context
@@ -5224,12 +5225,36 @@ WORS1:
 	_ADR	QDUP			// ?at end of list
 	_QBRAN	WORS2
 	_ADR	DUPP
-	_ADR	SPACE
 	_ADR	DOTID			// display a name
-	_ADR	CELLM
+	_ADR	RFROM   // column count 
+	_ADR	ONEP
+	_ADR	TOR 
+	_DOLIT  5 
+	_ADR	RAT     
+	_ADR	EQUAL 
+	_QBRAN  1f 
+	_ADR	CR 
+	_ADR	RFROM 
+	_ADR	DROP 
+	_DOLIT	0
+	_ADR	TOR  // reset columns counter 
+	_BRAN	2f  
+1:	// add spaces to align column on 16 characters 
+	_DOLIT	16 
+	_ADR	OVER   // CSTRING 
+	_ADR	COUNT 
+	_ADR	SWAP    
+	_ADR	DROP   
+	_DOLIT	0xF  
+	_ADR	ANDD  // limit to 15 characters 
+	_ADR	SUBB
+	_ADR	SPACS  
+2:	_ADR	CELLM
 	_ADR	AT
 	_BRAN	WORS1
 WORS2:
+	_ADR	RFROM 
+	_ADR	DROP 
 	_UNNEST
 
 

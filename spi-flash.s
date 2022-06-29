@@ -289,9 +289,28 @@ input:
     _ADR WAIT_DONE 
     _UNNEST 
 
+/*******************************
+    FREE-SECTOR ( -- a )
+    scan W251128FV for first 
+    free sector 
+output:
+    a   sector address 
+********************************/
+    _HEADER FREE_SECT,11,"FREE-SECTOR"
+    _NEST
+    _DOLIT  0 
+    _ADR    TOR
+1:      
+    _ADR    WB_BUFF 
+    _DOLIT    1
+    _ADR    RAT   
+    _ADR    RD_BLK 
+    
+    _UNNEST 
+
 /******************************
     ERASE-CHIP ( -- )
-    erase all data 
+    erase all data on W25Q128FV
 ******************************/
     _HEADER ERASE_CHIP,10,"ERASE-CHIP"
     _NEST 
@@ -344,8 +363,6 @@ input:
     _BRAN 2f 
 1:  _ADR DUPP 
     _ADR CAT 
-//    _ADR DUPP 
-//    _ADR HDOT
     _ADR WR_BYTE 
     _ADR ONEP
 2:  _DONXT 1b 
@@ -362,7 +379,7 @@ input:
    size: 4 bytes
    sectors count: 4 bytes
    update counter: 4 bytes
-   signature: IMAG for image files, DATA for others  
+   signature: IMAG for image files, TEXT for ASCII file, DATA for others  
    sector size: 4KB 
    free sector: first byte 0xFF 
    erased file: first byte 0xFF
@@ -396,26 +413,26 @@ input:
     _UNNEST 
 
 /*******************************
-    SAVE 'name' ( -- ) 
+    SAVE-IMAG 'name' ( -- ) 
     save current data space image 
     on flash chip. 
     This file can be reloaded 
-    using LOAD 
+    using LOAD-IMAG  
     This file as an IMAG signature  
 ********************************/
-    _HEADER SAVE,4,"SAVE"
+    _HEADER SAVE,9,"SAVE-IMAG"
     _NEST 
 
     _UNNEST 
 
 
 /*********************************
-    LOAD 'name' ( i*x -- j*x )
+    LOAD-IMAG 'name' ( i*x -- j*x )
     load image file previously saved 
     using SAVE. The file must 
     have an IMAG signature 
 ********************************/
-    _HEADER LOAD,4,"LOAD"
+    _HEADER LOAD,9,"LOAD-IMAG"
     _NEST 
 
     _UNNEST 

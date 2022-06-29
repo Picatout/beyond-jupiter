@@ -221,7 +221,7 @@ exponent:
 /**********************************
     FLOAT? ( a -- f# -2 | a 0 )
     parse float number 
-    return a 0 if not float 
+    return ( a 0 ) if not float 
 **********************************/
     _HEADER FLOATQ,6,"FLOAT?"
     _NEST
@@ -253,12 +253,17 @@ exponent:
     _TBRAN get_fraction  
     _DOLIT 'E'
     _ADR  CHARQ 
-    _TBRAN get_exponent 
-    _BRAN error2
+    _QBRAN error2 
+    _DOLIT 0 
+    _ADR    TOR 
+    _BRAN get_exponent 
 expect_dot:
     _DOLIT '.' 
     _ADR CHARQ 
-    _QBRAN error2
+    _TBRAN get_fraction 
+    _DOLIT 0 
+    _ADR TOR  // a 0 a+ cnt- r: base sign fint ffrac 
+    _BRAN try_e 
 get_fraction:
     _ADR OVER 
     _ADR CAT 
@@ -266,9 +271,14 @@ get_fraction:
     _ADR DIGTQ 
     _ADR SWAP 
     _ADR DROP 
-    _QBRAN error2       
+    _TBRAN get_decimals 
+    _DOLIT 0 
+    _ADR    TOR 
+    _BRAN   try_e        
+get_decimals:
     _ADR decimals 
     _ADR  TOR    // a 0 a+ cnt- r: base sign fint ffrac 
+try_e: 
 // if next char is 'E' get exponent 
     _DOLIT 'E' 
     _ADR CHARQ

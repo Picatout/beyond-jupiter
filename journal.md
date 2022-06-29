@@ -1,3 +1,37 @@
+2022-06-28
+
+* commit 21:52
+
+* Corrigé bogue dans [strtofl.s](strtof.s)
+```
+preset ok
+15. 7 f. 15.00000 ok
+1e-7 .s $33D6BF96
+ ok
+7 f. 0.100000E-6 ok
+1.0e-7 .s $33D6BF96
+ ok
+7 f. 0.100000E-6 ok
+```
+
+2022-06-27
+
+* Bogue dans [strtofl.s](strtof.s) 
+```
+15. 15. ?  \ devrait être accepté
+
+1e-7 .s $B3D6BF96     <---|
+ ok                       |
+1.e-7 1.E-7 ?             |
+                          |
+1.0e-7 .s $33D6BF96   <---|    
+ ok
+``` 
+
+* Corrigé bogue dans [ln.f](ln.f).
+
+* Modifié **WORDS** pour un affichage plus ordonné sur 5 colonnes.  
+
 2022-03-11
 
 * Ajout de **WB-BUFF**, **RD-SECTOR**, **WR-SECTOR** renommé **ERASE-BLK** **ERASE-SECTOR**.
@@ -183,7 +217,7 @@ d'un nouveau mot. Cette possibilité existe si **ALLOT** est utilisé avec un ar
 
 * Modifié **RSHIFT** pour LSR au lieu de ASR pour se conformer au standard.
 
-* Corrigé bogue dand **FLOAT?** acceptait la forme **.alpha..** comme float de valeur 0.0. 
+* Corrigé bogue dans **FLOAT?** acceptait la forme **.alpha..** comme float de valeur 0.0. 
 
 * Modifié **ABORT** Selon le standard ce mot n'affiche pas de message. Imprime __" ?"__.
 
