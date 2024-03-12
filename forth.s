@@ -5395,18 +5395,18 @@ PS2_QUERY:
 /*************************
    check PA8 to 
    select console 
-   PA8 -> low  LOCAL 
-   PA8 -> high SERIAL 
+   PA8 -> low  SERIAL
+   PA8 -> high LOCAL  
 *************************/
 IF_SENSE:
 	_NEST 
-	_ADR LOCAL 
+	_ADR SERIAL 
 	_DOLIT (GPIOA_BASE_ADR+GPIO_IDR) 
 	_ADR AT 
 	_DOLIT (1<<8)
 	_ADR ANDD 
 	_QBRAN 9f 
-	_ADR ONEP 
+	_ADR ONEM 
 9:  _ADR CONSOLE 
 	_UNNEST 
 

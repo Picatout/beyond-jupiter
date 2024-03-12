@@ -612,6 +612,16 @@ wait_sws:
     tst r0,#(1<<8)
 	beq 1b 	
 
+/* configure console select pin 
+   PA8 with pullup
+   hi -> local console 
+   low -> serial console (jumper on) 
+*/
+  _MOV32 r0,GPIOA_BASE_ADR // port A 
+  ldr r1,[r0,#GPIO_PUPDR]
+  orr r1,#(1<<(2*8))
+  str r1,[r0,#GPIO_PUPDR]
+
 /* configure audio output 
    PB6 Aout 
    T4-CH1  PWM mode

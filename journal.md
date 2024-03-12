@@ -1,11 +1,13 @@
-2022-07-01
+2024-03-12
+
+* Modifié mot **IF-SENSE** qui lit l'état de **J4** sur l'entrée **PA8**. Lorsque l'entrée est à zéro la console sérielle est sélectionnée.
 
 
 2022-06-28
 
 * commit 21:52
 
-* Corrigé bogue dans [strtofl.s](strtof.s)
+* Corrigé bogue dans [strtof.s](strtof.s)
 ```
 preset ok
 15. 7 f. 15.00000 ok
@@ -19,7 +21,7 @@ preset ok
 
 2022-06-27
 
-* Bogue dans [strtofl.s](strtof.s) 
+* Bogue dans [strtof.s](strtof.s) 
 ```
 15. 15. ?  \ devrait être accepté
 

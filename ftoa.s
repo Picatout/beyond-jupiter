@@ -407,7 +407,7 @@ infinity:
     F. (  f d -- )
     print float32 number  
     f -> float to print 
-    d -> string digits# 
+    d -> string digits#  {1..7}
 ***********************************/
     _HEADER FDOT,2,"F."
     _NEST 
