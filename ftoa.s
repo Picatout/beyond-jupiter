@@ -102,11 +102,11 @@ ITOA:
 
 /*************************
  SCALEUP ( f1 n -- f2 m ) 
- multiply fraction until 
+ multiply f1 until 
  f1 >= 10^n 
  input: 
    f1  float to scale 
-   n  int 10^n limit  
+   n   log10 limit  
  output:
    f2  scaled up float 
    m  log10 exponent scale factor  
@@ -140,7 +140,7 @@ ITOA:
  f < 10^n  
  input:
     f1   float to scale 
-    n    int 10^n limit 
+    n    log10 limit 
  output:
     f2   scaled down float 
     m    log10 reduction factor
@@ -205,14 +205,19 @@ output:
 //    _HEADER FPART,5,"FPART"
 FPART:
     _NEST
+// check if d<= 0 
     _DOLIT 2 
     _ADR PICK 
-    _ADR ZLESS 
-    _QBRAN 1f 
-    _ADR TOR 
+    _ADR ZGREAT
+    _TBRAN 1f 
+0:  _ADR TOR 
     _ADR DROP 
     _BRAN 2f 
-1:   _DOLIT '.' 
+1:
+// fractrion is null skip fraction part 
+    _ADR OVER 
+    _QBRAN 0b 
+     _DOLIT '.' 
     _ADR SWAP 
     _ADR CSTOP 
     _ADR TOR // >r ( d f r: b ) 
@@ -247,18 +252,21 @@ input:
     b   string* buffer 
 output:
     m   decimal exponent 
-    d   digit# to display left 
+    d   digit# remaining to display  
     f   float fraction 
-    b   update str* 
+    b   updated str* 
 ****************************/
 //    _HEADER IPART,5,"IPART"
 IPART: 
     _NEST 
     _ADR TOR // ( -- d f r: b )
     _ADR DUPP 
+// f<1.0 ? 
     _DOLIT fone 
     _ADR FLESS 
     _QBRAN 1f
+// if f<1.0 integer part is '0' 
+// scale up fraction so first non zero digit is rigth of '.' 
     _DOLIT -1 
     _ADR SCALEUP // ( d f -1 -- d f m  )
     _ADR NROT
@@ -268,18 +276,20 @@ IPART:
     _DOLIT fone 
     _ADR FLESS 
     _QBRAN 2f 
-    // first digit '0' 
+// first digit '0' 
     _DOLIT '0' 
     _ADR RFROM 
     _ADR CSTOP 
     _ADR TOR 
-    // decrement d 
+// decrement d 
     _ADR SWAP 
     _ADR ONEM 
     _ADR SWAP 
     _ADR RFROM // r> ( -- m d f b )  
     _UNNEST 
-1:  _ADR OVER 
+1: // f1>=1.0 integer part digits are converted 
+// scale down until mantissa digits count == d
+     _ADR OVER 
     _ADR SCALEDOWN // ( -- d f m r: b)
     _ADR NROT   // m d f r: b 
 2:  _ADR DUPP  // ( -- m d f f r: b )
@@ -294,7 +304,7 @@ IPART:
     _ADR TOR  // >r ( -- m d f b r: u )
     _ADR ROT
     _ADR RFROM // r> ( -- m f b d u ) 
-    _ADR SUBB // ( -- m f b d- )
+    _ADR SUBB // ( -- m f b d- ) digits left to convert 
     _ADR NROT // ( -- m d f b )
     _UNNEST
 
@@ -308,9 +318,9 @@ IPART:
 \   f float to convert 
 \  output: 
 \   b output buffer 
-\    u length of string 
+\   u length of string 
 ****************************************/
-    _HEADER FTOA,3,"F>A" // ( b d f -- b u )
+    _HEADER FTOA,3,"F>A" // (d f b -- b u )
     _NEST 
     _ADR OVER  
     _ADR FEXP 
@@ -329,7 +339,7 @@ IPART:
     // check float sign 
     _ADR OVER  // over ( -- d f b f r: b ) 
     _ADR FSIGN // fsign ( -- d f b 0|-1 r: b )
-    _QBRAN 1f  // 0branch 1f 
+    _QBRAN 1f  // 0branch 1f positive number 
     // negative number add '-' to buffer 
     _ADR SWAP 
     _ADR FABS 
@@ -337,9 +347,9 @@ IPART:
     _DOLIT '-'  // [char] - ( -- d f b+ c r: b )
     _ADR SWAP 
     _ADR CSTOP  // c!+  ( -- d f b+ r: b )
-1:  _ADR IPART  // ( d f b+ -- m d- f- b+ r: b )  
-    _ADR FPART   // ( m d- f- b+ -- m b+ r: b )
-    _ADR EPART    // ( m b+ -- b+ r: b  )
+1:  _ADR IPART  // ( d f b+ -- m d- f- b+ r: b )  integer part 
+    _ADR FPART   // ( m d- f- b+ -- m b+ r: b ) fraction part 
+    _ADR EPART    // ( m b+ -- b+ r: b  ) exponent part
     _ADR RAT 
     _ADR SUBB 
     _ADR RFROM 
@@ -404,18 +414,13 @@ infinity:
 
 
 /***********************************
-    F. (  f d -- )
+    F. (  f -- )
     print float32 number  
     f -> float to print 
-    d -> string digits#  {1..7}
 ***********************************/
     _HEADER FDOT,2,"F."
     _NEST 
-    // limit digits range [1..7]
-    _DOLIT 1 
-    _ADR MAX 
-    _DOLIT 7 
-    _ADR MIN
+    _DOLIT 7  // maximum digit to print 
     _ADR SWAP // ( -- d f )
     // allocate convertion buffer 
     _ADR HERE

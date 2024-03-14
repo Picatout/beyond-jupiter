@@ -1,3 +1,8 @@
+2024-03-15
+
+* Modifié **F.** pour supprimé l'argument digit-count. 
+    * **F. ( f# -- )**  imprime un f# qui est un float32 
+
 2024-03-14
 
 * Réécriture de l'analyseur numérique, i.e. NUMBER? et FLOAT?.
