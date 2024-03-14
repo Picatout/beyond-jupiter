@@ -24,7 +24,7 @@ source: [WeAct black pill V3.1](https://universal-solder.ca/product/stm32f411ceu
     * mémoire RAM 128ko 
     * Fclk maximal  100Mhz 
 
-![dessous](docs/STM32F411-black-pill-v3.1-Pro-new-2.jpg) 
+![dessous](docs/black-pill-v3.1-pro-bottom.jpg) 
 
 La carte que j'ai en main a les composants C15 (100nF) et U3 (25Q128JVSQ, mémoire flash SPI de 16Mo) installés.
 
