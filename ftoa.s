@@ -205,23 +205,25 @@ output:
 //    _HEADER FPART,5,"FPART"
 FPART:
     _NEST
-// check if d<= 0 
-    _DOLIT 2 
+// check if d>0 and f<>0
+    _ADR OVER  
+    _ADR ZNEQU // -- d f b flag  
+    _DOLIT 3 
     _ADR PICK 
     _ADR ZGREAT
+    _ADR ANDD 
     _TBRAN 1f 
 0:  _ADR TOR 
     _ADR DROP 
-    _BRAN 2f 
-1:
-// fractrion is null skip fraction part 
-    _ADR OVER 
-    _QBRAN 0b 
+    _BRAN 2f // no fraction 
+1: // convert fraction  
      _DOLIT '.' 
     _ADR SWAP 
     _ADR CSTOP 
     _ADR TOR // >r ( d f r: b ) 
-1:  _ADR SWAP  
+1:  _ADR QDUP 
+    _QBRAN 2f 
+    _ADR SWAP  
     _ADR QDUP 
     _QBRAN 2f
     _ADR ONEM // 1- ( -- f d- r: b )
