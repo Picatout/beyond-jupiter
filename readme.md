@@ -15,20 +15,22 @@ Le coeur de cet ordinateur est une carte black-pill comprenant un processeur **S
 
 ## BLACK-PILL 
 
-![black-pill](docs/STM32F411CEU6_WeAct_Black_Pill_V3.0-2.jpeg)
+source: [WeAct black pill V3.1](https://universal-solder.ca/product/stm32f411ceu6-black-pill-128m-flash/)
+
+![black-pill](docs/black-pill-v3.1-pro-top.jpg)
 
 * MCU  STM32F411CEU6
     * mémoire FLASH 512Ko
     * mémoire RAM 128ko 
     * Fclk maximal  100Mhz 
 
-![dessous](docs/STM32F411CEU6_WeAct_Black_Pill_V3.0-3.jpg) 
+![dessous](docs/STM32F411-black-pill-v3.1-Pro-new-2.jpg) 
 
 La carte que j'ai en main a les composants C15 (100nF) et U3 (25Q128JVSQ, mémoire flash SPI de 16Mo) installés.
 
 ## Pinout
 
-![board pinout](docs/STM32F4x1_PinoutDiagram_RichardBalint.png)
+![board pinout](docs/blackpill-pro-v3.1-pinout.png)
 
 
 ## Affichage Vidéo 
@@ -45,3 +47,6 @@ La carte que j'ai en main a les composants C15 (100nF) et U3 (25Q128JVSQ, mémoi
 
 * Audio 1 tonalité de fréquence et durée variables.
 
+## Schematic 
+
+![Beyond-Jupiter V.10](docs/schematic.png)

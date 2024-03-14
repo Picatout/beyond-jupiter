@@ -1708,8 +1708,9 @@
     (effects (font (size 2.0066 2.0066)) (justify left bottom))
     (uuid 9de5fee3-faf4-47d9-af27-384950fa1c6d)
   )
-  (text "Beyond-Jupiter\nV1.0" (at 201.93 179.705 0)
-    (effects (font (size 4 4)) (justify left bottom))
+  (text "Beyond-Jupiter\nV1.0\nJacques Deschenes, Copyright 2024"
+    (at 180.975 179.705 0)
+    (effects (font (size 3 3)) (justify left bottom))
     (uuid d30c6390-96af-4308-a3a3-d62f0c53c561)
   )
   (text "PA4,PA5,PA6,PA7\nUSED BY W25Q128\nON board SPI FLASH"
