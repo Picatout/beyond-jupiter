@@ -2384,10 +2384,35 @@ DGTQ1:
 	_UNNEST
 
 
+/************************************
+	D>S ( d -- s )
+if d not in {0x80000001...0x7fffffff} then
+single overflow to 0x80000000
+******************************************/
+	_HEADER DTOS,3,"D>S"
+	_NEST 
+	_ADR QDUP
+	_TBRAN 1f 
+	_UNNEST 
+1:	
+	_DOLIT -1
+	_ADR EQUAL 
+	_ADR OVER 
+	_ADR ZLESS 
+	_ADR ANDD   
+	_QBRAN 2f
+	_UNNEST   
+2:  // overflow
+	_ADR DROP 
+	_DOLIT 0X80000000
+ 	_UNNEST 
+ 
+	
+
 /*****************************************
 	>NUMBER ( ud1 adr1 u1 -- ud2 adr2 u2 )
-  convert unsigned double string 
-  to double integer adding to ud1 
+  convert string to unsigned double 
+  adding to ud1 
 input:
 	ud1  unsiged double 
 	adr1  string address 
@@ -2468,58 +2493,68 @@ NEGQ:
 3:	_NEXT 
 
 
+/************************
+	SET_BASE ( a cnt -- a++ cnt- )
+ check for base modifier 
+ $ -> hexadecimal 
+ ? -> binary 
+*************************/
+SET_BASE:
+	_NEST 
+	_DOLIT  '$' 
+	_ADR    CHARQ 
+	_QBRAN  1f 
+// hexadecimal number 
+	_ADR    HEX
+	_UNNEST 
+1:  _DOLIT  '%'   // -- a cnt '%'
+	_ADR	CHARQ  // -- a cnt f 
+	_QBRAN 2f
+// binary number
+	_ADR	BIN 
+2:	_UNNEST
+
 
 /**********************************
-    INT?	( a -- n T | a F )
+    INT?	( a -- a+ cnt- n )
  	parse string  at 'a' for 
-	integer. Push a flag on TOS.
-	integer form:
+	integer. Accept double  
+	but convert to single 
+	with possible overflow 
+	integer forms:
 		[-]hex_digit+  | 
 		$[-]hex_digit+ |
 		%[-]bin_digit+ | 
 		[-]dec_digit+ 
+	output:
+		a+ updated string pointer 
+		cnt- updated not parsed count 
+		n  integer  	
 **********************************/
 	_HEADER INTQ,4,"INT?"
 	_NEST
-// save BASE 	
-	_ADR	BASE
-	_ADR	AT
-	_ADR	TOR
-	_DOLIT	0      // a 0 
-	_ADR	OVER   // a 0 a 
-	_ADR	COUNT  // a 0 a+ cnt 
-	_DOLIT  '$' 
-	_ADR    CHARQ 
-	_QBRAN  0f 
-// hexadecimal number 
-	_ADR    HEX
-	_BRAN   2f 
-0:  _DOLIT  '%'   // -- a 0 a cnt '%'
-	_ADR	CHARQ  // -- a 0 a cnt f 
-	_QBRAN  2f
-	_ADR	BIN 
-2: // check if negative number 
+// save BASE 
+	_ADR BASE 
+	_ADR AT 
+	_ADR TOR 
+	_ADR	COUNT  // a+ cnt 
+// check for base prefix 	
+	_ADR	SET_BASE 
+2: // check for sign 
+   // a and cnt modified if '-'|'+'
 	_ADR    NEGQ 
-	_ADR	TOR  // -- a 0 a+ cnt- R: sign 
+	_ADR	TOR  // -- a+ cnt- R: sign 
+// initialize double integer to 0 
 	_DOLIT  0
 	_ADR	DUPP 
-	_ADR	DSWAP // a 0 0 0 a+ cnt- R: sign 
-	_ADR    TONBR // a 0 d a+ cnt 
-	_QBRAN  2f
-    // not an integer 
-	_ADR RFROM // a 0 d a sign  
-	_ADR DDROP 
-	_ADR DDROP 
-	_BRAN 7f 
-2: // valid integer 
-	_ADR	DROP // a 0 d
-	_ADR    DSWAP 
-	_ADR    DDROP 
-	_ADR    DROP  // d>s 
-	_ADR    RFROM // n sign 
-	_QBRAN  2f
-	_ADR    NEGAT   
-2:	_DOLIT  -1 
+	_ADR	DSWAP // d a+ cnt- R: sign 
+// parse all integer digits 
+	_ADR    TONBR // d a+ cnt- 
+	_ADR	DSWAP 
+	_ADR	RFROM 
+	_QBRAN 3f 
+	_ADR   DNEGA 
+3:  _ADR   DTOS
 7: // restore BASE 
 	_ADR	RFROM
 	_ADR	BASE
@@ -2531,18 +2566,40 @@ NEGQ:
     NUMBER? ( a -- int -1 | float -2 | a 0 )
     parse number, integer or float 
     if not a number return ( a 0 ) 
-    if integer return ( int -1 ) 
-    if float return ( float -2 )
+    if i return ( integer -1 ) 
+	if float return ( float -2 )
 **********************************/
     _HEADER NUMBERQ,7,"NUMBER?"
-    _NEST 
-    _ADR INTQ
-    _ADR QDUP 
-    _QBRAN 2f 
+    _NEST
+	_ADR DUPP 
+	_ADR TOR  // R: a 
+    _ADR INTQ // a -- a+ cnt- n  
+    _ADR TOR  // -- a+ cnt- R: a n 
+	_ADR QDUP
+    _TBRAN 2f
+// all string parsed 	
+	_ADR DROP
+	_DOLIT 0X80000000
+	_ADR RAT 
+	_ADR EQUAL 
+	_TBRAN 1f  
+	_ADR RFROM 
+	_DOLIT -1  
+	_ADR RFROM 
+	_ADR DROP 
+	_UNNEST  
+1: // integer overflow 
+	_ADR RFROM // a n  
+	_ADR DROP  
+	_ADR RFROM // A 
+	_DOLIT 0 
+	_UNNEST 
+2: // try float
+	_ADR RFROM // a+ cnt- n 
+	_ADR PRESE
+	_ADR RFROM // a -- 
+    _ADR FLOATQ
     _UNNEST 
-2:  _ADR FLOATQ
-    _UNNEST 
-
 
 /********************
   console I/O

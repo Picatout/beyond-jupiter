@@ -162,10 +162,8 @@ integer:
     _ADR DUPP 
     _ADR DSWAP // 0 0 a cnt 
     _ADR TONBR // d a+ cnt- 
-    _ADR DTOR 
-    _ADR DROP // drop hi word 
-    _ADR DRFROM // i a+ cnt-  
-    _ADR ROT  // a+ cnt- i
+    _ADR DSWAP 
+    _ADR DTOS 
     _ADR STOF 
     _UNNEST 
 
@@ -184,7 +182,7 @@ decimals:
     _ADR DSWAP 
     _ADR TONBR // -- d a+ cnt-  
     _ADR DSWAP  // a+ cnt- d
-    _ADR DROP   // a+ cnt- i 
+    _ADR DTOS   // a+ cnt- i 
     _ADR STOF  // convert integer to float 
     _ADR RFROM  // a+ cnt- f# cnt 
     _DOLIT 2 
@@ -209,8 +207,8 @@ exponent:
     _ADR DUPP 
     _ADR DSWAP // 0 0 a cnt  
     _ADR TONBR // d a cnt   
-    _ADR DSWAP
-    _ADR DROP  // hi word 
+    _ADR DSWAP 
+    _ADR DTOS  
     _ADR RFROM 
     _QBRAN 1f 
     _ADR NEGAT 
@@ -232,57 +230,50 @@ exponent:
     _ADR TOR 
     // use decimal base  
     _ADR DECIM 
-	_DOLIT	0      // failed flag   
-	_ADR	OVER   // a 0 a     R: base
-    _ADR	COUNT  // a 0 a+ cnt  // cnt is length of string 
-// check for '-'|'+' save sign on R: 
+    // save string pointer 
+	_ADR DUPP 
+    _ADR TOR // base a 
+    _ADR	COUNT  // a+ cnt  // cnt is length of string 
+// check for '-'|'+' save sign on R 
     _ADR   NEGQ
-    _ADR   TOR // -- a 0 a+ cnt-  R: base sign 
-    _ADR   DUPP 
-    _ADR   TOR  // a 0 a+ cnt r: base sign cnt 
-    _ADR  integer // a 0 a+ cnt- fint 
-    _ADR  OVER  
-    _ADR  RFROM  
-    _ADR  EQUAL
-    _ADR  SWAP
-    _ADR  TOR  //  a 0 a+ cnt- flag r: base sign fint  
-    _TBRAN expect_dot  
-// must be '.' or 'E'     
-    _DOLIT '.' 
-    _ADR CHARQ
-    _TBRAN get_fraction  
-    _DOLIT 'E'
-    _ADR  CHARQ 
-    _QBRAN error2 
+    _ADR   TOR // -- a+ cnt-  R: base a sign 
+// check if begin with '.'
     _DOLIT 0 
-    _ADR    TOR 
-    _BRAN get_exponent 
-expect_dot:
+    _ADR TOR  // r: base a sign fint 
     _DOLIT '.' 
     _ADR CHARQ 
-    _TBRAN get_fraction 
-    _DOLIT 0 
-    _ADR TOR  // a 0 a+ cnt- r: base sign fint ffrac 
-    _BRAN try_e 
-get_fraction:
-    _ADR OVER 
-    _ADR CAT 
-    _DOLIT 10
-    _ADR DIGTQ 
-    _ADR SWAP 
+    _TBRAN get_decimals
+// if 'E' error 
+    _DOLIT 'E' 
+    _ADR CHARQ 
+    _TBRAN error2 
+// drop fint 
+    _ADR RFROM 
     _ADR DROP 
-    _TBRAN get_decimals 
+    _ADR  integer // a+ cnt- fint 
+    _ADR  TOR  //  a 0 a+ cnt- flag r: base a sign fint  
+// must be '.' | 'E'     
+    _DOLIT '.' 
+    _ADR CHARQ
+    _TBRAN get_decimals   
+    _DOLIT 'E'
+    _ADR  CHARQ 
+    _QBRAN error2 // r: base a sign fint 
     _DOLIT 0 
-    _ADR    TOR 
-    _BRAN   try_e        
+    _ADR TOR  // r: base a sign fint ffrac 
+    _BRAN get_exponent 
 get_decimals:
     _ADR decimals 
     _ADR  TOR    // a 0 a+ cnt- r: base sign fint ffrac 
+    _ADR DUPP 
+    _QBRAN f_done 
 try_e: 
 // if next char is 'E' get exponent 
     _DOLIT 'E' 
     _ADR CHARQ
-    _TBRAN get_exponent 
+    _TBRAN get_exponent
+    _BRAN error3 
+f_done: 
     _DOLIT fzero 
     _ADR TOR   // a 0 a+ cnt- r: base sign fint ffrac fexp 
     _BRAN build_float
@@ -291,8 +282,7 @@ get_exponent:
     _ADR TOR   // a 0 a+ cnt- r: base sign fint ffrac exp 
     _ADR DUPP 
     _TBRAN error4   // count must be 0 
-build_float: // a 0 a+ cnt- R: base sign fint fdec exp 
-    _ADR DDROP 
+build_float: // a+ cnt- R: base a sign fint fdec exp 
     _ADR DDROP 
     _ADR RFROM 
     _ADR DRFROM 
@@ -303,21 +293,25 @@ build_float: // a 0 a+ cnt- R: base sign fint fdec exp
     _DOLIT fminus1
     _ADR FSTAR 
 1:  _DOLIT -2 
+    _ADR RFROM 
+    _ADR DROP 
     _BRAN restore_base  
-error2: // a 0 a cnt R: base sign fint 
+error2: // a cnt R: base a sign fint 
     _ADR DDROP  
     _BRAN e4  
-error3: // a 0 a cnt R: base sign fint fdec  
-    _ADR DDROP  // a 0 a R: base sign
+error3: // a cnt R: base a sign fint fdec  
+    _ADR DDROP  // -- R: base a sign
     _ADR RFROM 
     _ADR DROP 
     _BRAN e4  
-error4: // a 0 a+ cnt- r: base sign fint ffrac fexp  
+error4: // a+ cnt- r: base sign fint ffrac fexp  
     _ADR DDROP 
     _ADR DRFROM 
     _ADR DDROP 
 e4: _ADR DRFROM 
-    _ADR DDROP 
+    _ADR DDROP    
+    _ADR RFROM 
+    _DOLIT 0  
 restore_base: 
     _ADR RFROM 
     _ADR BASE 

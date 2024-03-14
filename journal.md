@@ -1,7 +1,24 @@
+2024-03-14
+
+* Réécriture de l'analyseur numérique, i.e. NUMBER? et FLOAT?.
+
+2024-03-13
+
+* Réécriture de l'analyseur numérique, i.e. NUMBER? et FLOAT?.
+
+* Ajout du mot **D>S**. 
+
 2024-03-12
 
 * Modifié mot **IF-SENSE** qui lit l'état de **J4** sur l'entrée **PA8**. Lorsque l'entrée est à zéro la console sérielle est sélectionnée.
 
+* Modification à jour schématique. 
+
+* Réécriture de l'analyseur numérique, i.e. NUMBER? et FLOAT?.
+
+2024-03-08
+
+* Modfication schématique.
 
 2022-06-28
 
