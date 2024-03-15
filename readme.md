@@ -51,6 +51,10 @@ La carte que j'ai en main a les composants C15 (100nF) et U3 (25Q128JVSQ, mémoi
 
 ![Beyond-Jupiter V.10](docs/schematic.png)
 
+## Prototype 
+
+![prototype](docs/prototype.jpg)
+
 ## Pour compiler 
 ```
 jacques@picatout:~/github/beyond-Jupiter$ make -B
@@ -113,3 +117,14 @@ EraseFlash - Sector:0x1 Size:0x4000 2024-03-14T21:14:23 INFO common.c: Flash pag
 2024-03-14T21:14:23 INFO common.c: Starting verification of write complete
 2024-03-14T21:14:23 INFO common.c: Flash written and verified! jolly good!
 ```
+
+## Utilisation 
+
+L'ordinateur peut-être utilisé de 2 façons 
+
+* **remote console**  Jumper **J4** fermé. Pour l'utiliser de cette façon il faut le relié au PC par le port sériel configuré en 115200 BAUDS 8N1 et utiliser un émulateur de terminal sur le PC. Mode texte seulement.
+
+* **local console** Jumper **J4** ouvert. Pour l'utiliser avec un téléviseur avec entrée NTSC et un clavier PS/2. Dans ce cas le mode graphique est disponbile. Dans ce mode l'affichage texte est de 25 lignes de 53 caractères. 
+
+Il est possible de commuter d'un mode à l'autre avec les commandes **REMOTE CONSOLE** et **LOCAL CONSOLE**. 
+
