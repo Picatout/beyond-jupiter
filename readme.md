@@ -67,7 +67,8 @@ arm-none-eabi-objdump -D build/stm32eforth.elf > build/stm32eforth.dasm
 Un petit programmeur économique comme celui-ci fait très bien l'affaire.
 ![stlink-v2](docs/stlink-v2.jpg).
 
-Dans le Makefile les variables suivante indique le type de programmeur installé et leur numéro de série. Ces paramètres doivent-être ajustés pour chaque STLINK V2 utilisé.
+Dans le Makefile les variables suivantes indiquent le type de programmeur utilisé et le numéro de série. Ces paramètres doivent-être ajustés pour en fonction STLINK V2 utilisé.
+
 
 ```
 # programmer
@@ -79,6 +80,19 @@ STV3_PROG_SN=
 SERIAL=$(STV2_DUNGLE)
 ```
 
+Pour connaître le numéro de série du programmeur
+```
+jacques@picatout:~/github/beyond-Jupiter$ st-info --probe
+Found 1 stlink programmers
+  version:    V2J40S7
+  serial:     48FF6E066772574857351967
+  flash:      524288 (pagesize: 16384)
+  sram:       131072
+  chipid:     0x0431
+  descr:      stm32f411re
+```
+
+Pour flasher le binaire 
 ```
 jacques@picatout:~/github/beyond-Jupiter$ make flash
 ************************
