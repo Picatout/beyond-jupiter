@@ -5286,7 +5286,14 @@ WORS1:
 	_ADR	RFROM   // column count 
 	_ADR	ONEP
 	_ADR	TOR 
-	_DOLIT  5 
+	_DOLIT  4 
+	_ADR	TSTDOUT 
+	_ADR	AT 
+	_DOLIT	TV_EMIT
+	_ADR	EQUAL 
+	_QBRAN	1f 
+	_ADR	ONEM 
+1:
 	_ADR	RAT     
 	_ADR	EQUAL 
 	_QBRAN  1f 
