@@ -51,7 +51,21 @@ La carte que j'ai en main a les composants C15 (100nF) et U3 (25Q128JVSQ, mémoi
 
 ![Beyond-Jupiter V.10](docs/schematic.png)
 
+## Pour compiler 
+```
+jacques@picatout:~/github/beyond-Jupiter$ make -B
+rm -f build/*
+arm-none-eabi-as  -march=armv7m -mfpu=vfpv4 -mfloat-abi=hard  -a=build/stm32eforth.lst init.s environment.s ser-term.s tvout.s ps2_kbd.s spi-flash.s fpu.s strtof.s ftoa.s forth.s  -g -obuild/stm32eforth.o
+arm-none-eabi-ld -T stm32f411ce.ld  -g build/stm32eforth.o -o build/stm32eforth.elf
+arm-none-eabi-objcopy -O binary build/stm32eforth.elf build/stm32eforth.bin 
+arm-none-eabi-objdump -D build/stm32eforth.elf > build/stm32eforth.dasm
+arm-none-eabi-objdump -D build/stm32eforth.elf > build/stm32eforth.dasm
+```
+
 ## Flasher le binaire 
+
+Un petit programmeur économique comme celui-ci fait très bien l'affaire.
+![stlink-v2](docs/stlink-v2.jpg).
 
 Dans le Makefile les variables suivante indique le type de programmeur installé et leur numéro de série. Ces paramètres doivent-être ajustés pour chaque STLINK V2 utilisé.
 
@@ -63,4 +77,25 @@ SMALL_DUNGLE=48FF6E066772574857351967
 STV2_DUNGLE=$(SMALL_DUNGLE)
 STV3_PROG_SN=
 SERIAL=$(STV2_DUNGLE)
+```
+
+```
+jacques@picatout:~/github/beyond-Jupiter$ make flash
+************************
+	 FLASHING DEVICE       
+************************
+st-flash  --serial=48FF6E066772574857351967   write build/stm32eforth.bin 0x8000000
+st-flash 1.7.0
+2024-03-14T21:14:22 INFO common.c: stm32f411re: 128 KiB SRAM, 512 KiB flash in at least 16 KiB pages.
+file build/stm32eforth.bin md5 checksum: 3c52bf457f28dd76db5e2a525052fa8a, stlink checksum: 0x001e7956
+2024-03-14T21:14:22 INFO common.c: Attempting to write 28308 (0x6e94) bytes to stm32 address: 134217728 (0x8000000)
+EraseFlash - Sector:0x0 Size:0x4000 2024-03-14T21:14:22 INFO common.c: Flash page at addr: 0x08000000 erased
+EraseFlash - Sector:0x1 Size:0x4000 2024-03-14T21:14:23 INFO common.c: Flash page at addr: 0x08004000 erased
+2024-03-14T21:14:23 INFO common.c: Finished erasing 2 pages of 16384 (0x4000) bytes
+2024-03-14T21:14:23 INFO common.c: Starting Flash write for F2/F4/F7/L4
+2024-03-14T21:14:23 INFO flash_loader.c: Successfully loaded flash loader in sram
+2024-03-14T21:14:23 INFO flash_loader.c: Clear DFSR
+2024-03-14T21:14:23 INFO common.c: enabling 32-bit flash writes
+2024-03-14T21:14:23 INFO common.c: Starting verification of write complete
+2024-03-14T21:14:23 INFO common.c: Flash written and verified! jolly good!
 ```
