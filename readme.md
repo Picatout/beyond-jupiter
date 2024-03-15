@@ -67,7 +67,7 @@ arm-none-eabi-objdump -D build/stm32eforth.elf > build/stm32eforth.dasm
 Un petit programmeur économique comme celui-ci fait très bien l'affaire.
 ![stlink-v2](docs/stlink-v2.jpg).
 
-Dans le Makefile les variables suivantes indiquent le type de programmeur utilisé et le numéro de série. Ces paramètres doivent-être ajustés pour en fonction STLINK V2 utilisé.
+Dans le Makefile les variables suivantes indiquent le type de programmeur utilisé et le numéro de série. Ces paramètres doivent-être ajustés en fonction STLINK V2 utilisé.
 
 
 ```
