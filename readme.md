@@ -122,9 +122,9 @@ EraseFlash - Sector:0x1 Size:0x4000 2024-03-14T21:14:23 INFO common.c: Flash pag
 
 L'ordinateur peut-être utilisé de 2 façons 
 
-* **remote console**  Jumper **J4** fermé. Pour l'utiliser de cette façon il faut le relié au PC par le port sériel configuré en 115200 BAUDS 8N1 et utiliser un émulateur de terminal sur le PC. Mode texte seulement.
+* **remote console**  Jumper **J4** fermé. Pour l'utiliser de cette façon il faut le relier au PC par le port sériel configuré en 115200 BAUDS 8N1 et utiliser un émulateur de terminal sur le PC. Mode texte seulement.
 
-* **local console** Jumper **J4** ouvert. Pour l'utiliser avec un téléviseur avec entrée NTSC et un clavier PS/2. Dans ce cas le mode graphique est disponbile. Dans ce mode l'affichage texte est de 25 lignes de 53 caractères. 
+* **local console** Jumper **J4** ouvert. Pour l'utiliser avec un téléviseur avec entrée **NTSC composite** et un clavier **PS/2**. Dans ce cas le mode graphique est disponbile. Dans ce mode l'affichage texte est de 25 lignes de 53 caractères. 
 
 Il est possible de commuter d'un mode à l'autre avec les commandes **REMOTE CONSOLE** et **LOCAL CONSOLE**. 
 
